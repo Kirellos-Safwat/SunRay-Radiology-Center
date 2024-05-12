@@ -44,4 +44,29 @@ CREATE TABLE Report (
   R_Image varchar(100),
   Billing INT
 );
+CREATE TABLE Treats (
+                        P_ID INT,
+                        Device_ID INT,
+                        FOREIGN KEY (P_ID) REFERENCES Patient(P_ID),
+                        FOREIGN KEY (Device_ID) REFERENCES Radiology_Equipment(Device_ID),
+                        PRIMARY KEY (P_ID, Device_ID)
+);
+CREATE TABLE Manipulates (
+                             Admin_ID INT,
+                             Device_ID INT,
+                             D_ID INT,
+                             P_ID INT,
+                             FOREIGN KEY (Admin_ID) REFERENCES Admin(Admin_ID),
+                             FOREIGN KEY (Device_ID) REFERENCES Radiology_Equipment(Device_ID),
+                             FOREIGN KEY (P_ID) REFERENCES Patient(P_ID),
+                             FOREIGN KEY (D_ID) REFERENCES Radiologist(D_ID),
+                             PRIMARY KEY (Admin_ID, Device_ID, D_ID, P_ID)
+);
+CREATE TABLE Diagnosed_By (
+                              Device_ID INT,
+                              P_ID INT,
+                              FOREIGN KEY (Device_ID) REFERENCES Radiology_Equipment(Device_ID),
+                              FOREIGN KEY (P_ID) REFERENCES Patient(P_ID),
+                              PRIMARY KEY (P_ID, Device_ID)
+);
 
