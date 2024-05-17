@@ -33,7 +33,10 @@
 
                 {{ form.Password_Confirmation.label }}
                 {{ form.Password_Confirmation(class="form-control",placeholder="Confirm Password") }}
-                <br>
+                <div class="mb-3">
+                    <label for="profile_photo" class="form-label">Profile Photo</label>
+                    <input type="file" class="form-control" id="profile_photo" name="profile_photo">
+                </div>
                 {{ form.submit(class="btn btn-lg btn-block btn-success") }}
             </form>
             <div class="text-center mt-5" style = "position:relative;  top:-88px; left: 85px; color:black">

@@ -14,9 +14,13 @@ class Credentials(db.Model, UserMixin):
     lname = db.Column(db.String(length=15), nullable=False)
     email = db.Column(db.String(length=30), nullable=False, unique=True)
     phone = db.Column(db.String(length=13), nullable=False, unique=True)
-    password_hash = db.Column(db.String(length=60), nullable=False)  # Will be changed later to false
+    password = db.Column(db.String(length=60), nullable=False)  # Will be changed later to false
     profile_picture = db.Column(db.String(length=255))
     is_admin = db.Column(db.Boolean(), default=False)
+    facebook = db.Column(db.String(length=255))
+    twitter = db.Column(db.String(length=255))
+    instagram = db.Column(db.String(length=255))
+    linkedin = db.Column(db.String(length=255))
 
     @property
     def password(self):
@@ -32,3 +36,17 @@ class Credentials(db.Model, UserMixin):
 
 def __repr__(self):
     return f'Credentials {self.fname}'
+
+class Radiology_Equipment(db.Model, UserMixin):
+    Device_ID = db.Column(db.Integer(), primary_key=True)
+    device_name = db.Column(db.String(length=15), nullable=False)
+    Commission_Date = db.Column(db.String(length=15), nullable=False)
+    Maintenance_Date = db.Column(db.String(length=15), nullable=False)
+
+class appointments(db.Model, UserMixin):
+    A_ID = db.Column(db.Integer(), primary_key=True)
+    P_ID = db.Column(db.Integer(), db.ForeignKey('patient.P_ID'), nullable=False)
+    D_ID = db.Column(db.Integer(), db.ForeignKey('radiologist.D_ID'),nullable=False)
+    device_name = db.Column(db.String(length=15),db.ForeignKey('radiology_equipment.device_name'), nullable=False)
+    Device_ID = db.Column(db.String(length=15),db.ForeignKey('radiology_equipment.Device_ID'), nullable=False)
+    date = db.Column(db.String(length=15), nullable=False)
