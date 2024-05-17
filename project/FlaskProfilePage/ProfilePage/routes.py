@@ -85,6 +85,9 @@ def profile_page():
     data = session.get('user_data')
     if data is None:
         return redirect('/login')
+    if os.name == 'nt' and data['profile_picture'] != None:
+        data['profile_picture'] = data['profile_picture'].replace("\\", "/")
+        print(data['profile_picture'])
     return render_template('profile.html', data=data)
 
 
