@@ -5,13 +5,16 @@ from flask import render_template, redirect, url_for, flash, session
 from werkzeug.utils import secure_filename
 import os
 from flask import request
-from ProfilePage.models import Credentials
+
 @app.route('/')  # that is the root url of the website
 @app.route('/home')
 def home_page():
     return render_template('home.html')
 
 
+# os.getcwd() might change from devide to device i think , based on your cwd: current working directory
+
+# UPLOAD_FOLDER = os.path.join(os.getcwd(), "project/FlaskProfilePage/ProfilePage/static/uploads")
 UPLOAD_FOLDER = os.path.join(os.getcwd(), "project", "FlaskProfilePage", "ProfilePage", "static", "uploads")
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
@@ -42,7 +45,8 @@ def registration_page():
         if form.validate_on_submit():
             cursor.execute(
                 "INSERT INTO Credentials (fname, lname, email, phone, password, profile_picture ,is_admin) VALUES (%s, %s, %s, %s, %s, %s , %s)",
-                (fname, lname, email, phone, password, relative_photo_path, is_admin)
+                (fname, lname, email, phone, password, relative_photo_path,is_admin)
+                
 
             )
             connection.commit()
@@ -161,21 +165,3 @@ def edit_profile():
         return redirect(url_for('login_page'))  # Redirect to login to refresh
 
     return render_template('edit_profile.html', data=data, form=form)
-
-
-@app.route('/BookAppointment', methods=['GET', 'POST'])
-def appointment_page():
-    form = AppointmentForm()
-    data = session.get('user_data')
-    if request.method == 'POST' and form.validate_on_submit():
-        user = Credentials.query.filter_by(id=data['id']).first()
-
-        # Update user information
-        user.fname = form.First_Name.data
-        user.lname = form.Last_Name.data
-        user.email = form.Email.data
-        user.phone = form.Phone_Number.data
-        db.session.commit()
-        flash('Your appointment has been booked successfully!', category='success')
-        return redirect(url_for('home_page'))
-    return render_template('appointment.html', form=form, data=data)
