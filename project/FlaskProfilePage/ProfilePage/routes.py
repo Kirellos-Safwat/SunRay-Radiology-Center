@@ -1,5 +1,5 @@
 import psycopg2.extras
-from ProfilePage.forms import RegisterForm, LoginForm , EditProfileForm
+from ProfilePage.forms import RegisterForm, LoginForm , EditProfileForm , PatientRegisterForm
 from ProfilePage import app, db, connection , connection_string
 from flask import render_template, redirect, url_for, flash, session
 from werkzeug.utils import secure_filename
@@ -166,5 +166,177 @@ def edit_profile():
 
         flash('Your profile has been updated successfully! Please login again', category='success')
         return redirect(url_for('login_page'))  # Redirect to login to refresh
+
+    return render_template('edit_profile.html', data=data, form=form)
+#######################################################################
+@app.route('/patient-register', methods=['GET', 'POST'])
+def patient_registration_page():
+    form = PatientRegisterForm()
+    if form.validate_on_submit():
+        fname = form.First_Name.data
+        lname = form.Last_Name.data
+        email = form.Email.data
+        phone = form.Phone_Number.data
+        password = form.Password.data
+
+        profile_photo = form.profile_photo.data
+        if profile_photo:
+            filename = secure_filename(profile_photo.filename)
+            profile_photo_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            profile_photo.save(profile_photo_path)
+            relative_photo_path = os.path.join('uploads', filename)
+        else:
+            relative_photo_path = None
+
+        connection = psycopg2.connect(connection_string)
+        cursor = connection.cursor()
+        cursor.execute(
+            "INSERT INTO Patient (fname, lname, email, phone, password, profile_picture) VALUES (%s, %s, %s, %s, %s, %s)",
+            (fname, lname, email, phone, password, relative_photo_path)
+        )
+        connection.commit()
+        cursor.close()
+        connection.close()
+
+        flash('Registration successful. Please log in.', category='success')
+        return redirect('/patient-login_page')
+
+    return render_template('registration.html', form=form)
+
+
+@app.route('/patient-login_page', methods=['GET', 'POST'])
+def patient_login_page():
+    if request.method == 'POST':
+        email = request.form['Email']
+        password = request.form['Password']
+        cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
+        cursor.execute(
+            "SELECT * FROM patient WHERE email = %s AND password = %s",
+            (email, password)
+        )
+        user = cursor.fetchone()
+
+        if user:
+            session['user_data'] = dict(user)
+            cursor.close()  # Close the cursor once
+            return redirect('/patient-profile')
+        else:
+            flash('Incorrect Email or password. Please try again.', category='danger')
+
+    return render_template('patient-login.html', form=LoginForm())
+
+@app.route('/patient-profile')
+def patient_profile_page():
+    data = session.get('user_data')
+    
+    cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
+    # Fetch appointments for the current user's ID
+    cursor.execute("""
+        SELECT appointments.*, radiologist.d_name
+        FROM appointments
+        JOIN radiologist ON appointments.D_ID = radiologist.d_id
+        WHERE P_ID = %s
+    """, (data['id'],))
+    appointments = cursor.fetchall()
+    cursor.close()
+    
+    ############################################
+    scans_folder = "patient" + str(data['id']) # make a folder for each patient
+    scans_path = os.path.join(app.config['UPLOAD_FOLDER'], scans_folder)
+    if  os.path.exists(scans_path):
+        scan_Files = os.listdir(scans_path) ## must be absolute path
+    else:
+        scan_Files = []
+    ############################################
+    
+    if data is None:
+        return redirect('/patient-login')
+    return render_template('patient-profile.html', data=data , scan_Files = scan_Files, appointments=appointments)
+
+@app.route('/upload_scan', methods=['GET', 'POST'])
+def patient_upload_scan():
+    data = session.get('user_data')
+    scans_folder = "patient" + str(data['id']) # make a folder for each patient
+    scans_path = os.path.join(app.config['UPLOAD_FOLDER'], scans_folder)
+    if data is None:
+        return redirect('/patient-login')
+    
+    if not os.path.exists(scans_path):
+        os.makedirs(scans_path)
+    else:
+        scan_files = os.listdir(scans_path)
+    
+    if request.method == 'POST':
+        scan_file = request.files['scan_file']
+        if scan_file and scan_file.filename != '':
+            filename = secure_filename(scan_file.filename)
+            scan_file_path = os.path.join(scans_path, filename)
+            scan_file.save(scan_file_path)
+            flash('Scan uploaded successfully!', category='success')
+        else:
+            flash('No scan file selected!', category='danger')
+    
+    scan_files = [] # this list stores paths to the scan files
+    if os.path.exists(scans_path):
+        scan_files = os.listdir(scans_path)
+    relative_scan_folder = os.path.join('uploads', scans_folder)
+    cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
+    cursor.execute(
+         "UPDATE patient SET scans = %s WHERE id = %s",
+            (relative_scan_folder, data['id'])
+    )# insert to the specific patient
+    connection.commit()
+    cursor.close()
+    
+    return render_template('upload_scan.html', data=data, scan_files=scan_files)
+
+@app.route('/patient-edit_profile', methods=['GET', 'POST'])
+def patient_edit_profile():
+    form = EditProfileForm()
+    data = session.get('user_data')
+
+    if request.method == 'POST' and form.validate_on_submit():
+        updated_data = {
+            'fname': form.First_Name.data,
+            'lname': form.Last_Name.data,
+            'email': form.Email.data,
+            'phone': form.Phone_Number.data,
+            'gender': form.Gender.data,
+            'age': form.Age.data,
+            'address': form.Address.data,
+            'is_admin': True if form.Email.data.endswith('@company.com') else False,
+            
+        }
+
+        profile_photo = form.profile_photo.data
+
+        if profile_photo:
+            filename = secure_filename(profile_photo.filename)
+            profile_photo_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            profile_photo.save(profile_photo_path)
+            relative_photo_path = os.path.join('uploads', filename)
+            updated_data['profile_picture'] = relative_photo_path
+        else:
+            updated_data['profile_picture'] = data['profile_picture']
+
+        # Update user information in the database
+        connection = psycopg2.connect(connection_string)
+        cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
+        update_query = """
+            UPDATE patient
+            SET fname = %(fname)s, lname = %(lname)s, email = %(email)s,
+                phone = %(phone)s, gender = %(gender)s, age = %(age)s, address = %(address)s,
+                profile_picture = %(profile_picture)s
+            WHERE id = %(id)s;
+        """
+        updated_data['id'] = data['id']
+
+        cursor.execute(update_query, updated_data)
+        connection.commit()
+        cursor.close()
+        connection.close()
+
+        flash('Your profile has been updated successfully! Please login again', category='success')
+        return redirect((('/patient-login_page') )) # Redirect to login to refresh
 
     return render_template('edit_profile.html', data=data, form=form)

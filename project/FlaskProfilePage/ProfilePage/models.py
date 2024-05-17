@@ -50,3 +50,22 @@ class appointments(db.Model, UserMixin):
     device_name = db.Column(db.String(length=15),db.ForeignKey('radiology_equipment.device_name'), nullable=False)
     Device_ID = db.Column(db.String(length=15),db.ForeignKey('radiology_equipment.Device_ID'), nullable=False)
     date = db.Column(db.String(length=15), nullable=False)
+
+class Patient(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    phone = db.Column(db.String(20))
+    name = db.Column(db.String(100))
+    gender = db.Column(db.String(10))
+    age = db.Column(db.Integer)
+    address = db.Column(db.String(200))
+    time = db.Column(db.DateTime)
+    password = db.Column(db.String(100))
+    email = db.Column(db.String(100), unique=True)
+    fname = db.Column(db.String(100))
+    lname = db.Column(db.String(100))
+    number = db.Column(db.String(20))
+    profile_picture = db.Column(db.String(200))
+    scans = db.Column(db.String(200))
+
+    def __repr__(self):
+        return f'Patient {self.p_name}'
