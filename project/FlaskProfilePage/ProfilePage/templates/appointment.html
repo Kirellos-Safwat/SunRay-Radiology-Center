@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block title %}
+    Appointment Page
+{% endblock %}
+{% block content %}
+<body>
+<link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+    <h1 class="text-center">Book Appointment</h1>
+    {% for message in get_flashed_messages() %}
+        <div class="alert alert-{{ message[0] }}" role="alert">{{ message[1] }}</div>
+    {% endfor %}
+<div class="container" style="max-width: 400px;">
+        <div class="card">
+            <div class="card-body">
+                <form method="POST" enctype="multipart/form-data">
+                    {{ form.hidden_tag() }}
+                    <div class="mb-3">
+                        <label for="First_Name" class="form-label">First Name:</label>
+                        <input type="text" class="form-control" id="First_Name" name="First_Name" value="{{ data.fname }}">
+                    </div>
+                    <div class="mb-3">
+                        <label for="Last_Name" class="form-label">Last Name:</label>
+                        <input type="text" class="form-control" id="Last_Name" name="Last_Name" value="{{ data.lname }}">
+                    </div>
+                    <div class="mb-3">
+                        <label for="Email" class="form-label">Email:</label>
+                        <input type="email" class="form-control" id="Email" name="Email" value="{{ data.email }}">
+                    </div>
+                    <div class="mb-3">
+                        <label for="Phone_Number" class="form-label">Phone Number:</label>
+                        <input type="text" class="form-control" id="Phone_Number" name="Phone_Number" value="{{ data.phone }}">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Book Appointment</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+{% endblock %}

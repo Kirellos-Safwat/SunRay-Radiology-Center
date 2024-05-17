@@ -1,0 +1,225 @@
+{% extends 'base.html' %}
+{% block title %}
+    Home Page
+{% endblock %}
+{% block content %}
+<section class="section__container identity__container">
+    <div class="identity__grid">
+        <div class="identity__card">
+            <span><i class="ri-admin-fill"></i></span>
+            <h4>Admin</h4>
+            <a href="/users">Click Here</a>
+        </div>
+        <div class="identity__card">
+            <span><i class="ri-nurse-line"></i></span>
+            <h4>Doctor</h4>
+            <a href="/login">Click Here</a>
+        </div>
+        <div class="identity__card">
+            <span><i class="ri-hotel-bed-fill"></i></span>
+            <h4>Patient</h4>
+            <a href="/login">Click Here</a>
+        </div>
+    </div>
+</section>
+<section class="section__container service__container">
+        <div class="service__header">
+            <div class="service__header__content">
+                <h2 class="section__header">Our Radiology Service</h2>
+                <p>
+                    Beyond diagnosis, we prioritize your comfort and clarity. At our radiology center, we deliver
+                    unparalleled imaging services tailored to your unique needs.
+                </p>
+            </div>
+            <button class="service__btn">Ask A Service</button>
+        </div>
+        <div class="service__grid">
+            <div class="service__card">
+                <!-- <img src="D:\Users\Desktop\Hospital Design\photos\mri.png" alt="no image"> -->
+                <!-- <img src="D:\Users\Desktop\Hospital Design\photos\mri.png" alt="Icon description" class="icon"> -->
+                <span><i class="ri-microscope-line"></i></span>
+                <h4>MRI</h4>
+                <p>
+                    Magnetic resonance imaging (MRI) uses a powerful magnetic field, radio waves and a computer to
+                    produce detailed pictures of the body's internal structures that are clearer, more detailed and more
+                    likely in some instances to identify and accurately characterize disease than other imaging methods.
+                </p>
+                <a href="#">Learn More</a>
+            </div>
+            <div class="service__card">
+                <span><i class="ri-mental-health-line"></i></span>
+                <h4>CT</h4>
+                <p>
+                    CT scanning combines special x-ray equipment with sophisticated computers to produce multiple images
+                    or pictures of the inside of the body. These cross-sectional images of the area being studied can
+                    then be examined on a computer monitor, printed or transferred to a CD.
+                </p>
+                <a href="#">Learn More</a>
+            </div>
+            <div class="service__card">
+                <span><i class="ri-hospital-line"></i></span>
+                <h4>Nuclear Imaging</h4>
+                <p>
+                    Nuclear medicine is a branch of medical imaging that uses small amounts of radioactive material to
+                    diagnose and determine the severity of or treat a variety of diseases including many types of
+                    cancers, heart disease, gastrointestinal, endocrine, neurological disorders
+                    and other abnormalities within the body.
+                </p>
+                <a href="#">Learn More</a>
+            </div>
+            <div class="service__card">
+                <span><i class="ri-hospital-line"></i></span>
+                <h4>Women's Imaging</h4>
+                <p>
+                    This unit is equipped with state of the art Digital mammography unit. In addition, the unit is
+                    equipped with a latest Ultrasound machines to cater to the ever present demand for an exclusive
+                    women's imaging.
+                </p>
+                <a href="#">Learn More</a>
+            </div>
+            <div class="service__card">
+                <span><i class="ri-hospital-line"></i></span>
+                <h4>Ultrasound</h4>
+                <p>
+                    Conventional ultrasound displays the images in thin, flat sections of the body. Advancements in
+                    ultrasound technology include three-dimensional (3-D) ultrasound that formats the sound wave data
+                    into 3-D images. Four-dimensional (4-D) ultrasound is 3-D ultrasound in motion.
+                </p>
+                <a href="#">Learn More</a>
+            </div>
+            <div class="service__card">
+                <span><i class="ri-hospital-line"></i></span>
+                <h4>Conventional X-ray</h4>
+                <p>
+                    Imaging with x-rays involves exposing a part of the Body to a small dose of ionizing radiation to
+                    produce pictures of the inside of the body. X-rays
+                    are the oldest and most frequently used form of medical imaging.
+                </p>
+                <a href="#">Learn More</a>
+            </div>
+        </div>
+    </section>
+    <section class="section__container about__container">
+        <div class="about__content">
+            <h2 class="section__header">About Us</h2>
+            <p>
+                SunRay is a leading provider of comprehensive and advanced diagnostic imaging services. We are
+                dedicated to providing clear and accurate diagnoses, using the latest technology in a patient-centered
+                environment.
+            </p>
+            <p>
+                Our team of board-certified radiologists possess extensive experience and specialize in interpreting a
+                wide range of medical images. They are committed to clear communication, working closely with your
+                physician to ensure a collaborative approach to your care.
+            </p>
+            <p>
+                We are constantly investing in the latest imaging equipment, including (mention specific equipment you
+                have, e.g., high-field MRI scanners, low-dose CT scanners, etc.). This ensures the most accurate and
+                detailed results possible, leading to optimal diagnoses.
+            </p>
+            <p>
+                Our highly skilled and certified technologists prioritize your comfort and safety throughout your visit.
+                Our friendly support staff is readily available to address your questions and concerns, making the
+                entire experience as smooth and stress-free as possible.
+            </p>
+        </div>
+        <div class="about__image">
+            <img src="static/photos/MRI-photo.jpg" alt="about" />
+        </div>
+    </section>
+    <section class="section__container why__container">
+        <div class="why__image">
+            <img src="static/photos/why-photo.png" alt="why choose us" />
+        </div>
+        <div class="why__content">
+            <h2 class="section__header">Why Choose Us</h2>
+            <p>
+                When it comes to your health, choosing the right radiology center matters. Here's why SunRay stands
+                out
+            </p>
+            <div class="why__grid">
+                <span><i class="ri-hand-heart-line"></i></span>
+                <div>
+                    <h4>Patient-Centered Approach</h4>
+                    <p>
+                        From scheduling your appointment to completing your
+                        procedure, we focus on creating a personalized experience.
+                    </p>
+                </div>
+                <span><i class="ri-phone-line"></i></span>
+                <div>
+                    <h4>Clear Communication</h4>
+                    <p>
+                        Our radiologists and staff are committed to
+                        explaining your results in a way you can understand, addressing any questions you
+                        may have.
+                    </p>
+                </div>
+                <span><i class="ri-stethoscope-line"></i></span>
+                <div>
+                    <h4>Home Services</h4>
+                    <p>
+                        Our radiology and Labs enables you to carry out your investigations at the comfort of your own
+                        home
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section class="section__container doctors__container">
+        <div class="doctors__header">
+            <div class="doctors__header__content">
+                <h2 class="section__header">Our Special Doctors</h2>
+                <p>
+                    We take immense pride in our exceptional team of radiologists. Each a specialist in their field,
+                    they bring a wealth of experience and expertise to ensure accurate diagnoses and compassionate care.
+                </p>
+            </div>
+            <div class="doctors__nav">
+                <span><i class="ri-arrow-left-line"></i></span>
+                <span><i class="ri-arrow-right-line"></i></span>
+            </div>
+        </div>
+        <div class="doctors__grid">
+            <div class="doctors__card">
+                <div class="doctors__card__image">
+                    <img src="static/photos/doctor-1-photo.jpg" alt="doctor" />
+                    <div class="doctors__socials">
+                        <span><i class="ri-instagram-line"></i></span>
+                        <span><i class="ri-facebook-fill"></i></span>
+                        <span><i class="ri-heart-fill"></i></span>
+                        <span><i class="ri-twitter-fill"></i></span>
+                    </div>
+                </div>
+                <h4>Dr. Emily Smith</h4>
+                <p>Radiologist</p>
+            </div>
+            <div class="doctors__card">
+                <div class="doctors__card__image">
+                    <img src="static/photos/doctor-2-photo.jpg" alt="doctor" />
+                    <div class="doctors__socials">
+                        <span><i class="ri-instagram-line"></i></span>
+                        <span><i class="ri-facebook-fill"></i></span>
+                        <span><i class="ri-heart-fill"></i></span>
+                        <span><i class="ri-twitter-fill"></i></span>
+                    </div>
+                </div>
+                <h4>Dr. James Anderson</h4>
+                <p>Radiologist</p>
+            </div>
+            <div class="doctors__card">
+                <div class="doctors__card__image">
+                    <img src="static/photos/doctor-3-photo.jpg" alt="doctor" />
+                    <div class="doctors__socials">
+                        <span><i class="ri-instagram-line"></i></span>
+                        <span><i class="ri-facebook-fill"></i></span>
+                        <span><i class="ri-heart-fill"></i></span>
+                        <span><i class="ri-twitter-fill"></i></span>
+                    </div>
+                </div>
+                <h4>Dr. Michael Lee</h4>
+                <p>Radiologist</p>
+            </div>
+        </div>
+    </section>
+{% endblock %}

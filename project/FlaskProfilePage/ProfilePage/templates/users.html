@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block title %}
+    Users Page
+{% endblock %}
+{% block content %}
+    <body>
+        <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+          <table class="table table-hover table-dark" style=" position:relative; border: 1px solid; text-align: center;tr:hover; {background-color: coral;};  top:50px; color:white">
+            <thead>
+                <tr>
+                    <!-- Your Columns HERE -->
+                    <th scope="col">ID</th>
+                    <th scope="col">First Name</th>
+                    <th scope="col">Last Name</th>
+                    <th scope="col">Email</th>
+                    <th scope="col">Phone Number</th>
+                    <th scope="col">Options</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Your rows inside the table HERE: -->
+                {% for credential in credentials %}
+                    <tr>
+                        <td>{{ credential.id }}</td>
+                        <td>{{ credential.fname }}</td>
+                        <td>{{ credential.lname }}</td>
+                        <td>{{ credential.email }}</td>
+                        <td>{{ credential.phone }}</td>
+                        <td>
+                            <button class="btn btn-outline btn-success">Edit</button>
+                            <button class="btn btn-outline btn-danger">Delete</button>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        </div>
+        <!-- Bootstrap core JS-->
+        <!--<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>-->
+        <!-- Core theme JS-->
+    </body>
+{% endblock %}

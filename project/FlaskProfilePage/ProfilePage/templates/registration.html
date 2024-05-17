@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block title %}
+    Register Page
+{% endblock %}
+{% block content %}
+    <body >
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+        <div class="container">
+            <div class="text-center mt-5" style = "position:relative;  color:black">
+                <h1>Create an account!</h1>
+
+            </div>
+            <br>
+        </div>
+
+        <div class="container" style="width: 30%">
+            <form method="POST" class="form-register" style="color:white">
+                {{ form.hidden_tag() }}
+                {{ form.First_Name.label }}
+                {{ form.First_Name(class="form-control",placeholder="First Name") }}
+
+                {{ form.Last_Name.label }}
+                {{ form.Last_Name(class="form-control",placeholder="Last Name") }}
+
+                {{ form.Email.label }}
+                {{ form.Email(class="form-control",placeholder="Email") }}
+
+                {{ form.Phone_Number.label }}
+                {{ form.Phone_Number(class="form-control",placeholder="Phone Number") }}
+
+                {{ form.Password.label }}
+                {{ form.Password(class="form-control",placeholder="Password") }}
+
+                {{ form.Password_Confirmation.label }}
+                {{ form.Password_Confirmation(class="form-control",placeholder="Confirm Password") }}
+                <br>
+                {{ form.submit(class="btn btn-lg btn-block btn-success") }}
+            </form>
+            <div class="text-center mt-5" style = "position:relative;  top:-88px; left: 85px; color:black">
+                <a class="lead" href="/login" style="color:black">Already have an account?</a>
+
+
+            </div>
+        </div>
+         </body>
+{% endblock %}
+
