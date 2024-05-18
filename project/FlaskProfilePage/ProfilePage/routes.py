@@ -1,12 +1,11 @@
 import psycopg2.extras
 import random
-from ProfilePage.forms import RegisterForm, LoginForm, EditProfileForm, AppointmentForm, PatientRegisterForm, ReportForm
+from ProfilePage.forms import RegisterForm, LoginForm, EditProfileForm, AppointmentForm, PatientRegisterForm, RadiologistRegisterForm , ReportForm
 from ProfilePage import app, db, connection, connection_string
 from flask import render_template, redirect, url_for, flash, session
 from werkzeug.utils import secure_filename
 import os
 from flask import request
-
 from ProfilePage.models import appointments
 
 
@@ -297,6 +296,131 @@ def edit_profile():
         return redirect(url_for('login_page'))  # Redirect to login to refresh
 
     return render_template('edit_profile.html', data=data, form=form)
+#######################################################################################
+@app.route('/radiologist-register', methods=['GET', 'POST'])
+def radiologist_registration_page():
+    form = RadiologistRegisterForm()
+    if form.validate_on_submit():
+        d_name = form.D_Name.data
+        d_email = form.Email.data
+        print(d_email)
+        d_phone = form.Phone_Number.data
+        d_password = form.Password.data
+
+        profile_photo = form.profile_photo.data
+        if profile_photo:
+            filename = secure_filename(profile_photo.filename)
+            profile_photo_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            profile_photo.save(profile_photo_path)
+            relative_photo_path = os.path.join('uploads', filename)
+        else:
+            relative_photo_path = None
+
+        connection = psycopg2.connect(connection_string)
+        cursor = connection.cursor()
+        cursor.execute(
+            "INSERT INTO radiologist (d_name,d_email, d_phone, d_password, d_profile_picture) VALUES (%s, %s, %s, %s, %s)",
+            (d_name ,d_email, d_phone, d_password, relative_photo_path)
+        )
+        connection.commit()
+        cursor.close()
+        connection.close()
+
+        flash('Registration successful. Please log in.', category='success')
+        return redirect('/radiologist-login_page')
+
+    return render_template('radiologist-registration.html', form=form)
+
+@app.route('/radiologist-login_page', methods=['GET', 'POST'])
+def radiologist_login_page():
+    if request.method == 'POST':
+        d_email = request.form['Email']
+        d_password = request.form['Password']
+        cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
+        cursor.execute(
+            "SELECT * FROM radiologist WHERE d_email = %s AND d_password = %s",
+            (d_email, d_password)
+        )
+        user = cursor.fetchone()
+
+        if user:
+            session['user_data'] = dict(user)
+            cursor.close()  # Close the cursor once
+            return redirect('/radiologist-profile')
+        else:
+            flash('Incorrect Email or password. Please try again.', category='danger')
+
+    return render_template('patient-login.html', form=LoginForm())  # check render
+
+@app.route('/radiologist-profile')
+def radiologist_profile_page():
+    data = session.get('user_data')
+
+    cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
+    # Fetch appointments for the current user's ID
+    cursor.execute("""
+            SELECT appointments.*, patient.fname, patient.lname
+            FROM appointments
+            JOIN patient ON appointments.p_id = patient.id
+            WHERE appointments.d_id = %s
+        """, (data['d_id'],))
+    appointments = cursor.fetchall()
+    cursor.close()
+
+    if data is None:
+        return redirect('/radiologist-login')
+    return render_template('radiologist-profile.html', data=data, appointments=appointments)
+
+@app.route('/radiologist-edit_profile', methods=['GET', 'POST'])
+def radiologist_edit_profile():
+    form = EditProfileForm()
+    data = session.get('user_data')
+
+    if request.method == 'POST' and form.validate_on_submit():
+        updated_data = {
+            'd_name': form.First_Name.data,
+            'd_email': form.Email.data,
+            'd_phone': form.Phone_Number.data,
+            'd_gender': form.Gender.data,
+            'd_age': form.Age.data,
+            'd_address': form.Address.data,
+            'd_is_admin': True if form.Email.data.endswith('@company.com') else False,
+
+        }
+
+        profile_photo = form.profile_photo.data
+
+        if profile_photo:
+            filename = secure_filename(profile_photo.filename)
+            profile_photo_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            profile_photo.save(profile_photo_path)
+            relative_photo_path = os.path.join('uploads', filename)
+            updated_data['profile_picture'] = relative_photo_path
+        else:
+            updated_data['profile_picture'] = data['profile_picture']
+
+        # Update user information in the database
+        connection = psycopg2.connect(connection_string)
+        cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
+        update_query = """
+            UPDATE radiologist
+            SET d_name = %(d_name)s, d_email = %(d_email)s,
+                d_phone = %(d_phone)s, d_gender = %(d_gender)s, d_age = %(d_age)s, d_address = %(d_address)s,
+                d_profile_picture = %(d_profile_picture)s
+            WHERE d_id = %(d_id)s;
+        """
+        updated_data['d_id'] = data['d_id']
+
+        cursor.execute(update_query, updated_data)
+        connection.commit()
+        cursor.close()
+        connection.close()
+
+        flash('Your profile has been updated successfully! Please login again', category='success')
+        return redirect((('/radiologist-login_page')))  # Redirect to login to refresh
+
+    return render_template('radiologist_edit_profile.html', data=data, form=form)
+
 
 
 #######################################################################

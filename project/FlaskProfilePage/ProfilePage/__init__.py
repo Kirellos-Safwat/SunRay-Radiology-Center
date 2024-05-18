@@ -6,7 +6,7 @@ from flask_login import LoginManager
 import os
 
 app = Flask(__name__)
-connection_string =  'postgresql://postgres:NgrvAKQp1@localhost/hospital'
+connection_string =  'postgresql://postgres:Easy_mina12@localhost/hospital'
 
 connection = psycopg2.connect(connection_string)
 app.config['SQLALCHEMY_DATABASE_URI'] = connection_string
