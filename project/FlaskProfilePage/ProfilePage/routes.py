@@ -1,12 +1,14 @@
-import psycopg2.extras
-import random
-from ProfilePage.forms import RegisterForm, LoginForm, EditProfileForm, AppointmentForm, PatientRegisterForm, RadiologistRegisterForm , ReportForm
+from ProfilePage.forms import RegisterForm, LoginForm, EditProfileForm, PatientRegisterForm, AppointmentForm
+from ProfilePage import app, db, connection, connection_string
+from ProfilePage.forms import RegisterForm, LoginForm, EditProfileForm, AppointmentForm, PatientRegisterForm
 from ProfilePage import app, db, connection, connection_string
 from flask import render_template, redirect, url_for, flash, session
 from werkzeug.utils import secure_filename
-import os
 from flask import request
 from ProfilePage.models import appointments
+import os
+import psycopg2.extras
+import random
 
 
 UPLOAD_FOLDER = os.path.join(os.getcwd(), "project", "FlaskProfilePage", "ProfilePage", "static", "uploads")
@@ -21,30 +23,47 @@ def home_page():
 
 @app.route('/edit_data', methods=['POST'])
 def edit_data():
-    cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
     data = request.get_json()
+    table = data.get('table')
+    cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
     if 'delete_id' in data:
         delete_id = data['delete_id']
-        print(delete_id)
-        update_query = """
-            DELETE FROM Credentials 
-            WHERE id = %s;
-        """
-        cursor.execute(update_query, str(delete_id))
-    elif 'id' in data:
+        if table == 'patient':
+            update_query = """
+                DELETE FROM patient 
+                WHERE id = %s;
+            """
+        if table == 'doctor':
+            update_query = """
+                DELETE FROM radiologist 
+                WHERE d_id = %s;
+            """
+        cursor.execute(update_query, (str(delete_id),))
+    elif 'id' in data or 'd_id' in data:
         update_data = data
-        update_query = f"""
-            UPDATE Credentials SET 
-            {', '.join(
-            f"{key} = '{value}'"
-            for key, value in update_data.items()
-            if key != 'id')}
-            WHERE id = {update_data['id']};
-        """
+        if table == 'patient':
+            update_query = f"""
+                UPDATE patient SET 
+                {', '.join(
+                f"{key} = '{value}'"
+                for key, value in update_data.items()
+                if key != 'id' and key != 'table')}
+                WHERE id = {update_data['id']};
+            """
+        if table == 'doctor':
+            update_query = f"""
+                UPDATE radiologist SET 
+                {', '.join(
+                f"{key} = '{value}'"
+                for key, value in update_data.items()
+                if key != 'id' and key != 'table')}
+                WHERE d_id = {update_data['id']};
+            """
         cursor.execute(update_query, update_data)
     cursor.close()
     connection.commit()
     return redirect(url_for('users_page'))
+
 
 @app.route('/BookAppointment', methods=['GET', 'POST'])
 def appointment_page():
@@ -104,6 +123,17 @@ def appointment_page():
             return redirect(url_for('home_page'))
     return render_template('appointment.html', form=form, data=data)
 
+'''
+    @app.route('/register', methods=['GET', 'POST'])
+    def registration_page():
+        form = RegisterForm()
+        if request.method == 'POST':
+            fname = request.form['First_Name']
+            lname = request.form['Last_Name']
+            email = request.form['Email']
+            phone = request.form['Phone_Number']
+            password = request.form['Password']
+            is_admin = True if email.endswith('@company.com') else False
 
 @app.route('/SubmitReport', methods=['GET', 'POST'])
 def report_page():
@@ -183,41 +213,41 @@ def registration_page():
         password = request.form['Password']
         is_admin = True if email.endswith('@company.com') else False
 
-        profile_photo = request.files['profile_photo']
-        if profile_photo and profile_photo.filename != '':
-            filename = secure_filename(profile_photo.filename)
-            profile_photo_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-            profile_photo.save(profile_photo_path)
-            relative_photo_path = os.path.join('uploads', filename)
-        else:
-            relative_photo_path = None
-        connection = psycopg2.connect(connection_string)
-        cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
-        if form.validate_on_submit():
-            cursor.execute(
-                "INSERT INTO Credentials (fname, lname, email, phone, password, profile_picture ,is_admin) VALUES (%s, %s, %s, %s, %s, %s , %s)",
-                (fname, lname, email, phone, password, relative_photo_path, is_admin)
+            profile_photo = request.files['profile_photo']
+            if profile_photo and profile_photo.filename != '':
+                filename = secure_filename(profile_photo.filename)
+                profile_photo_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                profile_photo.save(profile_photo_path)
+                relative_photo_path = os.path.join('uploads', filename)
+            else:
+                relative_photo_path = None
+            connection = psycopg2.connect(connection_string)
+            cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
+            if form.validate_on_submit():
+                cursor.execute(
+                    "INSERT INTO Credentials (fname, lname, email, phone, password, profile_picture ,is_admin) VALUES (%s, %s, %s, %s, %s, %s , %s)",
+                    (fname, lname, email, phone, password, relative_photo_path, is_admin)
 
-            )
-            connection.commit()
-            cursor.close()
-            connection.close()
-            flash('Registration successful. Please log in.', category='success')
-            return redirect(url_for('login_page'))
-        else:
-            flash('Invalid email or password. Please try again.', category='danger')
+                )
+                connection.commit()
+                cursor.close()
+                connection.close()
+                flash('Registration successful. Please log in.', category='success')
+                return redirect(url_for('login_admin')) 
+            else:
+                flash('Invalid email or password. Please try again.', category='danger')
 
-    return render_template('registration.html', form=RegisterForm())
-
+        return render_template('registration.html', form=RegisterForm())
+'''
 
 @app.route('/login', methods=['GET', 'POST'])
-def login_page():
+def login_admin():
     if request.method == 'POST':
         email = request.form['Email']
         password = request.form['Password']
         cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
         cursor.execute(
-            "SELECT * FROM Credentials WHERE email = %s AND password = %s",
+            "SELECT * FROM admin WHERE a_email = %s AND password = %s",
             (email, password)
         )
         user = cursor.fetchone()
@@ -225,35 +255,37 @@ def login_page():
         if user:
             session['user_data'] = dict(user)
             cursor.close()  # Close the cursor once
-            return redirect('/profile')
+            return redirect('/users')
         else:
             flash('Incorrect Email or password. Please try again.', category='danger')
 
     return render_template('login.html', form=LoginForm())
 
-
-@app.route('/profile')
-def profile_page():
-    data = session.get('user_data')
-    if data is None:
-        return redirect('/login')
-    if os.name == 'nt' and data['profile_picture'] is not None:
-        data['profile_picture'] = data['profile_picture'].replace("\\", "/")
-    return render_template('profile.html', data=data)
-
+'''
+    @app.route('/profile')
+    def profile_page():
+        data = session.get('user_data')
+        if data is None:
+            return redirect('/login')
+        if os.name == 'nt' and data['profile_picture'] is not None:
+            data['profile_picture'] = data['profile_picture'].replace("\\", "/")
+        return render_template('profile.html', data=data)
+'''
 
 @app.route('/users')
 def users_page():
     data = session.get('user_data')
-    if data is None or data['is_admin'] == False:
-        return redirect('/')
+    if data is None or 'admin_id' not in data:
+        return redirect('/login')
     cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
-    cursor.execute('SELECT * FROM Credentials')
-
-    # Fetch all the results
-    credentials = cursor.fetchall()
+    cursor.execute('SELECT * FROM patient')
+    # patients data
+    patients = cursor.fetchall()
+    cursor.execute('SELECT * FROM radiologist')
+    # doctors data
+    doctors = cursor.fetchall()
     cursor.close()
-    return render_template('users.html', credentials=credentials)
+    return render_template('users.html', patients=patients, doctors=doctors)
 
 
 @app.route('/logout')
@@ -270,61 +302,60 @@ def logout():
 def thanks_page():
     return render_template('thank_you.html')
 
+'''
+    @app.route('/edit_profile', methods=['GET', 'POST'])
+    def edit_profile():
+        form = EditProfileForm()
+        data = session.get('user_data')
 
-@app.route('/edit_profile', methods=['GET', 'POST'])
-def edit_profile():
-    form = EditProfileForm()
-    data = session.get('user_data')
+        if request.method == 'POST' and form.validate_on_submit():
+            updated_data = {
+                'fname': form.First_Name.data,
+                'lname': form.Last_Name.data,
+                'email': form.Email.data,
+                'phone': form.Phone_Number.data,
+                'is_admin': True if form.Email.data.endswith('@company.com') else False,
+                'facebook': form.Facebook.data,
+                'twitter': form.Twitter.data,
+                'instagram': form.Instagram.data,
+                'linkedin': form.LinkedIn.data,
+            }
 
-    if request.method == 'POST' and form.validate_on_submit():
-        updated_data = {
-            'fname': form.First_Name.data,
-            'lname': form.Last_Name.data,
-            'email': form.Email.data,
-            'phone': form.Phone_Number.data,
-            'is_admin': True if form.Email.data.endswith('@company.com') else False,
-            'facebook': form.Facebook.data,
-            'twitter': form.Twitter.data,
-            'instagram': form.Instagram.data,
-            'linkedin': form.LinkedIn.data,
-        }
+            profile_photo = form.profile_photo.data
 
-        profile_photo = form.profile_photo.data
+            if profile_photo:
+                filename = secure_filename(profile_photo.filename)
+                profile_photo_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                profile_photo.save(profile_photo_path)
+                relative_photo_path = os.path.join('uploads', filename)
+                updated_data['profile_picture'] = relative_photo_path
+            else:
+                updated_data['profile_picture'] = data['profile_picture']
 
-        if profile_photo:
-            filename = secure_filename(profile_photo.filename)
-            profile_photo_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-            profile_photo.save(profile_photo_path)
-            relative_photo_path = os.path.join('uploads', filename)
-            updated_data['profile_picture'] = relative_photo_path
-        else:
-            updated_data['profile_picture'] = data['profile_picture']
+            # Update user information in the database
+            connection = psycopg2.connect(connection_string)
+            cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
+            update_query = """
+                UPDATE Credentials
+                SET fname = %(fname)s, lname = %(lname)s, email = %(email)s,
+                    phone = %(phone)s, is_admin = %(is_admin)s, 
+                    facebook = %(facebook)s, twitter = %(twitter)s, 
+                    instagram = %(instagram)s, linkedin = %(linkedin)s,
+                    profile_picture = %(profile_picture)s
+                WHERE id = %(id)s;
+            """
+            updated_data['id'] = data['id']
 
-        # Update user information in the database
-        connection = psycopg2.connect(connection_string)
-        cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
-        update_query = """
-            UPDATE Credentials
-            SET fname = %(fname)s, lname = %(lname)s, email = %(email)s,
-                phone = %(phone)s, is_admin = %(is_admin)s, 
-                facebook = %(facebook)s, twitter = %(twitter)s, 
-                instagram = %(instagram)s, linkedin = %(linkedin)s,
-                profile_picture = %(profile_picture)s
-            WHERE id = %(id)s;
-        """
+            cursor.execute(update_query, updated_data)
+            connection.commit()
+            cursor.close()
+            connection.close()
 
-        updated_data['id'] = data['id']
+            flash('Your profile has been updated successfully! Please login again', category='success')
+            return redirect(url_for('login_admin'))  # Redirect to login to refresh
 
-        cursor.execute(update_query, updated_data)
-        connection.commit()
-        cursor.close()
-        connection.close()
-
-        flash('Your profile has been updated successfully! Please login again', category='success')
-        return redirect(url_for('login_page'))  # Redirect to login to refresh
-
-    return render_template('edit_profile.html', data=data, form=form)
-#######################################################################################
+        return render_template('edit_profile.html', data=data, form=form)
+'''
 @app.route('/radiologist-register', methods=['GET', 'POST'])
 def radiologist_registration_page():
     form = RadiologistRegisterForm()
@@ -373,6 +404,9 @@ def radiologist_login_page():
 
         if user:
             session['user_data'] = dict(user)
+            data = session['user_data']
+            if os.name == 'nt' and data['profile_picture'] is not None:
+                data['profile_picture'] = data['profile_picture'].replace("\\", "/")
             cursor.close()  # Close the cursor once
             return redirect('/radiologist-profile')
         else:
@@ -501,6 +535,11 @@ def patient_login_page():
 
         if user:
             session['user_data'] = dict(user)
+            data = session['user_data']
+            if os.name == 'nt' and data['scans'] is not None:
+                data['scans'] = data['scans'].replace("\\", "/")
+            if os.name == 'nt' and data['profile_picture'] is not None:
+                data['profile_picture'] = data['profile_picture'].replace("\\", "/")
             cursor.close()  # Close the cursor once
             return redirect('/patient-profile')
         else:
@@ -532,7 +571,8 @@ def patient_profile_page():
     else:
         scan_Files = []
     ############################################
-
+    # if os.name == 'nt' and data['scans'] is not None:
+    #     data['scans'] = data['scans'].replace("\\", "/")
     if data is None:
         return redirect('/patient-login')
     return render_template('patient-profile.html', data=data, scan_Files=scan_Files, appointments=appointments)

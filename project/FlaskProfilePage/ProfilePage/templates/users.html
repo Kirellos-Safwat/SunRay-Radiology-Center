@@ -6,7 +6,7 @@
 <body>
     <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
     <div class="container mt-5">
-        <h2>Inline Editing Table</h2>
+        <h2>Patients</h2>
         <table class="table table-hover table-dark" style="border: 1px solid; text-align: center; color:white">
             <thead>
                 <tr>
@@ -18,17 +18,44 @@
                     <th scope="col">Options</th>
                 </tr>
             </thead>
-            <tbody id="credentialsTable">
-                {% for credential in credentials %}
-                <tr data-id="{{ credential.id }}">
-                    <td>{{ credential.id }}</td>
-                    <td class="editable" data-field="fname">{{ credential.fname }}</td>
-                    <td class="editable" data-field="lname">{{ credential.lname }}</td>
-                    <td class="editable" data-field="email">{{ credential.email }}</td>
-                    <td class="editable" data-field="phone">{{ credential.phone }}</td>
+            <tbody id="patients">
+                {% for patient in patients %}
+                <tr data-id="{{ patient.id }}" data-table="patient">
+                    <td>{{ patient.id }}</td>
+                    <td class="editable" data-field="fname">{{ patient.fname }}</td>
+                    <td class="editable" data-field="lname">{{ patient.lname }}</td>
+                    <td class="editable" data-field="email">{{ patient.email }}</td>
+                    <td class="editable" data-field="phone">{{ patient.phone }}</td>
                     <td>
                         <button class="btn btn-outline btn-success save-btn" style="display: none;">Save</button>
-                        <button class="btn btn-outline btn-danger delete-btn" data-id="{{ credential.id }}">Delete</button>
+                        <button class="btn btn-outline btn-danger delete-btn" data-id="{{ patient.id }}" data-table="patient">Delete</button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <h2>Radiologists</h2>
+        <table class="table table-hover table-dark" style="border: 1px solid; text-align: center; color:white">
+            <thead>
+                <tr>
+                    <th scope="col">ID</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Email</th>
+                    <th scope="col">Phone Number</th>
+                    <th scope="col">Options</th>
+                </tr>
+            </thead>
+            <tbody id="doctors">
+                {% for doctor in doctors %}
+                <tr data-id="{{ doctor.d_id }}" data-table="doctor">
+                    <td>{{ doctor.d_id }}</td>
+                    <td class="editable" data-field="d_name">{{ doctor.d_name }}</td>
+                    <td class="editable" data-field="d_email">{{ doctor.d_email }}</td>
+                    <td class="editable" data-field="d_phone">{{ doctor.d_phone }}</td>
+                    <td>
+                        <button class="btn btn-outline btn-success save-btn" style="display: none;">Save</button>
+                        <button class="btn btn-outline btn-danger delete-btn" data-id="{{ doctor.d_id }}" data-table="doctor">Delete</button>
                     </td>
                 </tr>
                 {% endfor %}
@@ -42,69 +69,89 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.min.js"></script>
     <script>
         $(document).ready(function() {
-            // Make cells editable on click
-            $('.editable').click(function() {
-                if ($(this).find('input').length === 0) {
-                    let currentText = $(this).text();
-                    $(this).html(`<input type="text" class="form-control" value="${currentText}">`);
-                    $(this).closest('tr').find('.save-btn').show();
+    // Make cells editable on click
+    $('.editable').click(function() {
+        if ($(this).find('input').length === 0) {
+            let currentText = $(this).text();
+            let inputType = $(this).data('field') === 'phone' || $(this).data('field') === 'd_phone' ? 'number' : 'text';
+            let maxLength = $(this).data('field') === 'phone' || $(this).data('field') === 'd_phone' ? '13' : '';
+            $(this).html(`<input type="${inputType}" class="form-control" value="${currentText}" maxlength="${maxLength}">`);
+            $(this).closest('tr').find('.save-btn').show();
+        }
+    });
+
+    // Handle save button click
+    $('.save-btn').click(function() {
+        let row = $(this).closest('tr');
+        let id = row.data('id');
+        let table = row.data('table');
+        let updatedData = { table: table , id: id};
+        let valid = true;
+        row.find('.editable').each(function() {
+            let input = $(this).find('input');
+            if (input.length > 0) {
+                let newValue = input.val();
+                let fieldName = $(this).data('field'); // Using data-field as field name
+                if (fieldName === 'phone' || fieldName === 'd_phone') {
+                    if (!/^\d+$/.test(newValue)) {  // Check if the input is a numeric value
+                        valid = false;
+                        alert('Phone number must be numeric.');
+                        return false;
+                    }
+                    if (newValue.length > 13) {  // Check if the phone number exceeds the maximum length
+                        valid = false;
+                        alert('Phone number must be at most 13 digits.');
+                        return false;
+                    }
                 }
-            });
-
-            // Handle save button click
-            $('.save-btn').click(function() {
-                let row = $(this).closest('tr');
-                let id = row.data('id');
-                let updatedData = { id: id };
-
-                row.find('.editable').each(function() {
-                    let input = $(this).find('input');
-                    if (input.length > 0) {
-                        let newValue = input.val();
-                        let fieldName = $(this).data('field'); // Using data-field as field name
-                        updatedData[fieldName] = newValue;
-                        $(this).text(newValue);
-                    }
-                });
-
-                $(this).hide();
-
-                // Send the updated data to the server
-                $.ajax({
-                    url: '{{ url_for("edit_data") }}',
-                    type: 'POST',
-                    contentType: 'application/json',
-                    data: JSON.stringify(updatedData),
-                    success: function(response) {
-                        alert('Data updated successfully!');
-                    },
-                    error: function(error) {
-                        alert('Error updating data.');
-                    }
-                });
-            });
-
-            // Handle delete button click
-            $('.delete-btn').click(function() {
-                let id = $(this).data('id');
-
-                // Send the delete request to the server
-                $.ajax({
-                    url: '{{ url_for("edit_data") }}',
-                    type: 'POST',
-                    contentType: 'application/json',
-                    data: JSON.stringify({ delete_id: id }),
-                    success: function(response) {
-                        alert('Data deleted successfully!');
-                        // Remove the row from the table
-                        $(`tr[data-id=${id}]`).remove();
-                    },
-                    error: function(error) {
-                        alert('Error deleting data.');
-                    }
-                });
-            });
+                updatedData[fieldName] = newValue;
+                $(this).text(newValue);
+            }
         });
+
+        if (!valid) {
+            return;
+        }
+
+        $(this).hide();
+
+        // Send the updated data to the server
+        $.ajax({
+            url: '{{ url_for("edit_data") }}',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(updatedData),
+            success: function(response) {
+                alert('Data updated successfully!');
+            },
+            error: function(error) {
+                alert('Error updating data.');
+            }
+        });
+    });
+
+    // Handle delete button click
+    $('.delete-btn').click(function() {
+        let id = $(this).data('id');
+        let table = $(this).data('table');
+
+        // Send the delete request to the server
+        $.ajax({
+            url: '{{ url_for("edit_data") }}',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ delete_id: id, table: table }),
+            success: function(response) {
+                alert('Data deleted successfully!');
+                // Remove the row from the table
+                $(`tr[data-id=${id}]`).remove();
+            },
+            error: function(error) {
+                alert('Error deleting data.');
+            }
+        });
+    });
+});
     </script>
 </body>
 {% endblock %}
