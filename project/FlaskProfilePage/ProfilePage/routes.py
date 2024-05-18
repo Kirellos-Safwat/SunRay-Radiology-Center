@@ -113,7 +113,7 @@ def report_page():
     if request.method == 'POST':
         connection = psycopg2.connect(connection_string)
         cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
-        d_id = None
+        d_id = data['d_id']
 
         if form.validate_on_submit():
             r_time = form.r_time.data
