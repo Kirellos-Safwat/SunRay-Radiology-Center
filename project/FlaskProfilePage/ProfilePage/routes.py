@@ -7,14 +7,7 @@ from flask import render_template, redirect, url_for, flash, session
 from werkzeug.utils import secure_filename
 import os
 from flask import request
-
 from ProfilePage.models import appointments
-
-
-@app.route('/')  # that is the root url of the website
-@app.route('/home')
-def home_page():
-    return render_template('home.html')
 
 
 UPLOAD_FOLDER = os.path.join(os.getcwd(), "project", "FlaskProfilePage", "ProfilePage", "static", "uploads")
