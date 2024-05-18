@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% block title %}
+    Edit Profile Page
+{% endblock %}
+{% block content %}
+<body>
+<link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+    <h1 class="text-center">Edit Profile</h1>
+    {% for message in get_flashed_messages() %}
+        <div class="alert alert-{{ message[0] }}" role="alert">{{ message[1] }}</div>
+    {% endfor %}
+    <div class="container" style="max-width: 400px;">
+        <div class="card">
+            <div class="card-body">
+                <form method="POST" enctype="multipart/form-data">
+                    {{ form.hidden_tag() }}
+                    <div class="mb-3">
+                        <label for="First_Name" class="form-label">First Name:</label>
+                        {{ form.First_Name(class="form-control", id="First_Name", value=data.d_name) }}
+                    </div>
+                    <div class="mb-3">
+                        <label for="Email" class="form-label">Email:</label>
+                        {{ form.Email(class="form-control", id="Email", value=data.d_email) }}
+                    </div>
+                    <div class="mb-3">
+                        <label for="Phone_Number" class="form-label">Phone Number:</label>
+                        {{ form.Phone_Number(class="form-control", id="Phone_Number", value=data.d_phone) }}
+                    </div>
+                    <div class="mb-3">
+                        <label for="profile_photo" class="form-label">Profile Photo:</label>
+                        {{ form.profile_photo(class="form-control", id="profile_photo") }}
+                    </div>
+                    <div class="mb-3">
+                        <label for="Gender" class="form-label">Gender:</label>
+                        {{ form.Gender(class="form-control", id="Gender", value=data.d_gender) }}
+                    </div>
+                    <div class="mb-3">
+                        <label for="Age" class="form-label">Age:</label>
+                        {{ form.Age(class="form-control", id="Age", value=data.d_age) }}
+                    </div>
+                    <div class="mb-3">
+                        <label for="Address" class="form-label">Address:</label>
+                        {{ form.Address(class="form-control", id="Address", value=data.d_address) }}
+                    </div>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </form>
+                
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+{% endblock %}
