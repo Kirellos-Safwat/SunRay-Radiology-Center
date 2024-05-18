@@ -12,25 +12,23 @@
 <div class="container" style="max-width: 400px;">
         <div class="card">
             <div class="card-body">
-                <form method="POST" enctype="multipart/form-data">
+                <form action="" method='POST' name="AppointmentForm">
+
                     {{ form.hidden_tag() }}
+
+
+                    {{ form.date.label }} {{form.date(class='datepicker')}}
+                    <br>
                     <div class="mb-3">
-                        <label for="First_Name" class="form-label">First Name:</label>
-                        <input type="text" class="form-control" id="First_Name" name="First_Name" value="{{ data.fname }}">
-                    </div>
+                    <label for="Preferred Doctor">{{ form.doctors.label }}</label>
+                             {{ form.doctors }}
+                         </div>
                     <div class="mb-3">
-                        <label for="Last_Name" class="form-label">Last Name:</label>
-                        <input type="text" class="form-control" id="Last_Name" name="Last_Name" value="{{ data.lname }}">
-                    </div>
-                    <div class="mb-3">
-                        <label for="Email" class="form-label">Email:</label>
-                        <input type="email" class="form-control" id="Email" name="Email" value="{{ data.email }}">
-                    </div>
-                    <div class="mb-3">
-                        <label for="Phone_Number" class="form-label">Phone Number:</label>
-                        <input type="text" class="form-control" id="Phone_Number" name="Phone_Number" value="{{ data.phone }}">
-                    </div>
-                    <button type="submit" class="btn btn-primary">Book Appointment</button>
+                    <label for="Examination Type">{{ form.devices.label }}</label>
+                             {{ form.devices }}
+                        </div>
+                   <br>
+                    {{ form.submit(class="btn btn-lg btn-block btn-primary") }}
                 </form>
             </div>
         </div>

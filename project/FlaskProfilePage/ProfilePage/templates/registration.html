@@ -14,26 +14,37 @@
         </div>
 
         <div class="container" style="width: 30%">
-            <form method="POST" class="form-register" style="color:white">
+            <form method="POST" class="form-register" style="color:white" enctype="multipart/form-data">
                 {{ form.hidden_tag() }}
-                {{ form.First_Name.label }}
-                {{ form.First_Name(class="form-control",placeholder="First Name") }}
-
-                {{ form.Last_Name.label }}
-                {{ form.Last_Name(class="form-control",placeholder="Last Name") }}
-
-                {{ form.Email.label }}
-                {{ form.Email(class="form-control",placeholder="Email") }}
-
-                {{ form.Phone_Number.label }}
-                {{ form.Phone_Number(class="form-control",placeholder="Phone Number") }}
-
-                {{ form.Password.label }}
-                {{ form.Password(class="form-control",placeholder="Password") }}
-
-                {{ form.Password_Confirmation.label }}
-                {{ form.Password_Confirmation(class="form-control",placeholder="Confirm Password") }}
-                <br>
+                <div class="mb-3">
+                    <label for="First_Name" class="form-label">First Name</label>
+                    {{ form.First_Name(class="form-control", placeholder="First Name") }}
+                </div>
+                <div class="mb-3">
+                    <label for="Last_Name" class="form-label">Last Name</label>
+                    {{ form.Last_Name(class="form-control", placeholder="Last Name") }}
+                </div>
+                <div class="mb-3">
+                    <label for="Email" class="form-label">Email</label>
+                    {{ form.Email(class="form-control", placeholder="Email") }}
+                </div>
+                <div class="mb-3">
+                    <label for="Phone_Number" class="form-label">Phone Number</label>
+                    {{ form.Phone_Number(class="form-control", placeholder="Phone Number") }}
+                </div>
+                <div class="mb-3">
+                    <label for="Password" class="form-label">Password</label>
+                    {{ form.Password(class="form-control", placeholder="Password") }}
+                </div>
+                <div class="mb-3">
+                    <label for="Password_Confirmation" class="form-label">Confirm Password</label>
+                    {{ form.Password_Confirmation(class="form-control", placeholder="Confirm Password") }}
+                </div>
+                <!-- Profile Photo Upload Field -->
+                <div class="mb-3">
+                    <label for="profile_photo" class="form-label">Profile Photo</label>
+                    <input type="file" class="form-control" id="profile_photo" name="profile_photo">
+                </div>
                 {{ form.submit(class="btn btn-lg btn-block btn-success") }}
             </form>
             <div class="text-center mt-5" style = "position:relative;  top:-88px; left: 85px; color:black">
