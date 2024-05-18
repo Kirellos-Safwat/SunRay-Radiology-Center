@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, IntegerField, SelectField, DateField
 from wtforms.validators import Length, EqualTo, Email, DataRequired, ValidationError, NumberRange
-from ProfilePage.models import Credentials, Patient
+from ProfilePage.models import Credentials, Patient, radiologist
 from flask_wtf.file import FileField, FileAllowed
 
 
@@ -34,7 +34,7 @@ class LoginForm(FlaskForm):
 
 
 class EditProfileForm(FlaskForm):
-    First_Name = StringField(label='First Name:', validators=[Length(min=2, max=30), DataRequired()])
+    First_Name = StringField(label='First Name:', validators=[Length(min=2, max=50), DataRequired()])
     Last_Name = StringField(label='Last Name:', validators=[Length(min=2, max=30), DataRequired()])
     Email = StringField(label='Email:', validators=[Email(), DataRequired()])
     Phone_Number = StringField(label='Phone Number:', validators=[Length(min=11, max=13), DataRequired()])
@@ -51,7 +51,37 @@ class AppointmentForm(FlaskForm):
     devices = SelectField('Examination Type', validators=[DataRequired()], coerce=str)
     submit = SubmitField(label='Book Appointment')
 
+class RadiologistRegisterForm(FlaskForm):
+    def validate_Email(self, email_to_check):
+        radiologist_email = radiologist.query.filter_by(d_email=email_to_check.data).first()
+        if radiologist_email:
+            raise ValidationError('This Email has been used before')
 
+    def validate_Phone_Number(self, phone_to_check):
+        d_phone = radiologist.query.filter_by(d_phone=phone_to_check.data).first()
+        if d_phone:
+            raise ValidationError('This Phone number has been used before')
+
+    D_Name = StringField(label='Full Name:', validators=[Length(min=2, max=50), DataRequired()])
+    Email = StringField(label='Email:', validators=[Email(), DataRequired()])
+    Phone_Number = StringField(label='Phone Number:', validators=[Length(min=11, max=13), DataRequired()])
+    Password = PasswordField(label='Password:', validators=[Length(min=6), DataRequired()])
+    Password_Confirmation = PasswordField(label='Confirm Password:', validators=[EqualTo('Password'), DataRequired()])
+    # photo field
+    profile_photo = FileField('Profile Photo', validators=[FileAllowed(['jpg', 'png'])])  # Add this field
+    submit = SubmitField(label='Create Account')
+
+class ReportForm(FlaskForm):
+
+    devices = SelectField('Imaging modality', validators=[DataRequired()], coerce=str)
+    patients = SelectField('Patient Name', validators=[DataRequired()], coerce=str)
+    r_time = DateField('Date of study', format='%Y-%m-%d', validators=[DataRequired()])
+    r_scan = FileField('Imaging', validators=[FileAllowed(['jpg', 'png'])])
+    r_study_area = StringField(label='Study area', validators=[DataRequired()])
+    radiation_dose = StringField(label='Radiation dose:', validators=[DataRequired()])
+    r_findings = StringField(label='Findings:', validators=[DataRequired()])
+    r_result = StringField(label='Impressions:', validators=[DataRequired()])
+    submit = SubmitField(label='Submit Report')
 class PatientRegisterForm(FlaskForm):
     def validate_Email(self, email_to_check):
         patient_email = Patient.query.filter_by(email=email_to_check.data).first()
