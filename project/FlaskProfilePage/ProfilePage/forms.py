@@ -51,7 +51,17 @@ class AppointmentForm(FlaskForm):
     devices = SelectField('Examination Type', validators=[DataRequired()], coerce=str)
     submit = SubmitField(label='Book Appointment')
 
+class ReportForm(FlaskForm):
 
+    devices = SelectField('Imaging modality', validators=[DataRequired()], coerce=str)
+    patients = SelectField('Patient Name', validators=[DataRequired()], coerce=str)
+    r_time = DateField('Date of study', format='%Y-%m-%d', validators=[DataRequired()])
+    r_scan = FileField('Imaging', validators=[FileAllowed(['jpg', 'png'])])
+    r_study_area = StringField(label='Study area', validators=[DataRequired()])
+    radiation_dose = StringField(label='Radiation dose:', validators=[DataRequired()])
+    r_findings = StringField(label='Findings:', validators=[DataRequired()])
+    r_result = StringField(label='Impressions:', validators=[DataRequired()])
+    submit = SubmitField(label='Submit Report')
 class PatientRegisterForm(FlaskForm):
     def validate_Email(self, email_to_check):
         patient_email = Patient.query.filter_by(email=email_to_check.data).first()

@@ -1,7 +1,6 @@
 import psycopg2.extras
-from ProfilePage.forms import RegisterForm, LoginForm, EditProfileForm, PatientRegisterForm, AppointmentForm
-from ProfilePage import app, db, connection, connection_string
-from ProfilePage.forms import RegisterForm, LoginForm, EditProfileForm, AppointmentForm, PatientRegisterForm
+import random
+from ProfilePage.forms import RegisterForm, LoginForm, EditProfileForm, AppointmentForm, PatientRegisterForm, ReportForm
 from ProfilePage import app, db, connection, connection_string
 from flask import render_template, redirect, url_for, flash, session
 from werkzeug.utils import secure_filename
@@ -71,7 +70,7 @@ def appointment_page():
 
             cursor.execute(
                 "INSERT INTO appointments (d_id,device_name,device_id,date,d_name,p_id) VALUES (%s, %s, %s, %s,%s,%s)",
-                (d_id, device_name, device_id, date,d_name,p_id)
+                (d_id, device_name, device_id, date, d_name, p_id)
             )
             connection.commit()
             cursor.close()
@@ -80,6 +79,73 @@ def appointment_page():
             flash('Your appointment has been booked successfully!', category='success')
             return redirect(url_for('home_page'))
     return render_template('appointment.html', form=form, data=data)
+
+
+@app.route('/SubmitReport', methods=['GET', 'POST'])
+def report_page():
+    form = ReportForm()
+    data = session.get('user_data')  # This should be changed to get the patient data from the database
+
+    def get_patients():
+        connection = psycopg2.connect(connection_string)
+        curs = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
+        curs.execute("select concat(fname,' ',lname) AS full_name FROM patient")
+        patients = curs.fetchall()
+        curs.execute("ROLLBACK")
+        connection.commit()
+        curs.close()
+        connection.close()
+        return [patient['full_name'] for patient in patients]
+
+    def get_devices():
+        connection = psycopg2.connect(connection_string)
+        curs = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
+        curs.execute("SELECT device_name,device_id FROM radiology_equipment")
+        devices = curs.fetchall()
+        curs.execute("ROLLBACK")
+        connection.commit()
+        curs.close()
+        connection.close()
+        return [device['device_name'] for device in devices]
+
+    form.patients.choices = get_patients()
+    form.devices.choices = get_devices()
+
+    if request.method == 'POST':
+        connection = psycopg2.connect(connection_string)
+        cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
+        d_id = None
+
+        if form.validate_on_submit():
+            r_time = form.r_time.data
+            r_scan = form.r_scan.data
+            r_study_area = form.r_study_area.data
+            radiation_dose = form.radiation_dose.data
+            r_findings = form.r_findings.data
+            r_result = form.r_result.data
+            billing = random.randint(500, 1000)
+
+            p_name = form.patients.data
+            cursor.execute("SELECT id FROM patient WHERE concat(fname,' ',lname) = %s", (p_name,))
+            p_id = cursor.fetchall()[0][0]
+            cursor.execute("ROLLBACK")
+            device_name = form.devices.data
+            cursor.execute("SELECT device_id FROM radiology_equipment WHERE device_name = %s",
+                           (device_name,))
+            device_id = cursor.fetchall()[0][0]
+            cursor.execute("ROLLBACK")
+
+            cursor.execute(
+                "INSERT INTO report (p_id,d_id,device_id,r_time,r_scan,r_study_area,radiation_dose,r_findings,r_result,billing) VALUES (%s, %s, %s, %s,%s,%s, %s, %s, %s,%s)",
+                (p_id, d_id, device_id, r_time, r_scan, r_study_area, radiation_dose, r_findings, r_result, billing)
+            )
+            connection.commit()
+            cursor.close()
+            connection.close()
+
+            flash('The report was submitted successfully', category='success')
+            return redirect(url_for('report_page'))
+    return render_template('report.html', form=form, data=data)
 
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -219,6 +285,7 @@ def edit_profile():
                 profile_picture = %(profile_picture)s
             WHERE id = %(id)s;
         """
+
         updated_data['id'] = data['id']
 
         cursor.execute(update_query, updated_data)

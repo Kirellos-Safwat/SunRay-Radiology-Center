@@ -46,11 +46,11 @@ class radiology_equipment(db.Model, UserMixin):
 
 
 class appointments(db.Model, UserMixin):
-    A_ID = db.Column(db.Integer(), primary_key=True)
-    P_ID = db.Column(db.Integer(), db.ForeignKey('patient.P_ID'), nullable=True)
-    D_ID = db.Column(db.Integer(), db.ForeignKey('radiologist.D_ID'), nullable=False)
+    a_id = db.Column(db.Integer(), primary_key=True)
+    p_id = db.Column(db.Integer(), db.ForeignKey('patient.P_ID'), nullable=True)
+    d_id = db.Column(db.Integer(), db.ForeignKey('radiologist.D_ID'), nullable=False)
     device_name = db.Column(db.String(length=15), db.ForeignKey('radiology_equipment.device_name'), nullable=False)
-    Device_ID = db.Column(db.String(length=15), db.ForeignKey('radiology_equipment.Device_ID'), nullable=False)
+    device_id = db.Column(db.String(length=15), db.ForeignKey('radiology_equipment.Device_ID'), nullable=False)
     date = db.Column(db.String(length=15), nullable=False)
 
 
@@ -76,3 +76,16 @@ class radiologist(db.Model):
 
     def __repr__(self):
         return f'Patient {self.p_name}'
+
+class report(db.Model):
+    r_id = db.Column(db.Integer, primary_key=True)
+    p_id = db.Column(db.Integer(), db.ForeignKey('patient.id'), nullable=True)
+    d_id = db.Column(db.Integer(), db.ForeignKey('radiologist.D_ID'), nullable=False)
+    device_id = db.Column(db.String(length=15), db.ForeignKey('radiology_equipment.Device_ID'), nullable=False)
+    r_time = db.Column(db.String(length=15), nullable=False)
+    r_scan = db.Column(db.String(200))
+    r_study_area = db.Column(db.String(100))
+    radiation_dose=db.Column(db.String(100))
+    r_findings = db.Column(db.String(100))
+    r_result = db.Column(db.String(100))
+    billing = db.Column(db.Integer)
