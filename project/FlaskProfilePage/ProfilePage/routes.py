@@ -1,10 +1,15 @@
 import psycopg2.extras
-from ProfilePage.forms import RegisterForm, LoginForm , EditProfileForm , PatientRegisterForm
-from ProfilePage import app, db, connection , connection_string
+from ProfilePage.forms import RegisterForm, LoginForm, EditProfileForm, PatientRegisterForm, AppointmentForm
+from ProfilePage import app, db, connection, connection_string
+from ProfilePage.forms import RegisterForm, LoginForm, EditProfileForm, AppointmentForm, PatientRegisterForm
+from ProfilePage import app, db, connection, connection_string
 from flask import render_template, redirect, url_for, flash, session
 from werkzeug.utils import secure_filename
 import os
 from flask import request
+
+from ProfilePage.models import appointments
+
 
 @app.route('/')  # that is the root url of the website
 @app.route('/home')
@@ -12,13 +17,69 @@ def home_page():
     return render_template('home.html')
 
 
-# os.getcwd() might change from devide to device i think , based on your cwd: current working directory
-
-# UPLOAD_FOLDER = os.path.join(os.getcwd(), "project/FlaskProfilePage/ProfilePage/static/uploads")
 UPLOAD_FOLDER = os.path.join(os.getcwd(), "project", "FlaskProfilePage", "ProfilePage", "static", "uploads")
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+
+@app.route('/BookAppointment', methods=['GET', 'POST'])
+def appointment_page():
+    form = AppointmentForm()
+    data = session.get('user_data')  # This should be changed to get the patient data from the database
+
+    def get_doctors():
+        connection = psycopg2.connect(connection_string)
+        curs = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
+        curs.execute("SELECT d_name FROM radiologist")
+        doctors = curs.fetchall()
+        curs.execute("ROLLBACK")
+        connection.commit()
+        curs.close()
+        connection.close()
+        return [doctor['d_name'] for doctor in doctors]
+
+    def get_devices():
+        connection = psycopg2.connect(connection_string)
+        curs = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
+        curs.execute("SELECT device_name,device_id FROM radiology_equipment")
+        devices = curs.fetchall()
+        curs.execute("ROLLBACK")
+        connection.commit()
+        curs.close()
+        connection.close()
+        return [device['device_name'] for device in devices]
+
+    form.doctors.choices = get_doctors()
+    form.devices.choices = get_devices()
+
+    if request.method == 'POST':
+        connection = psycopg2.connect(connection_string)
+        cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
+        p_id = data['id']
+        if form.validate_on_submit():
+            date = form.date.data
+            d_name = form.doctors.data
+            cursor.execute("SELECT d_id FROM radiologist WHERE d_name = %s", (d_name,))
+            d_id = cursor.fetchall()[0][0]
+            cursor.execute("ROLLBACK")
+            device_name = form.devices.data
+            cursor.execute("SELECT device_id FROM radiology_equipment WHERE device_name = %s",
+                           (device_name,))
+            device_id = cursor.fetchall()[0][0]
+            cursor.execute("ROLLBACK")
+
+            cursor.execute(
+                "INSERT INTO appointments (d_id,device_name,device_id,date,d_name,p_id) VALUES (%s, %s, %s, %s,%s,%s)",
+                (d_id, device_name, device_id, date,d_name,p_id)
+            )
+            connection.commit()
+            cursor.close()
+            connection.close()
+
+            flash('Your appointment has been booked successfully!', category='success')
+            return redirect(url_for('home_page'))
+    return render_template('appointment.html', form=form, data=data)
 
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -45,8 +106,7 @@ def registration_page():
         if form.validate_on_submit():
             cursor.execute(
                 "INSERT INTO Credentials (fname, lname, email, phone, password, profile_picture ,is_admin) VALUES (%s, %s, %s, %s, %s, %s , %s)",
-                (fname, lname, email, phone, password, relative_photo_path,is_admin)
-                
+                (fname, lname, email, phone, password, relative_photo_path, is_admin)
 
             )
             connection.commit()
@@ -58,6 +118,7 @@ def registration_page():
             flash('Invalid email or password. Please try again.', category='danger')
 
     return render_template('registration.html', form=RegisterForm())
+
 
 @app.route('/login', methods=['GET', 'POST'])
 def login_page():
@@ -79,6 +140,7 @@ def login_page():
             flash('Incorrect Email or password. Please try again.', category='danger')
 
     return render_template('login.html', form=LoginForm())
+
 
 @app.route('/profile')
 def profile_page():
@@ -105,11 +167,11 @@ def users_page():
     return render_template('users.html', credentials=credentials)
 
 
-
 @app.route('/logout')
 def logout():
     session.pop('user_data')
     return redirect('/')
+
 
 @app.route('/done')
 def thanks_page():
@@ -168,6 +230,8 @@ def edit_profile():
         return redirect(url_for('login_page'))  # Redirect to login to refresh
 
     return render_template('edit_profile.html', data=data, form=form)
+
+
 #######################################################################
 @app.route('/patient-register', methods=['GET', 'POST'])
 def patient_registration_page():
@@ -225,10 +289,11 @@ def patient_login_page():
 
     return render_template('patient-login.html', form=LoginForm())
 
+
 @app.route('/patient-profile')
 def patient_profile_page():
     data = session.get('user_data')
-    
+
     cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
     # Fetch appointments for the current user's ID
     cursor.execute("""
@@ -239,33 +304,34 @@ def patient_profile_page():
     """, (data['id'],))
     appointments = cursor.fetchall()
     cursor.close()
-    
+
     ############################################
-    scans_folder = "patient" + str(data['id']) # make a folder for each patient
+    scans_folder = "patient" + str(data['id'])  # make a folder for each patient
     scans_path = os.path.join(app.config['UPLOAD_FOLDER'], scans_folder)
-    if  os.path.exists(scans_path):
-        scan_Files = os.listdir(scans_path) ## must be absolute path
+    if os.path.exists(scans_path):
+        scan_Files = os.listdir(scans_path)  ## must be absolute path
     else:
         scan_Files = []
     ############################################
-    
+
     if data is None:
         return redirect('/patient-login')
-    return render_template('patient-profile.html', data=data , scan_Files = scan_Files, appointments=appointments)
+    return render_template('patient-profile.html', data=data, scan_Files=scan_Files, appointments=appointments)
+
 
 @app.route('/upload_scan', methods=['GET', 'POST'])
 def patient_upload_scan():
     data = session.get('user_data')
-    scans_folder = "patient" + str(data['id']) # make a folder for each patient
+    scans_folder = "patient" + str(data['id'])  # make a folder for each patient
     scans_path = os.path.join(app.config['UPLOAD_FOLDER'], scans_folder)
     if data is None:
         return redirect('/patient-login')
-    
+
     if not os.path.exists(scans_path):
         os.makedirs(scans_path)
     else:
         scan_files = os.listdir(scans_path)
-    
+
     if request.method == 'POST':
         scan_file = request.files['scan_file']
         if scan_file and scan_file.filename != '':
@@ -275,20 +341,21 @@ def patient_upload_scan():
             flash('Scan uploaded successfully!', category='success')
         else:
             flash('No scan file selected!', category='danger')
-    
-    scan_files = [] # this list stores paths to the scan files
+
+    scan_files = []  # this list stores paths to the scan files
     if os.path.exists(scans_path):
         scan_files = os.listdir(scans_path)
     relative_scan_folder = os.path.join('uploads', scans_folder)
     cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
     cursor.execute(
-         "UPDATE patient SET scans = %s WHERE id = %s",
-            (relative_scan_folder, data['id'])
-    )# insert to the specific patient
+        "UPDATE patient SET scans = %s WHERE id = %s",
+        (relative_scan_folder, data['id'])
+    )  # insert to the specific patient
     connection.commit()
     cursor.close()
-    
+
     return render_template('upload_scan.html', data=data, scan_files=scan_files)
+
 
 @app.route('/patient-edit_profile', methods=['GET', 'POST'])
 def patient_edit_profile():
@@ -305,7 +372,7 @@ def patient_edit_profile():
             'age': form.Age.data,
             'address': form.Address.data,
             'is_admin': True if form.Email.data.endswith('@company.com') else False,
-            
+
         }
 
         profile_photo = form.profile_photo.data
@@ -337,6 +404,6 @@ def patient_edit_profile():
         connection.close()
 
         flash('Your profile has been updated successfully! Please login again', category='success')
-        return redirect((('/patient-login_page') )) # Redirect to login to refresh
+        return redirect((('/patient-login_page')))  # Redirect to login to refresh
 
     return render_template('edit_profile.html', data=data, form=form)
