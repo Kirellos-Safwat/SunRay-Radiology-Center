@@ -3,12 +3,13 @@
     Users Page
 {% endblock %}
 {% block content %}
-    <body>
-        <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
-          <table class="table table-hover table-dark" style=" position:relative; border: 1px solid; text-align: center;tr:hover; {background-color: coral;};  top:50px; color:white">
+<body>
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+    <div class="container mt-5">
+        <h2>Inline Editing Table</h2>
+        <table class="table table-hover table-dark" style="border: 1px solid; text-align: center; color:white">
             <thead>
                 <tr>
-                    <!-- Your Columns HERE -->
                     <th scope="col">ID</th>
                     <th scope="col">First Name</th>
                     <th scope="col">Last Name</th>
@@ -17,26 +18,93 @@
                     <th scope="col">Options</th>
                 </tr>
             </thead>
-            <tbody>
-                <!-- Your rows inside the table HERE: -->
+            <tbody id="credentialsTable">
                 {% for credential in credentials %}
-                    <tr>
-                        <td>{{ credential.id }}</td>
-                        <td>{{ credential.fname }}</td>
-                        <td>{{ credential.lname }}</td>
-                        <td>{{ credential.email }}</td>
-                        <td>{{ credential.phone }}</td>
-                        <td>
-                            <button class="btn btn-outline btn-success">Edit</button>
-                            <button class="btn btn-outline btn-danger">Delete</button>
-                        </td>
-                    </tr>
+                <tr data-id="{{ credential.id }}">
+                    <td>{{ credential.id }}</td>
+                    <td class="editable" data-field="fname">{{ credential.fname }}</td>
+                    <td class="editable" data-field="lname">{{ credential.lname }}</td>
+                    <td class="editable" data-field="email">{{ credential.email }}</td>
+                    <td class="editable" data-field="phone">{{ credential.phone }}</td>
+                    <td>
+                        <button class="btn btn-outline btn-success save-btn" style="display: none;">Save</button>
+                        <button class="btn btn-outline btn-danger delete-btn" data-id="{{ credential.id }}">Delete</button>
+                    </td>
+                </tr>
                 {% endfor %}
             </tbody>
         </table>
-        </div>
-        <!-- Bootstrap core JS-->
-        <!--<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>-->
-        <!-- Core theme JS-->
-    </body>
+    </div>
+
+    <!-- Bootstrap core JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Make cells editable on click
+            $('.editable').click(function() {
+                if ($(this).find('input').length === 0) {
+                    let currentText = $(this).text();
+                    $(this).html(`<input type="text" class="form-control" value="${currentText}">`);
+                    $(this).closest('tr').find('.save-btn').show();
+                }
+            });
+
+            // Handle save button click
+            $('.save-btn').click(function() {
+                let row = $(this).closest('tr');
+                let id = row.data('id');
+                let updatedData = { id: id };
+
+                row.find('.editable').each(function() {
+                    let input = $(this).find('input');
+                    if (input.length > 0) {
+                        let newValue = input.val();
+                        let fieldName = $(this).data('field'); // Using data-field as field name
+                        updatedData[fieldName] = newValue;
+                        $(this).text(newValue);
+                    }
+                });
+
+                $(this).hide();
+
+                // Send the updated data to the server
+                $.ajax({
+                    url: '{{ url_for("edit_data") }}',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(updatedData),
+                    success: function(response) {
+                        alert('Data updated successfully!');
+                    },
+                    error: function(error) {
+                        alert('Error updating data.');
+                    }
+                });
+            });
+
+            // Handle delete button click
+            $('.delete-btn').click(function() {
+                let id = $(this).data('id');
+
+                // Send the delete request to the server
+                $.ajax({
+                    url: '{{ url_for("edit_data") }}',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ delete_id: id }),
+                    success: function(response) {
+                        alert('Data deleted successfully!');
+                        // Remove the row from the table
+                        $(`tr[data-id=${id}]`).remove();
+                    },
+                    error: function(error) {
+                        alert('Error deleting data.');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
 {% endblock %}

@@ -6,20 +6,44 @@ from werkzeug.utils import secure_filename
 import os
 from flask import request
 
-@app.route('/')  # that is the root url of the website
-@app.route('/home')
-def home_page():
-    return render_template('home.html')
-
-
 # os.getcwd() might change from devide to device i think , based on your cwd: current working directory
-
 # UPLOAD_FOLDER = os.path.join(os.getcwd(), "project/FlaskProfilePage/ProfilePage/static/uploads")
 UPLOAD_FOLDER = os.path.join(os.getcwd(), "project", "FlaskProfilePage", "ProfilePage", "static", "uploads")
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
+@app.route('/')  # that is the root url of the website
+@app.route('/home')
+def home_page():
+    return render_template('home.html')
+
+@app.route('/edit_data', methods=['POST'])
+def edit_data():
+    cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
+    data = request.get_json()
+    if 'delete_id' in data:
+        delete_id = data['delete_id']
+        print(delete_id)
+        update_query = """
+            DELETE FROM Credentials 
+            WHERE id = %s;
+        """
+        cursor.execute(update_query, str(delete_id))
+    elif 'id' in data:
+        update_data = data
+        update_query = f"""
+            UPDATE Credentials SET 
+            {', '.join(
+            f"{key} = '{value}'"
+            for key, value in update_data.items()
+            if key != 'id')}
+            WHERE id = {update_data['id']};
+        """
+        cursor.execute(update_query, update_data)
+    cursor.close()    
+    connection.commit()
+    return redirect(url_for('users_page'))
 
 @app.route('/register', methods=['GET', 'POST'])
 def registration_page():
@@ -85,16 +109,15 @@ def profile_page():
     data = session.get('user_data')
     if data is None:
         return redirect('/login')
-    if os.name == 'nt' and data['profile_picture'] != None:
+    if os.name == 'nt' and data['profile_picture'] is not None:
         data['profile_picture'] = data['profile_picture'].replace("\\", "/")
-        print(data['profile_picture'])
     return render_template('profile.html', data=data)
 
 
 @app.route('/users')
 def users_page():
     data = session.get('user_data')
-    if data is None:
+    if data is None or data['is_admin'] == False:
         return redirect('/')
     cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
     cursor.execute('SELECT * FROM Credentials')
@@ -109,6 +132,10 @@ def users_page():
 @app.route('/logout')
 def logout():
     session.pop('user_data')
+    try:
+        session.pop('update')
+    except:
+        pass
     return redirect('/')
 
 @app.route('/done')
