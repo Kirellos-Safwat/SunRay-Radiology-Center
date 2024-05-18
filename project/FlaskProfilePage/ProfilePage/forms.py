@@ -52,11 +52,11 @@ class AppointmentForm(FlaskForm):
 
 class PatientRegisterForm(FlaskForm):
     def validate_Email(self, email_to_check):
-        patient_email = Patient.query.filter_by(p_email=email_to_check.data).first()
+        patient_email = Patient.query.filter_by(email=email_to_check.data).first()
         if patient_email:
             raise ValidationError('This Email has been used before')
     def validate_Phone_Number(self, phone_to_check):
-        patient_phone = Patient.query.filter_by(p_phone=phone_to_check.data).first()
+        patient_phone = Patient.query.filter_by(phone=phone_to_check.data).first()
         if patient_phone:
             raise ValidationError('This Phone number has been used before')
 

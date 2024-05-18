@@ -54,7 +54,7 @@ class appointments(db.Model, UserMixin):
 class Patient(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     phone = db.Column(db.String(20))
-    name = db.Column(db.String(100))
+    # name = db.Column(db.String(100))
     gender = db.Column(db.String(10))
     age = db.Column(db.Integer)
     address = db.Column(db.String(200))
@@ -63,7 +63,7 @@ class Patient(db.Model):
     email = db.Column(db.String(100), unique=True)
     fname = db.Column(db.String(100))
     lname = db.Column(db.String(100))
-    number = db.Column(db.String(20))
+    # number = db.Column(db.String(20))
     profile_picture = db.Column(db.String(200))
     scans = db.Column(db.String(200))
 
