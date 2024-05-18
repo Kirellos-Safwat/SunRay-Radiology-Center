@@ -73,6 +73,14 @@ class Patient(db.Model):
 class radiologist(db.Model):
     d_id = db.Column(db.Integer, primary_key=True)
     d_name = db.Column(db.String(100))
+    d_phone = db.Column(db.String(20))
+    d_gender = db.Column(db.String(10))
+    d_age = db.Column(db.Integer)
+    d_address = db.Column(db.String(200))
+    d_password = db.Column(db.String(100))
+    d_email = db.Column(db.String(100), unique=True)
+
+    d_profile_picture = db.Column(db.String(200))
 
     def __repr__(self):
         return f'Patient {self.p_name}'
