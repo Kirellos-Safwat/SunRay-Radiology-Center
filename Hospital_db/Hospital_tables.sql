@@ -1,7 +1,7 @@
 CREATE TABLE Admin (
   Admin_ID INT Primary key,
   A_Name varchar(100),
-  A_Phone varchar(100),
+  A_Phone varchar(13),
   A_Address varchar(100),
   A_Email varchar(100),
   Password varchar(100)
@@ -11,14 +11,14 @@ CREATE TABLE Radiologist (
   D_ID INT Primary key,
   D_Name varchar(100),
   D_Gender varchar(100),
-  D_Phone varchar(100),
+  D_Phone varchar(13),
   D_Address varchar(100),
   D_Email varchar(100),
   D_Password varchar(100)
 );
 CREATE TABLE Patient (
   P_ID INT Primary key,
-  P_Phone varchar(100),
+  P_Phone varchar(13),
   P_Name varchar(100),
   P_Gender varchar(100),
   P_Age INT,
@@ -31,8 +31,8 @@ CREATE TABLE Patient (
 
 CREATE TABLE Radiology_Equipment (
   Device_ID INT Primary key,
-  Commission_Date varchar(100),
-  Maintenance_Date varchar(100)
+  Commission_Date varchar(8),
+  Maintenance_Date varchar(8)
 );
 CREATE TABLE Report (
   ID_Report INT Primary key,
