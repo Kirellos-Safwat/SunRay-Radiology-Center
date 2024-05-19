@@ -1,6 +1,4 @@
-from ProfilePage.forms import RegisterForm, LoginForm, EditProfileForm, PatientRegisterForm, AppointmentForm
-from ProfilePage import app, db, connection, connection_string
-from ProfilePage.forms import RegisterForm, LoginForm, EditProfileForm, AppointmentForm, PatientRegisterForm
+from ProfilePage.forms import RegisterForm, LoginForm, EditProfileForm, AppointmentForm, PatientRegisterForm, ReportForm,RadiologistRegisterForm
 from ProfilePage import app, db, connection, connection_string
 from flask import render_template, redirect, url_for, flash, session
 from werkzeug.utils import secure_filename
@@ -123,17 +121,6 @@ def appointment_page():
             return redirect(url_for('home_page'))
     return render_template('appointment.html', form=form, data=data)
 
-'''
-    @app.route('/register', methods=['GET', 'POST'])
-    def registration_page():
-        form = RegisterForm()
-        if request.method == 'POST':
-            fname = request.form['First_Name']
-            lname = request.form['Last_Name']
-            email = request.form['Email']
-            phone = request.form['Phone_Number']
-            password = request.form['Password']
-            is_admin = True if email.endswith('@company.com') else False
 
 @app.route('/SubmitReport', methods=['GET', 'POST'])
 def report_page():
@@ -200,6 +187,20 @@ def report_page():
             flash('The report was submitted successfully', category='success')
             return redirect(url_for('report_page'))
     return render_template('report.html', form=form, data=data)
+
+
+
+'''
+    @app.route('/register', methods=['GET', 'POST'])
+    def registration_page():
+        form = RegisterForm()
+        if request.method == 'POST':
+            fname = request.form['First_Name']
+            lname = request.form['Last_Name']
+            email = request.form['Email']
+            phone = request.form['Phone_Number']
+            password = request.form['Password']
+            is_admin = True if email.endswith('@company.com') else False
 
 
 @app.route('/register', methods=['GET', 'POST'])
