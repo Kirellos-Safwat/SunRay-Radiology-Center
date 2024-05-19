@@ -1,23 +1,24 @@
-from ProfilePage.forms import RegisterForm, LoginForm, EditProfileForm, AppointmentForm, PatientRegisterForm, ReportForm,RadiologistRegisterForm
-from ProfilePage import app, db, connection, connection_string
+from ProfilePage.forms import LoginForm, EditProfileForm, AppointmentForm, PatientRegisterForm, ReportForm, \
+    RadiologistRegisterForm
+from ProfilePage import app, connection, connection_string
 from flask import render_template, redirect, url_for, flash, session
 from werkzeug.utils import secure_filename
 from flask import request
-from ProfilePage.models import appointments
 import os
 import psycopg2.extras
 import random
-
 
 UPLOAD_FOLDER = os.path.join(os.getcwd(), "project", "FlaskProfilePage", "ProfilePage", "static", "uploads")
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
+
 @app.route('/')  # that is the root url of the website
 @app.route('/home')
 def home_page():
     return render_template('home.html')
+
 
 @app.route('/edit_data', methods=['POST'])
 def edit_data():
@@ -189,7 +190,6 @@ def report_page():
     return render_template('report.html', form=form, data=data)
 
 
-
 '''
     @app.route('/register', methods=['GET', 'POST'])
     def registration_page():
@@ -241,6 +241,7 @@ def registration_page():
         return render_template('registration.html', form=RegisterForm())
 '''
 
+
 @app.route('/login', methods=['GET', 'POST'])
 def login_admin():
     if request.method == 'POST':
@@ -262,6 +263,7 @@ def login_admin():
 
     return render_template('login.html', form=LoginForm())
 
+
 '''
     @app.route('/profile')
     def profile_page():
@@ -272,6 +274,7 @@ def login_admin():
             data['profile_picture'] = data['profile_picture'].replace("\\", "/")
         return render_template('profile.html', data=data)
 '''
+
 
 @app.route('/users')
 def users_page():
@@ -302,6 +305,7 @@ def logout():
 @app.route('/done')
 def thanks_page():
     return render_template('thank_you.html')
+
 
 '''
     @app.route('/edit_profile', methods=['GET', 'POST'])
@@ -357,6 +361,8 @@ def thanks_page():
 
         return render_template('edit_profile.html', data=data, form=form)
 '''
+
+
 @app.route('/radiologist-register', methods=['GET', 'POST'])
 def radiologist_registration_page():
     form = RadiologistRegisterForm()
@@ -380,7 +386,7 @@ def radiologist_registration_page():
         cursor = connection.cursor()
         cursor.execute(
             "INSERT INTO radiologist (d_name,d_email, d_phone, d_password, d_profile_picture) VALUES (%s, %s, %s, %s, %s)",
-            (d_name ,d_email, d_phone, d_password, relative_photo_path)
+            (d_name, d_email, d_phone, d_password, relative_photo_path)
         )
         connection.commit()
         cursor.close()
@@ -390,6 +396,7 @@ def radiologist_registration_page():
         return redirect('/radiologist-login_page')
 
     return render_template('radiologist-registration.html', form=form)
+
 
 @app.route('/radiologist-login_page', methods=['GET', 'POST'])
 def radiologist_login_page():
@@ -415,6 +422,7 @@ def radiologist_login_page():
 
     return render_template('patient-login.html', form=LoginForm())  # check render
 
+
 @app.route('/radiologist-profile')
 def radiologist_profile_page():
     data = session.get('user_data')
@@ -433,6 +441,7 @@ def radiologist_profile_page():
     if data is None:
         return redirect('/radiologist-login')
     return render_template('radiologist-profile.html', data=data, appointments=appointments)
+
 
 @app.route('/radiologist-edit_profile', methods=['GET', 'POST'])
 def radiologist_edit_profile():
@@ -480,10 +489,9 @@ def radiologist_edit_profile():
         connection.close()
 
         flash('Your profile has been updated successfully! Please login again', category='success')
-        return redirect((('/radiologist-login_page')))  # Redirect to login to refresh
+        return redirect('/radiologist-login_page')  # Redirect to log in to refresh
 
     return render_template('radiologist_edit_profile.html', data=data, form=form)
-
 
 
 #######################################################################
@@ -568,7 +576,7 @@ def patient_profile_page():
     scans_folder = "patient" + str(data['id'])  # make a folder for each patient
     scans_path = os.path.join(app.config['UPLOAD_FOLDER'], scans_folder)
     if os.path.exists(scans_path):
-        scan_Files = os.listdir(scans_path)  ## must be absolute path
+        scan_Files = os.listdir(scans_path)  # must be absolute path
     else:
         scan_Files = []
     ############################################
@@ -664,6 +672,6 @@ def patient_edit_profile():
         connection.close()
 
         flash('Your profile has been updated successfully! Please login again', category='success')
-        return redirect((('/patient-login_page')))  # Redirect to login to refresh
+        return redirect('/patient-login_page')  # Redirect to log in to refresh
 
     return render_template('edit_profile.html', data=data, form=form)

@@ -1,15 +1,15 @@
 {% extends 'base.html' %}
 {% block title %}
-    Appointment Page
+    Report Page
 {% endblock %}
 {% block content %}
-<body>
+<body onload="setMinDate()">
 <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
     <h1 class="text-center">Submit Report</h1>
     {% for message in get_flashed_messages() %}
         <div class="alert alert-{{ message[0] }}" role="alert">{{ message[1] }}</div>
     {% endfor %}
-<div class="container" style="max-width: 400px;">
+<div class="container" style="max-width: 400px;" >
         <div class="card">
             <div class="card-body">
                 <form action="" method='POST' name="ReportForm">
@@ -19,9 +19,18 @@
                     <label for="Patient Name">{{ form.patients.label }}</label>
                              {{ form.patients }}
                          </div>
-                    <div>
-                    {{ form.r_time.label }} {{form.r_time(class='datepicker')}}
+
+                    <script>
+                                function setMinDate() {
+                                    var today = new Date().toISOString().split('T')[0];
+                                    document.getElementById('date').setAttribute('min', today);
+                                }
+                                         </script>
+
+                    <div >
+                    {{ form.r_time.label }} {{form.r_time(class='datepicker',id = 'date')}}
                         </div>
+
                     <div class="mb-3">
                     <label for="Patient Name">'Replace this with scan image input in the html'</label>
                              {{ form.patient }}

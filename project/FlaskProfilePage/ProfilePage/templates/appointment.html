@@ -3,7 +3,9 @@
     Appointment Page
 {% endblock %}
 {% block content %}
-<body>
+
+<body onload="setMinDate()">
+
 <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
     <h1 class="text-center">Book Appointment</h1>
     {% for message in get_flashed_messages() %}
@@ -16,8 +18,14 @@
 
                     {{ form.hidden_tag() }}
 
+            <script>
+                        function setMinDate() {
+                            var today = new Date().toISOString().split('T')[0];
+                            document.getElementById('date').setAttribute('min', today);
+                        }
+                                 </script>
 
-                    {{ form.date.label }} {{form.date(class='datepicker')}}
+                    {{ form.date.label }} {{form.date(class='datepicker',id = 'date')}}
                     <br>
                     <div class="mb-3">
                     <label for="Preferred Doctor">{{ form.doctors.label }}</label>
