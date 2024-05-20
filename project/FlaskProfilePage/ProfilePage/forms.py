@@ -46,8 +46,8 @@ class EditProfileForm(FlaskForm):
 
 
 class AppointmentForm(FlaskForm):
-    date = DateField('Preferred Date', format='%Y-%m-%d', validators=[DataRequired()])
-    doctors = SelectField('Preferred Doctor', validators=[DataRequired()], coerce=str)
+    date = DateField('Choose Day', format='%Y-%m-%d', validators=[DataRequired()])
+    doctors = SelectField('Choose Doctor', validators=[DataRequired()], coerce=str)
     devices = SelectField('Examination Type', validators=[DataRequired()], coerce=str)
     submit = SubmitField(label='Book Appointment')
 
@@ -72,3 +72,33 @@ class PatientRegisterForm(FlaskForm):
     # photo field
     profile_photo = FileField('Profile Photo', validators=[FileAllowed(['jpg', 'png'])])  # Add this field
     submit = SubmitField(label='Create Account')
+
+
+class contactForm(FlaskForm):
+    Name = StringField(label='Name:', validators=[Length(min=2, max=30), DataRequired()])
+    Email = StringField(label='Email:', validators=[Email(), DataRequired()])
+    Message = StringField(label='Message:', validators=[Length(min=2, max=200), DataRequired()])
+    submit = SubmitField(label='Send Now')
+
+
+'''
+class SearchForm(FlaskForm):
+    searched = StringField("Searched", validators=[DataRequired()])
+    submit = SubmitField("Submit")
+'''
+
+
+class ForgetForm(FlaskForm):
+    email = StringField(label='Email Address', validators=[Email(), DataRequired()])
+    submit = SubmitField(label='Request Reset Password')
+
+    def validate_Email(self, email_to_check):
+        email = Patient.query.filter_by(email=email_to_check.data).first()
+        if email is None:
+            raise ValidationError('There is no account for that email. Please register first.')
+
+
+class ResetPasswordForm(FlaskForm):
+    new_password = PasswordField(label='Reset Password:', validators=[Length(min=6), DataRequired()])
+    confirm_password = PasswordField(label='Confirm Password:', validators=[EqualTo('Password'), DataRequired()])
+    submit = SubmitField(label='Reset Password')
