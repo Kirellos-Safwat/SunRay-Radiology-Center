@@ -1,0 +1,174 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap');
+*{
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Poppins" , sans-serif;
+}
+.container{
+  width: 85%;
+  background: rgb(18, 172, 142);
+  border-radius: 6px;
+  padding: 20px 60px 30px 40px;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+  margin-top: 5%;
+  margin-left: 8%;
+}
+.container .content{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.container .content .left-side{
+  width: 35%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-top: 15px;
+  position: relative;
+}
+.content .left-side::before{
+  content: '';
+  position: absolute;
+  height: 70%;
+  width: 2px;
+  right: -15px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: #afafb6;
+}
+.content .left-side .details{
+  margin: 14px;
+  text-align: center;
+}
+.content .left-side .details i{
+  font-size: 30px;
+  color: var(--secondary-color);
+  margin-bottom: 10px;
+}
+.content .left-side .details .topic{
+  font-size: 18px;
+  font-weight: 700;
+  color: white;
+}
+.content .left-side .details a{
+  font-size: 14px;
+  color: white;
+}
+.content .left-side .details a:hover{
+    color: #000000;
+}
+.content .left-side .contactSocials {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    font-size: 30px;
+    color: var(--secondary-color);
+    cursor: pointer;
+}
+.content .left-side .topic-text{
+  font-size: 20px;
+  font-weight: 200;
+  color: white;
+  margin-top: 10%;
+}
+.container .content .right-side{
+  width: 75%;
+  margin-left: 75px;
+}
+.content .right-side .topic-text{
+  font-size: 23px;
+  font-weight: 600;
+  color: white;
+}
+.content .right-side .Problem{
+  font-size: 18px;
+  font-weight: 100px;
+  color: white;
+  margin-top: 4%;
+  margin-bottom: 7px;
+}
+.right-side input {
+  background-color: white;
+  width: 70%;
+  margin-left: 5px;
+  font-size: 15px;
+  padding: 16px 16px;
+  border-radius: 10px;
+  border-color: white;
+  margin-bottom: 10px;
+}
+
+.right-side textarea {
+  background-color: white;
+  width: 70%;
+  margin-left: 5px;
+  font-size: 15px;
+  padding: 16px 16px;
+  border-radius: 10px;
+  border-color: white;
+  margin-bottom: 15px;
+}
+
+.right-side input:focus-within {
+  outline: none;
+  border-color: white;
+  border-width: 3px;
+}
+
+.right-side textarea:focus-within {
+  outline: none;
+  border-color: white;
+  border-width: 3px;
+}
+
+.right-side button {
+  background-color: var(--secondary-color);
+  color: white;
+  border-radius: 20px;
+  border-color: white;
+  font-size: 18px;
+  padding: 10px 18px;
+  text-align: center;
+  display: flex;
+  margin-left: 5px;
+}
+
+.right-side button:hover {
+  cursor: pointer;
+}
+@media (max-width: 950px) {
+  .container{
+    width: 90%;
+    padding: 30px 40px 40px 35px ;
+  }
+  .container .content .right-side{
+   width: 75%;
+   margin-left: 55px;
+}
+}
+@media (max-width: 820px) {
+  .container{
+    margin: 40px 0;
+    height: 100%;
+  }
+  .container .content{
+    flex-direction: column-reverse;
+  }
+ .container .content .left-side{
+   width: 100%;
+   flex-direction: row;
+   margin-top: 40px;
+   justify-content: center;
+   flex-wrap: wrap;
+ }
+ .container .content .left-side::before{
+   display: none;
+ }
+ .container .content .right-side{
+   width: 100%;
+   margin-left: 0;
+ }
+}

@@ -1,0 +1,42 @@
+.AppointmentBox{
+    width: 350px;
+    height: 480px;
+    background: rgb(18, 172, 142);
+    color: white;
+    margin-top: 5%;
+    margin-left: 40%;
+    border-radius: 10px;
+}
+.AppointmentBox h1{
+    text-align: center;
+    margin-top: -60px;
+}
+.AppointmentBox label{
+    font-size: 18px;
+    display: block;
+    margin-left: 2%;
+    margin-top: 5%;
+    margin-bottom: 3%;
+}
+.AppointmentForm {
+    font-size: 18px;
+    position: relative;
+    margin-left: 5%;
+}
+.AppointmentBox input{
+    width: 80%;
+    margin: 0 0 20px 20px;
+    font-size: 18px;
+    margin-left: 2%;
+    margin-bottom: 3%;
+}
+.AppointmentBox input[type="submit"]{
+    border: none;
+    outline: none;
+    height: 40px;
+    border-radius: 20px;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+    margin-left: 10%;
+}

@@ -1,3 +1,18 @@
+import psycopg2.extras
+from sqlalchemy.testing.plugin.plugin_base import post
+
+from ProfilePage.forms import RegisterForm, LoginForm, EditProfileForm, contactForm, AppointmentForm
+from ProfilePage import app, db, connection, connection_string
+from ProfilePage.forms import RegisterForm, LoginForm, EditProfileForm, AppointmentForm, contactForm, ForgetForm, \
+    ResetPasswordForm
+from ProfilePage import app, db, connection, connection_string, mail
+from flask import render_template, redirect, url_for, flash, session
+from werkzeug.utils import secure_filename
+import os
+from flask import request
+from flask_login import current_user
+from flask_mail import Message
+from ProfilePage.models import appointments, Patient
 from ProfilePage.forms import LoginForm, EditProfileForm, AppointmentForm, PatientRegisterForm, ReportForm, \
     RadiologistRegisterForm
 from ProfilePage import app, connection, connection_string
@@ -7,13 +22,10 @@ from flask import request
 import os
 import psycopg2.extras
 import random
-
 UPLOAD_FOLDER = os.path.join(os.getcwd(), "project", "FlaskProfilePage", "ProfilePage", "static", "uploads")
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-
-
 @app.route('/')  # that is the root url of the website
 @app.route('/home')
 def home_page():
@@ -62,7 +74,6 @@ def edit_data():
     cursor.close()
     connection.commit()
     return redirect(url_for('users_page'))
-
 
 @app.route('/BookAppointment', methods=['GET', 'POST'])
 def appointment_page():
@@ -675,3 +686,119 @@ def patient_edit_profile():
         return redirect('/patient-login_page')  # Redirect to log in to refresh
 
     return render_template('edit_profile.html', data=data, form=form)
+
+
+@app.route('/contactUs', methods=['GET', 'POST'])
+def contact_page():
+    form = contactForm()
+    if request.method == 'POST':
+        name = request.form['Name']
+        email = request.form['Email']
+        message = request.form['Message']
+        '''
+        connection = psycopg2.connect(connection_string)
+        cursor = connection.cursor()
+        cursor.execute(
+            "INSERT INTO Patient (Message) VALUES (%s)",
+            (message)
+        )
+        connection.commit()
+        cursor.close()
+        connection.close()
+        '''
+        flash('Thank you for contact us', category='success')
+        return redirect('/home')
+
+    return render_template('contact.html', form=form)
+
+
+'''
+@app.route('/search', methods=["POST"])
+def search():
+    form = SearchForm()
+    posts = Posts.query
+    if form.validate_on_submit():
+        # Get data from submitted form
+        post.searched = form.searched.data
+        # Query the Database
+        posts = posts.filter(Posts.content.like('%' + post.searched + '%'))
+        posts = posts.order_by(Posts.title).all()
+
+        return render_template("search.html",
+                               form=form,
+                               searched=post.searched,
+                               posts=posts)
+
+
+@app.context_processor
+def base():
+    form = SearchForm()
+    return dict(form=form)
+
+
+@app.route('/posts')
+def posts():
+    # Grab all the posts from the database
+    posts = Posts.query.order_by(Posts.date_posted)
+    return render_template("posts.html", posts=posts)
+'''
+
+
+def send_reset_email(patient):
+    token = patient.get_reset_token()
+    msg = Message('Password Reset Request',
+                  sender='noreply@demo.com',
+                  recipients=[patient.email])
+    msg.body = f'''To reset your password, visit the following link:
+{url_for('reset_token', token=token, _external=True)}
+
+If you did not make this request then simply ignore this email and no changes will be made.
+'''
+    mail.send(msg)
+
+
+@app.route('/forgetPassword', methods=('GET', 'POST'))
+def reset_request():
+    if current_user.is_authenticated:
+        return redirect(url_for('home'))
+    form = ForgetForm()
+    if form.validate_on_submit():
+        patient = Patient.query.filter_by(email=form.email.data).first()
+        send_reset_email(patient)
+        flash('An email has been sent with instructions to reset your password.', 'info')
+        return redirect(url_for('login'))
+    return render_template("forgetPassword.html", form=form)
+
+
+@app.route("/forgetPassword/<token>", methods=['GET', 'POST'])
+def reset_token(token):
+    if current_user.is_authenticated:
+        return redirect(url_for('home'))
+    patient = Patient.verify_reset_token(token)
+    if patient is None:
+        flash('That is an invalid or expired token', category='warning')
+        return redirect(url_for('reset_request'))
+    form = ResetPasswordForm()
+    data = session.get('user_data')
+    if request.method == 'POST' and form.validate_on_submit():
+        updated_data = {
+            'password': form.new_password.data
+        }
+        # Update user information in the database
+        connection = psycopg2.connect(connection_string)
+        cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
+        update_query = """
+                        UPDATE patient
+                        SET password = %(password)s
+                        WHERE id = %(id)s;
+                    """
+        updated_data['id'] = data['id']
+
+        cursor.execute(update_query, updated_data)
+        connection.commit()
+        cursor.close()
+        connection.close()
+
+        flash('Your password has been updated successfully!', category='success')
+        return redirect('/patient-login_page')  # Redirect to log in to refresh
+    return render_template("ResetPassword.html", form=form)

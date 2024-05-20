@@ -1,170 +1,174 @@
 {% extends 'base.html' %}
 {% block title %}
-    Profile Page
+    Patient Profile Page
 {% endblock %}
 {% block content %}
-
-<body>
-    <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/profile.css') }}">
-<div class="container emp-profile">
+    <body>
+        <header>
+            <nav class="section__container nav__container">
+                <div class="nav__logo">Sun<span>Ray</span></div>
+                <ul class="nav__links">
+                    <li class="link"><a href="/home">Home</a></li>
+                    <li class="link"><a href="/home">About Us</a></li>
+                    <li class="link"><a href="/home">Services</a></li>
+                    <li class="link"><a href="#">Blog</a></li>
+                    <li class="link"><a href="/contactUs">Contact Us</a></li>
+                    <li class="link"><a href="/logout">Log Out</a></li>
+                </ul>
+                <a class="btn" href="/BookAppointment">BOOK NOW</a>
+            </nav>
+        </header>
+        <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/profile.css') }}">
+        <div class="container emp-profile">
             <form method="post">
                 <div class="row">
                     <div class="col-md-4">
                         <div class="profile-img">
-                            
-                            
-                        {% if data.profile_picture is none %}
-                            <img src="{{ url_for('static', filename='images/image.png') }}" class="image" height="200"/>
-                        {% else %}
-                            <img src="{{ url_for('static', filename=data.profile_picture) }}" class="image" height="200"/>
-                        {% endif %}
-                        <!-- <div class="file btn btn-lg btn-primary">
-                            Change Photo
-                            <input type="file" name="file"/>
-                        </div> -->
-                        <div class="profile-work">
-                            <!-- <p id="p1">Social</p>
-                            <a href={{data.facebook}}><i class="fab fa-facebook"></i> Facebook</a><br/>
-                            <a href={{data.linkedin}} target="_blank"><i class="fab fa-linkedin"></i> LinkedIn</a><br/>
-                            <a href={{data.instagram}} target="_blank"> <i class="fab fa-instagram"></i> Instagram</a><br/>
-                            <a href={{data.twitter}} target="_blank"><i class="fab fa-twitter"></i> Twitter</a> -->
-                            <p> </p>
-                            <a class="edit_profile_btn" href="/patient-edit_profile">Edit Profile</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="profile-head">
-                        <div class="profile-head-content">
-                            <h5>
-                                {{ data.fname }} {{ data.lname }}
-                            </h5>
-                            <h6>
-                                {% if data.is_admin == true %}
-                                    admin
-                                {% else %}
-                                    user
-                                {% endif %}
-                            </h6>
-                            
-                        </div>
-                        <div class="col-md-8">
-                            <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <label>User Id :</label>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <p>{{ data.id }}</p>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <label>First Name :</label>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <p>{{ data.fname }}</p>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <label>Last Name :</label>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <p>{{ data.lname }}</p>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <label>Email :</label>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <p>{{ data.email }}</p>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <label>Phone :</label>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <p>{{ data.phone }}</p>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <label>Age :</label>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <p>{{ data.age }}</p>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <label>gender :</label>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <p>{{ data.gender }}</p>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <label>Address :</label>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <p>{{ data.address }}</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="activity-section">
-                <div class="patient">
-                    <h3>Your scans</h3>
-                    <div class="scrollable">
-                        <div class="scrollable-content">
-                            {% if data.scans %}
-                                {% for image in scan_Files %}
-                                    <img src="{{ url_for('static', filename=data.scans+ '/' + image) }}" class="image" height="200"/>
-                                {% endfor %}
+                            {% if data.profile_picture is none %}
+                                <img src="{{ url_for('static', filename='images/image.png') }}" class="image" height="200"/>
                             {% else %}
-                                <p>No scans available</p>
+                                <img src="{{ url_for('static', filename=data.profile_picture) }}" class="image" height="200"/>
                             {% endif %}
+                            <!-- <div class="file btn btn-lg btn-primary">
+                                Change Photo
+                                <input type="file" name="file"/>
+                            </div> -->
+                            <div class="profile-work">
+                                <!-- <p id="p1">Social</p>
+                                <a href={{data.facebook}}><i class="fab fa-facebook"></i> Facebook</a><br/>
+                                <a href={{data.linkedin}} target="_blank"><i class="fab fa-linkedin"></i> LinkedIn</a><br/>
+                                <a href={{data.instagram}} target="_blank"> <i class="fab fa-instagram"></i> Instagram</a><br/>
+                                <a href={{data.twitter}} target="_blank"><i class="fab fa-twitter"></i> Twitter</a> -->
+                                <p> </p>
+                                <a class="edit_profile_btn" href="/patient-edit_profile">Edit Profile</a>
+                            </div>
                         </div>
                     </div>
-                    
-                </div>
-                <a class="btn btn-primary" href="/upload_scan">upload_scans</a>
-                
-                    {% if appointments %}
-                        <ul>
-                            <h3>Your reserved appointments</h3>
-                            {% for appointment in appointments %}
-                            <div class ="row">
-                                <li>
+                    <div class="col-md-6">
+                        <div class="profile-head">
+                            <div class="profile-head-content">
+                                <h5>
+                                    {{ data.fname }} {{ data.lname }}
+                                </h5>
+                                <h6>
+                                    {% if data.is_admin == true %}
+                                        admin
+                                    {% else %}
+                                        user
+                                    {% endif %}
+                                </h6>
 
-                                    <p>Appointment ID: {{ appointment.a_id }}</p>
-                                    <p>Date: {{ appointment.date }}</p>
-                                    <p>Dr: {{ appointment.d_name }}</p>
-                                    <!-- Add more fields as needed -->
-                                </li>
                             </div>
-                            {% endfor %}
-                        </ul>
-                    {% else %}
-                        <p>No appointments found.</p>
-                    {% endif %}
-                    <!-- change the route to add btn functionality -->
-                    <a class="btn btn-primary" href="/BookAppointment">book an appointment</a>
-                
-            </div>
-            
+                            <div class="col-md-8">
+                                <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <label>User Id :</label>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <p>{{ data.id }}</p>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <label>First Name :</label>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <p>{{ data.fname }}</p>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <label>Last Name :</label>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <p>{{ data.lname }}</p>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <label>Email :</label>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <p>{{ data.email }}</p>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <label>Phone :</label>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <p>{{ data.phone }}</p>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <label>Age :</label>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <p>{{ data.age }}</p>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <label>gender :</label>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <p>{{ data.gender }}</p>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <label>Address :</label>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <p>{{ data.address }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="activity-section">
+                    <div class="patient">
+                        <h3>Your scans</h3>
+                        <div class="scrollable">
+                            <div class="scrollable-content">
+                                {% if data.scans %}
+                                    {% for image in scan_Files %}
+                                        <img src="{{ url_for('static', filename=data.scans+ '/' + image) }}" class="image" height="200"/>
+                                    {% endfor %}
+                                {% else %}
+                                    <p>No scans available</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <a class="btn btn-primary" href="/upload_scan">upload_scans</a>
+                        {% if appointments %}
+                            <ul>
+                                <h3>Your reserved appointments</h3>
+                                {% for appointment in appointments %}
+                                <div class ="row">
+                                    <li>
 
-            
-        </form>
-    </div>
-</body>
+                                        <p>Appointment ID: {{ appointment.a_id }}</p>
+                                        <p>Date: {{ appointment.date }}</p>
+                                        <p>Dr: {{ appointment.d_name }}</p>
+                                        <!-- Add more fields as needed -->
+                                    </li>
+                                </div>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <p>No appointments found.</p>
+                        {% endif %}
+                        <!-- change the route to add btn functionality -->
+                        <a class="btn btn-primary" href="/book-appointement">book an appointment</a>
+                </div>
+            </form>
+        </div>
+    </body>
 {% endblock %}

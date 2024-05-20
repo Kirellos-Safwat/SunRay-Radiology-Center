@@ -1,6 +1,10 @@
+from flask import current_app
+
 from ProfilePage import db, login_manager
 from ProfilePage import bcrypt
 from flask_login import UserMixin
+from itsdangerous import URLSafeTimedSerializer as Serializer
+from datetime import datetime
 
 
 @login_manager.user_loader
@@ -69,6 +73,19 @@ class Patient(db.Model):
     profile_picture = db.Column(db.String(200))
     scans = db.Column(db.String(200))
 
+    def get_reset_token(self):
+        s = Serializer(current_app.config['SECRET_KEY'])
+        return s.dumps({'Patient_id': self.id}).encode('utf-8')
+
+    @staticmethod
+    def verify_reset_token(token):
+        s = Serializer(current_app.config['SECRET_KEY'])
+        try:
+            Patient_id = s.loads(token)['Patient_id']
+        except:
+            return None
+        return Patient.query.get(Patient_id)
+
 
 class radiologist(db.Model):
     d_id = db.Column(db.Integer, primary_key=True)
@@ -97,3 +114,15 @@ class report(db.Model):
     r_findings = db.Column(db.String(100))
     r_result = db.Column(db.String(100))
     billing = db.Column(db.Integer)
+
+    '''
+    class Posts(db.Model):
+        id = db.Column(db.Integer, primary_key=True)
+        title = db.Column(db.String(255))
+        content = db.Column(db.Text)
+        # author = db.Column(db.String(255))
+        date_posted = db.Column(db.DateTime, default=datetime.utcnow)
+        slug = db.Column(db.String(255))
+        # Foreign Key To Link Users (refer to primary key of the user)
+        poster_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    '''

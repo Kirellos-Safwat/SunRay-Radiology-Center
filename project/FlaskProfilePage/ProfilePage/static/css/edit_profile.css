@@ -1,0 +1,56 @@
+.editProfileBox{
+    width: 400px;
+    height: 860px;
+    background: rgb(18, 172, 142);
+    color: white;
+    margin-top: 5%;
+    margin-left: 38%;
+    border-radius: 10px;
+}
+.logo{
+    width: 100px;
+    height:100px;
+    position: relative;
+    top: -70px;
+    left: calc(50% - 50px);
+}
+.editProfileBox h1{
+    text-align: center;
+    margin-top: -60px;
+}
+.editProfileBox a{
+    text-decoration: none;
+    color: white;
+    margin-left: 10%;
+}
+.editProfileBox label{
+    font-size: 18px;
+    display: block;
+    margin-left: 20px;
+}
+.editProfileBox input{
+    width: 80%;
+    margin: 0 0 20px 20px;
+    height: 30px;
+}
+
+.editProfileBox input[type="text"],input[type="password"]{
+    border: none;
+    background: transparent;
+    border-bottom: 1px solid #fff;
+    height: 40px;
+    outline: none;
+    color: white;
+    font-size: 16px;
+}
+.editProfileBox button {
+    border: none;
+    outline: none;
+    height: 40px;
+    border-radius: 20px;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+    margin-top: 15px;
+    margin-left: 22%;
+}
