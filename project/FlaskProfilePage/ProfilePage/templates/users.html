@@ -4,8 +4,21 @@
 {% endblock %}
 {% block content %}
     <body>
+        <header>
+            <nav class="section__container nav__container">
+                <div class="nav__logo">Sun<span>Ray</span></div>
+                <ul class="nav__links">
+                    <li class="link"><a href="/home">Home</a></li>
+                    <li class="link"><a href="/home">About Us</a></li>
+                    <li class="link"><a href="/home">Services</a></li>
+                    <li class="link"><a href="#">Blog</a></li>
+                    <li class="link"><a href="/contactUs">Contact Us</a></li>
+                    <li class="link"><a href="/logout">Log Out</a></li>
+                </ul>
+            </nav>
+        </header>
         <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
-          <table class="table table-hover table-dark" style=" position:relative; border: 1px solid; text-align: center;tr:hover; {background-color: coral;};  top:50px; color:white">
+        <table class="table table-hover table-dark" style=" position:relative; border: 1px solid; text-align: center;tr:hover; {background-color: coral;};  top:50px; color:white">
             <thead>
                 <tr>
                     <!-- Your Columns HERE -->
@@ -34,9 +47,8 @@
                 {% endfor %}
             </tbody>
         </table>
-        </div>
         <!-- Bootstrap core JS-->
-        <!--<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>-->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
         <!-- Core theme JS-->
     </body>
 {% endblock %}

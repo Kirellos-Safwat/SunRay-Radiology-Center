@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+{% block title %}
+    Patient Login Page
+{% endblock %}
+{% block content %}
+    <head>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css"/>
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/contact.css') }}">
+    </head>
+    <body>
+        <header>
+            <nav class="section__container nav__container">
+                <div class="nav__logo">Sun<span>Ray</span></div>
+                <ul class="nav__links">
+                    <li class="link"><a href="/home">Home</a></li>
+                    <li class="link"><a href="/home">About Us</a></li>
+                    <li class="link"><a href="/home">Services</a></li>
+                    <li class="link"><a href="#">Blog</a></li>
+                    <li class="link"><a href="/patient-login_page">Log In</a></li>
+                    <li class="link"><a href="/patient-register">Register</a></li>
+                </ul>
+                <a class="btn" href="/BookAppointment">BOOK NOW</a>
+            </nav>
+        </header>
+      <div class="container">
+        <div class="content">
+          <div class="left-side">
+            <div class="address details">
+              <i class="fas fa-map-marker-alt"></i>
+              <div class="topic">Address</div>
+              <a href="https://maps.app.goo.gl/NvEDjJ5pebo74wEm8">
+                  156, Abbas El-Akkad Street, Cairo
+              </a>
+            </div>
+            <div class="phone details">
+              <i class="fas fa-phone-alt"></i>
+              <div class="topic">Phone</div>
+              <p><a href="tel:+20102-453-9970">(+20) 1024539970</a></p>
+            </div>
+            <div class="email details">
+              <i class="fas fa-envelope"></i>
+              <div class="topic">Email</div>
+              <p><a href="mailto:support@care.com">support@care.com</a></p>
+            </div>
+            <div class="topic-text">Contact Us</div>
+            <div class="contactSocials">
+                <span><i class="ri-instagram-line"></i></span>
+                <span><i class="ri-facebook-fill"></i></span>
+                <span><i class="ri-heart-fill"></i></span>
+                <span><i class="ri-twitter-fill"></i></span>
+            </div>
+          </div>
+          <div class="right-side">
+            <div class="topic-text">Contact Us</div>
+            <p class="Problem">If you have any work from me or any types of queries related to my tutorial, you can send me message from here. It's my pleasure to help you.</p>
+              <!--<form class="form" method="POST" enctype="multipart/form-data">
+                  {{ form.hidden_tag() }}
+                  <div class="input-box">
+                      {{ form.Name(class="form-control", placeholder="Enter Your Name") }}
+                  </div>
+                  <div class="input-box">
+                      {{ form.Email(class="form-control", placeholder="Enter Your Email") }}
+                  </div>
+                  <div class="input-box message-box">
+                      {{ form.Message(class="form-control", placeholder="Enter Your Message") }}
+                  </div>
+                  <div class="button">
+                      {{ form.submit(class="btn btn-lg btn-block btn-success") }}
+                  </div>
+              </form>-->
+              <form action="https://formspree.io/f/xleygqoj" method="POST">
+                <input type="text" name="first" placeholder="First Name" autocomplete="off" required>
+                <input type="text" name="last" placeholder="Last Name" autocomplete="off" required>
+                <input type="email" name="email" placeholder="Email Address" autocomplete="off" required>
+                <textarea rows="5" cols="60" name="message" placeholder="Enter Message" autocomplete="off" required></textarea>
+                <button type="submit">Send Now</button>
+              </form>
+            </div>
+        </div>
+      </div>
+    </body>
+{% endblock %}

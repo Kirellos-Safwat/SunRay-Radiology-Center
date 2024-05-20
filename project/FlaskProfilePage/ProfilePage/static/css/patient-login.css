@@ -1,0 +1,62 @@
+.loginBox{
+    width: 350px;
+    height: 450px;
+    background: rgb(18, 172, 142);
+    color: white;
+    margin-top: 5%;
+    margin-left: 39%;
+    border-radius: 10px;
+}
+.logo{
+    width: 100px;
+    height:100px;
+    position: relative;
+    top: -70px;
+    left: calc(50% - 50px);
+}
+.loginBox h1{
+    text-align: center;
+    margin-top: -60px;
+}
+.loginBox a{
+    text-decoration: none;
+    color: white;
+    margin-bottom: 5%;
+}
+.signUp{
+    margin-left: 20%;
+}
+.pass{
+    margin-left: 5%;
+    color: #1a79ca;
+    font-size: 15px;
+    font-weight: 600px;
+}
+.form-signin label{
+    font-size: 18px;
+    display: block;
+    margin-left: 20px;
+}
+.form-signin input{
+    width: 80%;
+    margin: 0 0 20px 20px;
+}
+.form-signin input[type="text"],input[type="password"]{
+    border: none;
+    background: transparent;
+    border-bottom: 1px solid #fff;
+    height: 40px;
+    outline: none;
+    color: white;
+    font-size: 16px;
+}
+.form-signin input[type="submit"]{
+    border: none;
+    outline: none;
+    height: 40px;
+    border-radius: 20px;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+    margin-top: 20px;
+}
