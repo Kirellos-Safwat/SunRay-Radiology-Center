@@ -75,4 +75,8 @@
     color: white;
     margin-top: 5%;
     border-radius: 10px;
+    display: flex;
+    flex-direction: row;
+    overflow-x: auto;
+    justify-content: space-between;
 }
