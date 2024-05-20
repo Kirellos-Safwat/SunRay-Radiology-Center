@@ -4,7 +4,6 @@ from ProfilePage import db, login_manager
 from ProfilePage import bcrypt
 from flask_login import UserMixin
 from itsdangerous import URLSafeTimedSerializer as Serializer
-from datetime import datetime
 
 
 @login_manager.user_loader

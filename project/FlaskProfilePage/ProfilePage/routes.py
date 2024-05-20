@@ -1,31 +1,23 @@
 import psycopg2.extras
 from sqlalchemy.testing.plugin.plugin_base import post
-
-from ProfilePage.forms import RegisterForm, LoginForm, EditProfileForm, contactForm, AppointmentForm
-from ProfilePage import app, db, connection, connection_string
-from ProfilePage.forms import RegisterForm, LoginForm, EditProfileForm, AppointmentForm, contactForm, ForgetForm, \
-    ResetPasswordForm
 from ProfilePage import app, db, connection, connection_string, mail
-from flask import render_template, redirect, url_for, flash, session
-from werkzeug.utils import secure_filename
-import os
-from flask import request
 from flask_login import current_user
 from flask_mail import Message
 from ProfilePage.models import appointments, Patient
 from ProfilePage.forms import LoginForm, EditProfileForm, AppointmentForm, PatientRegisterForm, ReportForm, \
-    RadiologistRegisterForm
+    RadiologistRegisterForm, contactForm, ForgetForm, \
+    ResetPasswordForm
 from ProfilePage import app, connection, connection_string
-from flask import render_template, redirect, url_for, flash, session
+from flask import render_template, redirect, url_for, flash, session, request
 from werkzeug.utils import secure_filename
-from flask import request
-import os
-import psycopg2.extras
-import random
+import os, psycopg2.extras, random
+
 UPLOAD_FOLDER = os.path.join(os.getcwd(), "project", "FlaskProfilePage", "ProfilePage", "static", "uploads")
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+
 @app.route('/')  # that is the root url of the website
 @app.route('/home')
 def home_page():
@@ -74,6 +66,7 @@ def edit_data():
     cursor.close()
     connection.commit()
     return redirect(url_for('users_page'))
+
 
 @app.route('/BookAppointment', methods=['GET', 'POST'])
 def appointment_page():

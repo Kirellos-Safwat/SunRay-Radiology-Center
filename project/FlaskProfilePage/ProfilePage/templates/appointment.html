@@ -8,6 +8,12 @@
     </head>
 
 <body onload="setMinDate()">
+  <script>
+                        function setMinDate() {
+                            var today = new Date().toISOString().split('T')[0];
+                            document.getElementById('date').setAttribute('min', today);
+                        }
+                                 </script>
 
  <header>
             <nav class="section__container nav__container">
