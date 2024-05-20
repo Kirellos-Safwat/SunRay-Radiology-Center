@@ -12,12 +12,6 @@ from flask import render_template, redirect, url_for, flash, session, request
 from werkzeug.utils import secure_filename
 import os, psycopg2.extras, random
 
-UPLOAD_FOLDER = os.path.join(os.getcwd(), "project", "FlaskProfilePage", "ProfilePage", "static", "uploads")
-if not os.path.exists(UPLOAD_FOLDER):
-    os.makedirs(UPLOAD_FOLDER)
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-
-
 @app.route('/')  # that is the root url of the website
 @app.route('/home')
 def home_page():
@@ -402,8 +396,8 @@ def radiologist_registration_page():
     return render_template('radiologist-registration.html', form=form)
 
 
-@app.route('/radiologist-login_page', methods=['GET', 'POST'])
-def radiologist_login_page():
+@app.route('/radiologist-login', methods=['GET', 'POST'])
+def radiologist_login():
     if request.method == 'POST':
         d_email = request.form['Email']
         d_password = request.form['Password']
@@ -417,14 +411,14 @@ def radiologist_login_page():
         if user:
             session['user_data'] = dict(user)
             data = session['user_data']
-            if os.name == 'nt' and data['profile_picture'] is not None:
+            if os.name == 'nt' and data['d_profile_picture'] is not None:
                 data['profile_picture'] = data['profile_picture'].replace("\\", "/")
             cursor.close()  # Close the cursor once
             return redirect('/radiologist-profile')
         else:
             flash('Incorrect Email or password. Please try again.', category='danger')
 
-    return render_template('patient-login.html', form=LoginForm())  # check render
+    return render_template('radiologist-login.html', form=LoginForm())  # check render
 
 
 @app.route('/radiologist-profile')

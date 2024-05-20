@@ -11,8 +11,12 @@ connection_string =  'postgresql://hospital_owner:qx6si3HTUwNA@ep-orange-lake-a2
 connection = psycopg2.connect(connection_string)
 app.config['SQLALCHEMY_DATABASE_URI'] = connection_string
 app.config['SECRET_KEY'] = '4266af1ee8b1c32ecc9b2d97'
-UPLOAD_FOLDER = os.path.join(os.getcwd(), "project", "FlaskProfilePage", "ProfilePage", "static", "uploads")
+
+UPLOAD_FOLDER = os.path.join(os.getcwd(), "ProfilePage", "static", "uploads")
+if not os.path.exists(UPLOAD_FOLDER):
+    os.makedirs(UPLOAD_FOLDER)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
 app.config['MAIL_SERVER'] = 'smtp.googlemail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
