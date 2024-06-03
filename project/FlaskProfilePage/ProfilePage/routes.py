@@ -1,16 +1,21 @@
 import psycopg2.extras
+from google.oauth2 import id_token
 from sqlalchemy.testing.plugin.plugin_base import post
-from ProfilePage import app, db, connection, connection_string, mail
+from ProfilePage import app, db, connection, connection_string, mail, bcrypt, flow, GOOGLE_CLIENT_ID
 from flask_login import current_user
 from flask_mail import Message
 from ProfilePage.models import appointments, Patient
 from ProfilePage.forms import LoginForm, EditProfileForm, AppointmentForm, PatientRegisterForm, ReportForm, \
-    RadiologistRegisterForm, contactForm, ForgetForm, \
+    RadiologistRegisterForm, ForgetForm, \
     ResetPasswordForm
-from ProfilePage import app, connection, connection_string
 from flask import render_template, redirect, url_for, flash, session, request
 from werkzeug.utils import secure_filename
 import os, psycopg2.extras, random
+import requests
+from google.oauth2 import id_token
+from pip._vendor import cachecontrol
+import google.auth.transport.requests
+
 
 @app.route('/')  # that is the root url of the website
 @app.route('/home')
@@ -677,12 +682,21 @@ def patient_edit_profile():
 
 @app.route('/contactUs', methods=['GET', 'POST'])
 def contact_page():
-    form = contactForm()
     if request.method == 'POST':
-        name = request.form['Name']
-        email = request.form['Email']
-        message = request.form['Message']
-        '''
+        flash('We have received your message. Thank you for contacting us', category='success')
+        return redirect('/home')
+    '''
+        form = contactForm()
+        if request.method == 'POST':
+        name = request.form.get('Name')
+        email = request.form.get('Email')
+        message = request.form.get('Message')
+    
+        msg = Message(
+            subject=f"Mail from {name}",  body=f"Name: {name}\nEmail: {email}\n\n\n{message}", sender="rawanwalid978", recipients="rawanwalid978@gmial.com"
+        )
+        mail.send(msg)
+        
         connection = psycopg2.connect(connection_string)
         cursor = connection.cursor()
         cursor.execute(
@@ -692,11 +706,8 @@ def contact_page():
         connection.commit()
         cursor.close()
         connection.close()
-        '''
-        flash('Thank you for contact us', category='success')
-        return redirect('/home')
-
-    return render_template('contact.html', form=form)
+    '''
+    return render_template('contact.html')
 
 
 '''
@@ -753,7 +764,7 @@ def reset_request():
         patient = Patient.query.filter_by(email=form.email.data).first()
         send_reset_email(patient)
         flash('An email has been sent with instructions to reset your password.', 'info')
-        return redirect(url_for('login'))
+        return redirect(url_for('patient_login_page'))
     return render_template("forgetPassword.html", form=form)
 
 
@@ -761,24 +772,26 @@ def reset_request():
 def reset_token(token):
     if current_user.is_authenticated:
         return redirect(url_for('home'))
+    '''
     patient = Patient.verify_reset_token(token)
     if patient is None:
         flash('That is an invalid or expired token', category='warning')
         return redirect(url_for('reset_request'))
+    '''
     form = ResetPasswordForm()
     data = session.get('user_data')
     if request.method == 'POST' and form.validate_on_submit():
         updated_data = {
-            'password': form.new_password.data
+            'password': form.new_password.data,
         }
         # Update user information in the database
         connection = psycopg2.connect(connection_string)
         cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
         update_query = """
-                        UPDATE patient
-                        SET password = %(password)s
-                        WHERE id = %(id)s;
-                    """
+            UPDATE patient
+            SET password = %(password)s
+            WHERE id = %(id)s;
+        """
         updated_data['id'] = data['id']
 
         cursor.execute(update_query, updated_data)
@@ -786,6 +799,46 @@ def reset_token(token):
         cursor.close()
         connection.close()
 
-        flash('Your password has been updated successfully!', category='success')
+        flash('Your password has been updated successfully! You are now able to log in', category='success')
         return redirect('/patient-login_page')  # Redirect to log in to refresh
     return render_template("ResetPassword.html", form=form)
+
+
+def login_is_required(function):
+    def wrapper(*args, **kwargs):
+        if "google_id" not in session:
+            return os.abort(401)  # Authorization required
+        else:
+            return function()
+
+    return wrapper
+
+
+@app.route("/googleLogin")
+def google_login():
+    authorization_url, state = flow.authorization_url()
+    session["state"] = state
+    return redirect(authorization_url)
+
+
+@app.route("/callback")
+def callback():
+    flow.fetch_token(authorization_response=request.url)
+
+    if not session["state"] == request.args["state"]:
+        os.abort(500)  # State does not match!
+
+    credentials = flow.credentials
+    request_session = requests.session()
+    cached_session = cachecontrol.CacheControl(request_session)
+    token_request = google.auth.transport.requests.Request(session=cached_session)
+
+    id_info = id_token.verify_oauth2_token(
+        id_token=credentials._id_token,
+        request=token_request,
+        audience=GOOGLE_CLIENT_ID
+    )
+
+    session["google_id"] = id_info.get("sub")
+    session["name"] = id_info.get("name")
+    return redirect("/patient-profile")
