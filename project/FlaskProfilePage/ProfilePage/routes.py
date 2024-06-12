@@ -1,7 +1,6 @@
 import psycopg2.extras
-from google.oauth2 import id_token
 from sqlalchemy.testing.plugin.plugin_base import post
-from ProfilePage import app, db, connection, connection_string, mail, bcrypt, flow, GOOGLE_CLIENT_ID
+from ProfilePage import app, db, connection, connection_string, mail, bcrypt,flow, GOOGLE_CLIENT_ID
 from flask_login import current_user
 from flask_mail import Message
 from ProfilePage.models import appointments, Patient
@@ -41,6 +40,7 @@ def edit_data():
                 WHERE d_id = %s;
             """
         cursor.execute(update_query, (str(delete_id),))
+
     elif 'id' in data or 'd_id' in data:
         update_data = data
         if table == 'patient':
@@ -122,7 +122,7 @@ def appointment_page():
             connection.close()
 
             flash('Your appointment has been booked successfully!', category='success')
-            return redirect(url_for('home_page'))
+            return redirect(url_for('patient_profile_page'))
     return render_template('appointment.html', form=form, data=data)
 
 
@@ -189,7 +189,7 @@ def report_page():
             connection.close()
 
             flash('The report was submitted successfully', category='success')
-            return redirect(url_for('report_page'))
+            return redirect(url_for('radiologist_profile_page'))
     return render_template('report.html', form=form, data=data)
 
 
@@ -363,7 +363,7 @@ def thanks_page():
             return redirect(url_for('login_admin'))  # Redirect to login to refresh
 
         return render_template('edit_profile.html', data=data, form=form)
-'''
+
 
 
 @app.route('/radiologist-register', methods=['GET', 'POST'])
@@ -400,7 +400,7 @@ def radiologist_registration_page():
 
     return render_template('radiologist-registration.html', form=form)
 
-
+'''
 @app.route('/radiologist-login', methods=['GET', 'POST'])
 def radiologist_login():
     if request.method == 'POST':
@@ -421,7 +421,7 @@ def radiologist_login():
             cursor.close()  # Close the cursor once
             return redirect('/radiologist-profile')
         else:
-            flash('Incorrect Email or password. Please try again.', category='danger')
+            flash('Incorrect Email or password. Please try again.', category='error')
 
     return render_template('radiologist-login.html', form=LoginForm())  # check render
 
@@ -555,7 +555,7 @@ def patient_login_page():
             cursor.close()  # Close the cursor once
             return redirect('/patient-profile')
         else:
-            flash('Incorrect Email or password. Please try again.', category='danger')
+            flash('Incorrect Email or password. Please try again.', category='error')
 
     return render_template('patient-login.html', form=LoginForm())
 

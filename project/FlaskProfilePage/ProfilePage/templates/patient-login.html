@@ -7,16 +7,7 @@
     <head>
         <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/patient-login.css') }}">
     </head>
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            {% for category,message in messages %}
-                 <div class="alert alert-{{ category }}" style="text-align: center">
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" style="position: absolute; left: 1400px"></button>
-                    {{ message }}
-                 </div>
-            {% endfor %}
-        {% endif %}
-    {% endwith %}
+
     <body>
         <header>
             <nav class="section__container nav__container">
@@ -32,6 +23,11 @@
                 <a class="btn" href="/BookAppointment">BOOK NOW</a>
             </nav>
         </header>
+         {% with messages = get_flashed_messages(with_categories=true) %}
+  {% for category, message in messages %}
+    <div class="{{ category }}">{{ message }}</div>
+  {% endfor %}
+{% endwith %}
         <div class="loginBox">
             <img class="logo" src="https://cdn-icons-png.flaticon.com/128/4228/4228704.png">
             <h1>Log In</h1>

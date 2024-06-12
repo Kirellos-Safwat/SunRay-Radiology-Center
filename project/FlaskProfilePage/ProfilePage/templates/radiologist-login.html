@@ -1,22 +1,13 @@
 {% extends 'base.html' %}
 {% block title %}
-    Patient Login Page
+    Radiologist Login Page
 {% endblock %}
 {% block content %}
 <!--xmlns="http://www.w3.org/1999/html"-->
     <head>
         <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/patient-login.css') }}">
     </head>
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            {% for category,message in messages %}
-                 <div class="alert alert-{{ category }}" style="text-align: center">
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" style="position: absolute; left: 1400px"></button>
-                    {{ message }}
-                 </div>
-            {% endfor %}
-        {% endif %}
-    {% endwith %}
+
     <body>
         <header>
             <nav class="section__container nav__container">
@@ -32,6 +23,13 @@
                 <a class="btn" href="/BookAppointment">BOOK NOW</a>
             </nav>
         </header>
+<div >
+        {% with messages = get_flashed_messages(with_categories=true) %}
+  {% for category, message in messages %}
+    <div class="{{ category }}">{{ message }}</div>
+  {% endfor %}
+{% endwith %}
+</div>
         <div class="loginBox">
             <img class="logo" src="static/photos/doctor.png">
             <h1>Log In</h1>
@@ -44,7 +42,6 @@
                 <a class="pass" href="{{ url_for('reset_request') }}">Forgot Password?</a>
                 {{ form.submit(class="btn btn-lg btn-block btn-success") }}
             </form>
-            <a class="signUp" href="/patient-register">Don't have an account?</a>
         </div>
     </body>
 {% endblock %}
