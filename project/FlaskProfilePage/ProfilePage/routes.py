@@ -7,7 +7,7 @@ from flask_mail import Message
 from ProfilePage.models import appointments, Patient
 from ProfilePage.forms import LoginForm, EditProfileForm, AppointmentForm, PatientRegisterForm, ReportForm, \
     RadiologistRegisterForm, ForgetForm, \
-    ResetPasswordForm
+    ResetPasswordForm, SearchForm
 from flask import render_template, redirect, url_for, flash, session, request
 from werkzeug.utils import secure_filename
 import os, psycopg2.extras, random
@@ -710,22 +710,19 @@ def contact_page():
     return render_template('contact.html')
 
 
-'''
 @app.route('/search', methods=["POST"])
 def search():
     form = SearchForm()
-    posts = Posts.query
+    names = Patient.query
     if form.validate_on_submit():
         # Get data from submitted form
         post.searched = form.searched.data
         # Query the Database
-        posts = posts.filter(Posts.content.like('%' + post.searched + '%'))
-        posts = posts.order_by(Posts.title).all()
-
+        names = names.filter(Patient.fname.like('%' + post.searched + '%'))
+        names = names.order_by(Patient.id).all()
         return render_template("search.html",
                                form=form,
-                               searched=post.searched,
-                               posts=posts)
+                               searched=post.searched, names=names)
 
 
 @app.context_processor
@@ -734,6 +731,7 @@ def base():
     return dict(form=form)
 
 
+'''
 @app.route('/posts')
 def posts():
     # Grab all the posts from the database

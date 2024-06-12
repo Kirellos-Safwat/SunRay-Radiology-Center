@@ -4,6 +4,7 @@
 {% endblock %}
 {% block content %}
     <body>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/users.css') }}">
         <header>
             <nav class="section__container nav__container">
                 <div class="nav__logo">Sun<span>Ray</span></div>
@@ -16,6 +17,11 @@
                     <li class="link"><a href="/logout">Log Out</a></li>
                 </ul>
             </nav>
+            <form method="POST" action="{{url_for('search')}}" class="searchBar">
+                {{ form.hidden_tag() }}
+                <input class="formControl" type="search" placeholder="Search" name="searched">
+                <button class="btn btn-online-secondary" type="submit">Search</button>
+            </form>
         </header>
         <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
         <table class="table table-hover table-dark" style=" position:relative; border: 1px solid; text-align: center;tr:hover; {background-color: coral;};  top:50px; color:white">

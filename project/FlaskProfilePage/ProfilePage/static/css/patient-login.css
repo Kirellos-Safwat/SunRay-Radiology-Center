@@ -1,6 +1,6 @@
 .loginBox{
     width: 350px;
-    height: 450px;
+    height: 520px;
     background: rgb(18, 172, 142);
     color: white;
     margin-top: 5%;
@@ -23,8 +23,14 @@
     color: white;
     margin-bottom: 5%;
 }
+.loginBox a:hover {
+    cursor: pointer;
+    /*-webkit-box-shadow: 0 0 3px 3px #0d846c;
+    box-shadow: 0 0 3px 3px #0d846c;*/
+}
 .signUp{
-    margin-left: 20%;
+    margin-left: 25%;
+    margin-bottom: 20%;
 }
 .pass{
     margin-left: 5%;
@@ -49,14 +55,83 @@
     outline: none;
     color: white;
     font-size: 16px;
+    margin-bottom: 5%;
 }
 .form-signin input[type="submit"]{
     border: none;
     outline: none;
-    height: 40px;
+    height: 50px;
     border-radius: 20px;
     color: white;
     font-size: 20px;
     cursor: pointer;
     margin-top: 20px;
+    margin-left: 10%;
+    margin-bottom: 50px;
+}
+
+.form-signin input[type="submit"]:hover {
+    cursor: pointer;
+    -webkit-box-shadow: 0 0 3px 3px rgba(66, 133, 244, .3);
+    box-shadow: 0 0 3px 3px #e9f7f7;
+}
+
+.form-signin .g-sign-in-button {
+  position: relative;
+  top: 55%;
+  left: 48%;
+  transform: translate(-50%, -50%);
+  margin: 10px;
+  display: inline-block;
+  width: 260px;
+  height: 50px;
+  background-color: #4285f4;
+  color: #fff;
+  border-radius: 20px;
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, .25);
+  transition: background-color .218s, border-color .218s, box-shadow .218s;
+}
+
+.form-signin .g-sign-in-button:hover {
+  cursor: pointer;
+  -webkit-box-shadow: 0 0 3px 3px rgba(66, 133, 244, .3);
+  box-shadow: 0 0 3px 3px rgba(66, 133, 244, .3);
+}
+
+.form-signin .g-sign-in-button:active {
+  background-color: #3367D6;
+  transition: background-color .2s;
+}
+
+.form-signin .g-sign-in-button .content-wrapper {
+  height: 100%;
+  width: 100%;
+  border: 1px solid transparent;
+}
+
+.form-signin .g-sign-in-button img {
+  width: 18px;
+  height: 18px;
+}
+
+.form-signin .g-sign-in-button .logo-wrapper {
+  padding: 15px;
+  background: #fff;
+  width: 48px;
+  height: 100%;
+  border-radius: 20px;
+  display: inline-block;
+}
+
+.form-signin .g-sign-in-button .text-container {
+  font-family: "Roboto", arial, sans-serif;
+  font-weight: 500;
+  letter-spacing: .21px;
+  font-size: 16px;
+  line-height: 48px;
+  vertical-align: top;
+  border: none;
+  display: inline-block;
+  text-align: center;
+  width: 180px;
 }

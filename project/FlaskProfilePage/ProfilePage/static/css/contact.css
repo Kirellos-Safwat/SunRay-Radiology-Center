@@ -88,21 +88,9 @@
   font-weight: 100px;
   color: white;
   margin-top: 4%;
-  margin-bottom: 7px;
-}
-.right-side input {
-  background-color: white;
-  width: 70%;
-  margin-left: 5px;
-  font-size: 15px;
-  padding: 16px 16px;
-  border-radius: 10px;
-  border-color: white;
   margin-bottom: 10px;
 }
-
-.right-side textarea {
-  background-color: white;
+.right-side input {
   width: 70%;
   margin-left: 5px;
   font-size: 15px;
@@ -111,14 +99,17 @@
   border-color: white;
   margin-bottom: 15px;
 }
-
-.right-side input:focus-within {
-  outline: none;
-  border-color: white;
-  border-width: 3px;
+.right-side textarea {
+    width: 70%;
+    margin-left: 5px;
+    font-size: 15px;
+    padding: 16px 16px;
+    border-radius: 10px;
+    border-color: white;
+    margin-bottom: 15px;
 }
 
-.right-side textarea:focus-within {
+.right-side input :focus-within {
   outline: none;
   border-color: white;
   border-width: 3px;
@@ -134,6 +125,8 @@
   text-align: center;
   display: flex;
   margin-left: 5px;
+  margin-top: 20px;
+  width: 125px;
 }
 
 .right-side button:hover {

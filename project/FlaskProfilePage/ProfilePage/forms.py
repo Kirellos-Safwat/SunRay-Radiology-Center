@@ -51,6 +51,7 @@ class AppointmentForm(FlaskForm):
     devices = SelectField('Examination Type', validators=[DataRequired()], coerce=str)
     submit = SubmitField(label='Book Appointment')
 
+
 class RadiologistRegisterForm(FlaskForm):
     def validate_Email(self, email_to_check):
         radiologist_email = radiologist.query.filter_by(d_email=email_to_check.data).first()
@@ -71,8 +72,8 @@ class RadiologistRegisterForm(FlaskForm):
     profile_photo = FileField('Profile Photo', validators=[FileAllowed(['jpg', 'png'])])  # Add this field
     submit = SubmitField(label='Create Account')
 
-class ReportForm(FlaskForm):
 
+class ReportForm(FlaskForm):
     devices = SelectField('Imaging modality', validators=[DataRequired()], coerce=str)
     patients = SelectField('Patient Name', validators=[DataRequired()], coerce=str)
     r_time = DateField('Date of study', format='%Y-%m-%d', validators=[DataRequired()])
@@ -82,6 +83,8 @@ class ReportForm(FlaskForm):
     r_findings = StringField(label='Findings:', validators=[DataRequired()])
     r_result = StringField(label='Impressions:', validators=[DataRequired()])
     submit = SubmitField(label='Submit Report')
+
+
 class PatientRegisterForm(FlaskForm):
     def validate_Email(self, email_to_check):
         patient_email = Patient.query.filter_by(email=email_to_check.data).first()
@@ -104,18 +107,18 @@ class PatientRegisterForm(FlaskForm):
     submit = SubmitField(label='Create Account')
 
 
+'''
 class contactForm(FlaskForm):
     Name = StringField(label='Name:', validators=[Length(min=2, max=30), DataRequired()])
     Email = StringField(label='Email:', validators=[Email(), DataRequired()])
     Message = StringField(label='Message:', validators=[Length(min=2, max=200), DataRequired()])
     submit = SubmitField(label='Send Now')
-
-
 '''
+
+
 class SearchForm(FlaskForm):
     searched = StringField("Searched", validators=[DataRequired()])
     submit = SubmitField("Submit")
-'''
 
 
 class ForgetForm(FlaskForm):
@@ -123,8 +126,8 @@ class ForgetForm(FlaskForm):
     submit = SubmitField(label='Request Reset Password')
 
     def validate_Email(self, email_to_check):
-        email = Patient.query.filter_by(email=email_to_check.data).first()
-        if email is None:
+        patient = Patient.query.filter_by(email=email_to_check.data).first()
+        if patient is None:
             raise ValidationError('There is no account for that email. Please register first.')
 
 

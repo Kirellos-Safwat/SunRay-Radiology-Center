@@ -1,0 +1,5 @@
+.searchBar input[type="search"] {
+    width: 250px;
+    margin-left : 65%;
+    height: 40px;
+}

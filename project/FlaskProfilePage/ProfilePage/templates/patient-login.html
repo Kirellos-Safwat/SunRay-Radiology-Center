@@ -43,6 +43,20 @@
                 {{ form.Password(class="form-control",placeholder="Password") }}
                 <a class="pass" href="{{ url_for('reset_request') }}">Forgot Password?</a>
                 {{ form.submit(class="btn btn-lg btn-block btn-success") }}
+                <div class="container">
+                  <a href="/googleLogin">
+                    <div class="g-sign-in-button">
+                      <div class="content-wrapper">
+                        <div class="logo-wrapper">
+                          <img src="https://developers.google.com/identity/images/g-logo.png">
+                        </div>
+                        <span class="text-container">
+                          <span>Sign in with Google</span>
+                        </span>
+                      </div>
+                    </div>
+                  </a>
+                </div>
             </form>
             <a class="signUp" href="/patient-register">Don't have an account?</a>
         </div>
