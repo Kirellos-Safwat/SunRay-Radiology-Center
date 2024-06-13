@@ -155,12 +155,12 @@
                                         <img src="{{ url_for('static', filename=data.scans+ '/' + image) }}" class="image" height="200"/>
                                     {% endfor %}
                                 {% else %}
-                                    <p>No scans available</p>
+                                    <p>No Scans Were Uploaded</p>
                                 {% endif %}
                             </div>
                         </div>
                     </div>
-                    <a class="btn btn-primary" href="/upload_scan">upload_scans</a>
+                    <a class="btn btn-primary" href="/upload_scan">Upload your Scans</a>
                         {% if appointments %}
                             <ul>
                                 <h3>Your reserved appointments</h3>
@@ -170,7 +170,7 @@
 
                                         <p>Appointment ID: {{ appointment.a_id }}</p>
                                         <p>Date: {{ appointment.date }}</p>
-                                        <p>Dr: {{ appointment.d_name }}</p>
+                                        <p>With: {{ appointment.d_name }}</p>
                                         <!-- Add more fields as needed -->
                                     </li>
                                 </div>
@@ -180,7 +180,7 @@
                             <p>No appointments found.</p>
                         {% endif %}
                         <!-- change the route to add btn functionality -->
-                    <a class="btn btn-primary" href="/BookAppointment">book an appointment></a>
+                    <a class="btn btn-primary" href="/BookAppointment">Book an Appointment</a>
                 </div>
             </form>
         </div>
