@@ -24,6 +24,8 @@
             </form>
         </header>
         <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+        
+        <h2>patients</h2>
         <table class="table table-hover table-dark" style=" position:relative; border: 1px solid; text-align: center;tr:hover; {background-color: coral;};  top:50px; color:white">
             <thead>
                 <tr>
@@ -53,7 +55,9 @@
             </tbody>
         </table>
 
+        <br></br>
         <h2>Radiologists</h2>
+        <button class="btn btn-primary" id="add-doctor-btn">Add</button>
         <table class="table table-hover table-dark" style="border: 1px solid; text-align: center; color:white">
             <thead>
                 <tr>
@@ -80,15 +84,15 @@
             </tbody>
         </table>
     </div>
-
+    
     <!-- Bootstrap core JS and dependencies -->
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.min.js"></script>
     <script>
-        $(document).ready(function() {
+$(document).ready(function() {
     // Make cells editable on click
-    $('.editable').click(function() {
+    $(document).on('click', '.editable', function() {
         if ($(this).find('input').length === 0) {
             let currentText = $(this).text();
             let inputType = $(this).data('field') === 'phone' || $(this).data('field') === 'd_phone' ? 'number' : 'text';
@@ -99,12 +103,17 @@
     });
 
     // Handle save button click
-    $('.save-btn').click(function() {
+    $(document).on('click', '.save-btn', function() {
         let row = $(this).closest('tr');
         let id = row.data('id');
         let table = row.data('table');
         let updatedData = { table: table , id: id};
         let valid = true;
+
+        if (id === undefined) {
+            updatedData['new'] = true; // Indicate a new entry
+        }
+        
         row.find('.editable').each(function() {
             let input = $(this).find('input');
             if (input.length > 0) {
@@ -169,6 +178,23 @@
             }
         });
     });
+    // Add new doctor row
+    $('#add-doctor-btn').click(function() {
+        let newRow = `
+            <tr data-table="doctor">
+                <td>New</td>
+                <td class="editable" data-field="d_name"><input type="text" class="form-control"></td>
+                <td class="editable" data-field="d_email"><input type="text" class="form-control"></td>
+                <td class="editable" data-field="d_phone"><input type="number" class="form-control" maxlength="13"></td>
+                <td>
+                    <button class="btn btn-outline btn-success save-btn">Save</button>
+                    <button class="btn btn-outline btn-danger delete-btn">Delete</button>
+                </td>
+            </tr>
+        `;
+        $('#doctors').append(newRow);
+    });
+
 });
     </script>
 </body>

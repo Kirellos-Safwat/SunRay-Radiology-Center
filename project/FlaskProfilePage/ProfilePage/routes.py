@@ -19,7 +19,8 @@ import google.auth.transport.requests
 @app.route('/')  # that is the root url of the website
 @app.route('/home')
 def home_page():
-    return render_template('home.html')
+    data = session.get('user_data')
+    return render_template('home.html', data=data)
 
 
 @app.route('/edit_data', methods=['POST'])
@@ -27,6 +28,7 @@ def edit_data():
     data = request.get_json()
     table = data.get('table')
     cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
+    # handle deleting
     if 'delete_id' in data:
         delete_id = data['delete_id']
         if table == 'patient':
@@ -40,7 +42,19 @@ def edit_data():
                 WHERE d_id = %s;
             """
         cursor.execute(update_query, (str(delete_id),))
-
+    # handle editing
+    elif 'new' in data:
+        doctor_data = {
+                'd_name': data['d_name'],
+                'd_phone': data['d_phone'],
+                'd_email': data['d_email']
+            }
+        add_query = """
+            INSERT INTO radiologist(d_name, d_email, d_phone)
+            VALUES(%(d_name)s, %(d_email)s, %(d_phone)s)
+        """
+        cursor.execute(add_query, doctor_data)
+    # adding new doctor
     elif 'id' in data or 'd_id' in data:
         update_data = data
         if table == 'patient':
@@ -732,11 +746,11 @@ def base():
 
 
 '''
-@app.route('/posts')
-def posts():
-    # Grab all the posts from the database
-    posts = Posts.query.order_by(Posts.date_posted)
-    return render_template("posts.html", posts=posts)
+    @app.route('/posts')
+    def posts():
+        # Grab all the posts from the database
+        posts = Posts.query.order_by(Posts.date_posted)
+        return render_template("posts.html", posts=posts)
 '''
 
 
@@ -746,10 +760,10 @@ def send_reset_email(patient):
                   sender='noreply@demo.com',
                   recipients=[patient.email])
     msg.body = f'''To reset your password, visit the following link:
-{url_for('reset_token', token=token, _external=True)}
+        {url_for('reset_token', token=token, _external=True)}
 
-If you did not make this request then simply ignore this email and no changes will be made.
-'''
+        If you did not make this request then simply ignore this email and no changes will be made.
+        '''
     mail.send(msg)
 
 

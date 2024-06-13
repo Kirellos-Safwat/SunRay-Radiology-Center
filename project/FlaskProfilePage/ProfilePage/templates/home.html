@@ -16,8 +16,13 @@
                     <li class="link"><a href="#service">Services</a></li>
                     <li class="link"><a href="#">Blog</a></li>
                     <li class="link"><a href="/contactUs">Contact Us</a></li>
-                    <li class="link"><a href="#identity">Log In</a></li>
-                    <li class="link"><a href="#identity">Register</a></li>
+                    {% if data is none %}
+                        <li class="link"><a href="#identity">Log In</a></li>
+                        <li class="link"><a href="#identity">Register</a></li>
+                    {% else %}
+                        <li class="link"><a href="/patient-profile">Profile</a></li>
+                        <li class="link"><a href="/logout">Log Out</a></li>
+                    {% endif %}
                 </ul>
                 <a class="btn" href="/BookAppointment">BOOK NOW</a>
             </nav>
@@ -33,6 +38,7 @@
                 </div>
             </div>
         </header>
+        {% if data is none %}
         <section class="section__container identity__container" id="identity">
             <div class="identity__grid">
                 <div class="identity__card">
@@ -49,6 +55,7 @@
                 </div>
              </div>
         </section>
+        {% endif %}
         <section class="section__container service__container" id="service">
                 <div class="service__header">
                     <div class="service__header__content">
