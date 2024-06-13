@@ -31,23 +31,25 @@
     {% for message in get_flashed_messages() %}
             <div class="alert alert-{{ message[0] }}" role="alert">{{ message[1] }}</div>
         {% endfor %}
-        <div class="AppointmentBox"> <br> <br> <br> <br>
-            <h1>Book Appointment</h1>
+        <div class="AppointmentBox"> <br>
+            <h2 align="center">Make an Appointment</h2>
 
 
                 <form action="" method='POST' name="AppointmentForm">
 
+                    <div class="form-group">
+                        {{ form.hidden_tag() }}
+                    {{ form.date.label }} {{form.date(class='form-control datepicker')}}
+                    </div>
 
-                    {{ form.hidden_tag() }}
-                    {{ form.date.label }} {{form.date(class='datepicker')}}
-                    <br>
-                    <div class="mb-3">
+                    <div class="form-group"  >
                     <label for="Preferred Doctor">{{ form.doctors.label }}</label>
-                    <label class="dropList"> {{ form.doctors }} </label>
+                    <label class="dropList"> {{ form.doctors(class="form-control") }} </label>
                 </div>
-                <div class="mb-3">
+
+                <div class="form-group">
                     <label for="Examination Type">{{ form.devices.label }}</label>
-                    <label class="dropList"> {{ form.devices }} </label>
+                    <label class="dropList"> {{ form.devices(class="form-control") }} </label>
                 </div>
                 <br>
                 {{ form.submit(class="btn btn-lg btn-block btn-primary") }}

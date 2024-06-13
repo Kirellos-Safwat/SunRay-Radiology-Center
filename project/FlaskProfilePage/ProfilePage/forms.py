@@ -46,8 +46,8 @@ class EditProfileForm(FlaskForm):
 
 
 class AppointmentForm(FlaskForm):
-    date = DateField('Choose Day', format='%Y-%m-%d', validators=[DataRequired()])
-    doctors = SelectField('Choose Doctor', validators=[DataRequired()], coerce=str)
+    date = DateField(' Preferred Day', format='%Y-%m-%d', validators=[DataRequired()])
+    doctors = SelectField('Preferred Doctor', validators=[DataRequired()], coerce=str)
     devices = SelectField('Examination Type', validators=[DataRequired()], coerce=str)
     submit = SubmitField(label='Book Appointment')
 

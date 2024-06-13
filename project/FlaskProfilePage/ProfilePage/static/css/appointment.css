@@ -1,15 +1,82 @@
 .AppointmentBox{
     width: 350px;
-    height: 480px;
+    height: 500px;
     background: rgb(18, 172, 142);
     color: white;
     margin-top: 5%;
     margin-left: 40%;
     border-radius: 10px;
+     font-size: 16px;
 }
+.ReportBox{
+    position: relative;
+    left: -220px;
+    width: 750px;
+    height: 550px;
+    background: rgb(18, 172, 142);
+    color: white;
+    margin-top: 5%;
+    margin-left: 40%;
+    border-radius: 10px;
+     font-size: 16px;
+}
+
 .AppointmentBox h1{
     text-align: center;
     margin-top: -60px;
+}
+.form-group select {
+    /* Your styles here */
+    width: 83%;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #3367D6;
+    border-radius: 10px;
+    box-sizing: border-box;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-control {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+.form-control:focus {
+    border-color: #80bdff;
+    outline: none;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+button {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+.form-control {
+    display: block;
+    width: 100%;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: #495057;
+    background-color: #fff;
+    background-clip: padding-box;
+    border: 1px solid #3367D6;
+    border-radius: 10px;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
 .AppointmentBox label{
     font-size: 18px;
