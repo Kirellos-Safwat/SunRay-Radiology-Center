@@ -181,6 +181,28 @@
                         {% endif %}
                         <!-- change the route to add btn functionality -->
                     <a class="btn btn-primary" href="/BookAppointment">Book an Appointment</a>
+
+
+                    {% if reports %}
+                    <ul>
+                        <h3>Your reports</h3>
+                        {% for report in reports %}
+                        <div class ="row">
+                            <li>
+
+                                <p>report ID: {{ report.r_id }}</p>
+                                <p> Doctor Name: {{ report.d_name }}</p>
+                                <p>Study Area: {{ report.r_study_area}}</p>
+                                <p>Prescripted Dose: {{ report.radiation_dose}}</p>
+                                <p>Observation: {{ report.r_findings}}</p>
+                            </li>
+                        </div>
+                        {% endfor %}
+                    </ul>
+                    {% else %}
+                    <p>No reports found.</p>
+                    {% endif %}
+                
                 </div>
             </form>
         </div>

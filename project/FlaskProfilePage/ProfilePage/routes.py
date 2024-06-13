@@ -459,9 +459,17 @@ def radiologist_profile_page():
     appointments = cursor.fetchall()
     cursor.close()
 
+    cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
+    # Fetch reports for the current user's ID
+    cursor.execute(""" SELECT report.*, patient.fname, patient.lname
+                   FROM report Join patient ON report.p_id = patient.id
+                   WHERE d_id = %s """, (data['d_id'],))
+    reports = cursor.fetchall()
+    cursor.close()
+
     if data is None:
         return redirect('/radiologist-login')
-    return render_template('radiologist-profile.html', data=data, appointments=appointments)
+    return render_template('radiologist-profile.html', data=data, appointments=appointments , reports=reports)
 
 
 @app.route('/radiologist-edit_profile', methods=['GET', 'POST'])
@@ -593,6 +601,12 @@ def patient_profile_page():
         WHERE P_ID = %s
     """, (data['id'],))
     appointments = cursor.fetchall()
+    # cursor.close()
+    # Fetch reports for the current user's ID
+    cursor.execute(""" SELECT report.*, radiologist.d_name
+                   FROM report Join radiologist ON report.d_id = radiologist.d_id
+                   WHERE P_id = %s """, (data['id'],))
+    reports = cursor.fetchall()
     cursor.close()
 
     ############################################
@@ -607,7 +621,7 @@ def patient_profile_page():
     #     data['scans'] = data['scans'].replace("\\", "/")
     if data is None:
         return redirect('/patient-login')
-    return render_template('patient-profile.html', data=data, scan_Files=scan_Files, appointments=appointments)
+    return render_template('patient-profile.html', data=data, scan_Files=scan_Files, appointments=appointments, reports=reports)
 
 
 @app.route('/upload_scan', methods=['GET', 'POST'])
