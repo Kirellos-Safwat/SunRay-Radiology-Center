@@ -19,12 +19,19 @@
                     {% if data is none %}
                         <li class="link"><a href="#identity">Log In</a></li>
                         <li class="link"><a href="#identity">Register</a></li>
-                    {% else %}
+                    {% elif data.id %}
                         <li class="link"><a href="/patient-profile">Profile</a></li>
                         <li class="link"><a href="/logout">Log Out</a></li>
+                    {% elif data.d_id %}
+                    <li class="link"><a href="/radiologist-profile">Profile</a></li>
+                    <li class="link"><a href="/logout">Log Out</a></li>
+                    {% elif data.admin_id %}
+                    <li class="link"><a href="/logout">Log Out</a></li>
                     {% endif %}
                 </ul>
+                {% if data.id %}
                 <a class="btn" href="/BookAppointment">BOOK NOW</a>
+                {% endif %}
             </nav>
             <div class="section__container header__container">
                 <div class="header__content">

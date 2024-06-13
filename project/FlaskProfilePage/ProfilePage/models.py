@@ -48,6 +48,7 @@ class radiology_equipment(db.Model, UserMixin):
     Maintenance_Date = db.Column(db.String(length=15), nullable=False)
 
 
+
 class appointments(db.Model, UserMixin):
     a_id = db.Column(db.Integer(), primary_key=True)
     p_id = db.Column(db.Integer(), db.ForeignKey('patient.P_ID'), nullable=True)
