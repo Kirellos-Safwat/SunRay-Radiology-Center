@@ -53,7 +53,7 @@
 <div class="container" style="max-width: 400px;" >
         <div class="card">
             <div class="card-body">-->
-                <form action="" method='POST' name="ReportForm">
+                <form action="" method='POST' name="ReportForm" enctype="multipart/form-data">
 <div class="container">
                     <div class="column">
 
@@ -66,14 +66,14 @@
 
 
                    <div class="form-group">
-                    <label for="Study Area">{{ form.r_study_area.label }}</label>
+                        <label for="Study Area">{{ form.r_study_area.label }}</label>
                              {{ form.r_study_area(class="form-control") }}
                          </div>
 
-                    <div class="form-group">
-                    <label for="Replace me">'Replace this with scan image input '</label>
-                             {{ form.r_study_area(class="form-control") }}
-                         </div>
+                         <div class="mb-3">
+                            <label for="profile_photo" class="form-label">Profile Photo:</label>
+                            {{ form.r_scan(class="form-control") }}
+                        </div>
                          <div >
                     {{ form.r_time.label }} {{form.r_time(class='form-control datepicker')}}
                         </div>

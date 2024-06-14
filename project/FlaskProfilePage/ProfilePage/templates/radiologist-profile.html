@@ -146,9 +146,9 @@
                             <div class ="row">
                                 <li>
 
-                                    <p>Appointment ID: {{ appointment.a_id }}</p>
-                                    <p>Date: {{ appointment.date }}</p>
-                                    <p>Dr: {{ appointment.p_name }}</p>
+                                    <p><strong>Appointment ID:</strong> {{ appointment.a_id }}</p>
+                                    <p><strong>Date:</strong> {{ appointment.date }}</p>
+                                    <p><strong>Dr:</strong> {{ appointment.p_name }}</p>
                                     <!-- Add more fields as needed -->
                                 </li>
                             </div>
@@ -164,14 +164,40 @@
                     <ul>
                         <h3>Your reports</h3>
                         {% for report in reports %}
+                        <style>
+                            .row .hidden-item {
+                                display: none;
+                            }
+                        
+                            .row:hover .hidden-item {
+                                display: block;
+                            }
+                        </style>
                         <div class ="row">
                             <li>
+                            
 
-                                <p>report ID: {{ report.r_id }}</p>
-                                <p>Patiet Name: {{ report.fname +" "+ report.lname }}</p>
-                                <p>Study Area: {{ report.r_study_area}}</p>
-                                <p>Prescripted Dose: {{ report.radiation_dose}}</p>
-                                <p>Observation: {{ report.r_findings}}</p>
+                                <p><strong>report ID:</strong> {{ report.r_id }}</p>
+                                <p><strong>Patient Name:</strong> {{report.fname +" "+ report.lname}}</p>
+                                <p><strong>Study Area:</strong> {{ report.r_study_area}}</p>
+                                <p><strong>Prescripted Dose:</strong> {{ report.radiation_dose}}</p>
+                                <p class="hidden-item"><strong>Observation:</strong> {{ report.r_findings}}</p>
+                                <p class="hidden-item"><strong>Date:</strong> {{ report.r_time}}</p>
+                                <p class="hidden-item"><strong>Result:</strong> {{ report.r_result}}</p>
+                                <p class="hidden-item"><strong>Billing:</strong> {{ report.billing}}</p>
+                                <!-- <style>
+                                    .flex-container {
+                                        display: flex;
+                        
+                                    }
+                                </style> -->
+                                {% if report.r_scan %}
+                                    <div class="flex-container">
+                                        <p class="hidden-item"><strong>scan:</strong> </p>
+                                        <img src="{{ url_for('static', filename=report.r_scan) }}" class="hidden-item" height="200"/>
+                                    </div>
+                                {% endif %}
+                                
                             </li>
                         </div>
                         {% endfor %}
@@ -179,6 +205,8 @@
                     {% else %}
                     <p>No reports found.</p>
                     {% endif %}
+
+                    
 
                     <a class="btn btn-primary" href="/SubmitReport">Create a report</a>
                 
