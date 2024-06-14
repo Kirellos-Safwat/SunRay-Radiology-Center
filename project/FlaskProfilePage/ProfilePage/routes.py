@@ -1,13 +1,14 @@
 import psycopg2.extras
+from google.oauth2 import id_token
 from sqlalchemy.testing.plugin.plugin_base import post
-from ProfilePage import app, db, connection, connection_string, mail, bcrypt,flow, GOOGLE_CLIENT_ID
+from ProfilePage import app, db, connection, connection_string, mail, bcrypt, flow, GOOGLE_CLIENT_ID
 from flask_login import current_user
 from flask_mail import Message
 from ProfilePage.models import appointments, Patient
 from ProfilePage.forms import LoginForm, EditProfileForm, AppointmentForm, PatientRegisterForm, ReportForm, \
     RadiologistRegisterForm, ForgetForm, \
-    ResetPasswordForm, SearchForm
-from flask import render_template, redirect, url_for, flash, session, request
+    ResetPasswordForm
+from flask import render_template, redirect, url_for, flash, session, request, json, jsonify
 from werkzeug.utils import secure_filename
 import os, psycopg2.extras, random
 import requests
@@ -19,9 +20,7 @@ import google.auth.transport.requests
 @app.route('/')  # that is the root url of the website
 @app.route('/home')
 def home_page():
-    data = session.get('user_data')
-    print(data)
-    return render_template('home.html', data=data)
+    return render_template('home.html')
 
 
 @app.route('/edit_data', methods=['POST'])
@@ -29,7 +28,6 @@ def edit_data():
     data = request.get_json()
     table = data.get('table')
     cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
-    # handle deleting
     if 'delete_id' in data:
         delete_id = data['delete_id']
         if table == 'patient':
@@ -43,19 +41,6 @@ def edit_data():
                 WHERE d_id = %s;
             """
         cursor.execute(update_query, (str(delete_id),))
-    # handle editing
-    elif 'new' in data:
-        doctor_data = {
-                'd_name': data['d_name'],
-                'd_phone': data['d_phone'],
-                'd_email': data['d_email']
-            }
-        add_query = """
-            INSERT INTO radiologist(d_name, d_email, d_phone)
-            VALUES(%(d_name)s, %(d_email)s, %(d_phone)s)
-        """
-        cursor.execute(add_query, doctor_data)
-    # adding new doctor
     elif 'id' in data or 'd_id' in data:
         update_data = data
         if table == 'patient':
@@ -79,15 +64,14 @@ def edit_data():
         cursor.execute(update_query, update_data)
     cursor.close()
     connection.commit()
-    return redirect(url_for('admin_page'))
+    return redirect(url_for('users_page'))
 
 
 @app.route('/BookAppointment', methods=['GET', 'POST'])
 def appointment_page():
     form = AppointmentForm()
     data = session.get('user_data')  # This should be changed to get the patient data from the database
-    if data is None or 'id' not in data:
-        return redirect(url_for('patient_login_page'))
+
     def get_doctors():
         connection = psycopg2.connect(connection_string)
         curs = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
@@ -96,7 +80,7 @@ def appointment_page():
         curs.execute("ROLLBACK")
         connection.commit()
         curs.close()
-        # connection.close()
+        connection.close()
         return [doctor['d_name'] for doctor in doctors]
 
     def get_devices():
@@ -107,7 +91,7 @@ def appointment_page():
         curs.execute("ROLLBACK")
         connection.commit()
         curs.close()
-        # connection.close()
+        connection.close()
         return [device['device_name'] for device in devices]
 
     form.doctors.choices = get_doctors()
@@ -135,10 +119,10 @@ def appointment_page():
             )
             connection.commit()
             cursor.close()
-            # connection.close()
+            connection.close()
 
             flash('Your appointment has been booked successfully!', category='success')
-            return redirect(url_for('patient_profile_page'))
+            return redirect(url_for('home_page'))
     return render_template('appointment.html', form=form, data=data)
 
 
@@ -146,70 +130,119 @@ def appointment_page():
 def report_page():
     form = ReportForm()
     data = session.get('user_data')  # This should be changed to get the patient data from the database
-    if data is None or 'd_id' not in data:
-        return redirect(url_for('radiologist_login'))
 
     def get_patients():
         connection = psycopg2.connect(connection_string)
         curs = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
-        curs.execute("SELECT concat(fname,' ',lname) AS full_name FROM patient")
+        curs.execute("select concat(fname,' ',lname) AS full_name FROM patient")
         patients = curs.fetchall()
+        curs.execute("ROLLBACK")
+        connection.commit()
+        curs.close()
         connection.close()
-        return [(patient['full_name'], patient['full_name']) for patient in patients]
+        return [patient['full_name'] for patient in patients]
 
     def get_devices():
         connection = psycopg2.connect(connection_string)
         curs = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
-        curs.execute("SELECT device_name FROM radiology_equipment")
+        curs.execute("SELECT device_name,device_id FROM radiology_equipment")
         devices = curs.fetchall()
+        curs.execute("ROLLBACK")
+        connection.commit()
+        curs.close()
         connection.close()
-        return [(device['device_name'], device['device_name']) for device in devices]
+        return [device['device_name'] for device in devices]
 
     form.patients.choices = get_patients()
     form.devices.choices = get_devices()
 
     if request.method == 'POST':
-        if form.validate_on_submit():
-            connection = psycopg2.connect(connection_string)
-            cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
-            d_id = data['d_id']
+        connection = psycopg2.connect(connection_string)
+        cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
+        d_id = data['d_id']
 
+        if form.validate_on_submit():
             r_time = form.r_time.data
+            r_scan = form.r_scan.data
             r_study_area = form.r_study_area.data
             radiation_dose = form.radiation_dose.data
             r_findings = form.r_findings.data
             r_result = form.r_result.data
             billing = random.randint(500, 1000)
-            
-            profile_photo = form.r_scan.data
-            
-            filename = secure_filename(profile_photo.filename)
-            profile_photo_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-            profile_photo.save(profile_photo_path)
-            relative_photo_path = os.path.join('uploads', filename)
-            
-
 
             p_name = form.patients.data
             cursor.execute("SELECT id FROM patient WHERE concat(fname,' ',lname) = %s", (p_name,))
-            p_id = cursor.fetchone()[0]
-
+            p_id = cursor.fetchall()[0][0]
+            cursor.execute("ROLLBACK")
             device_name = form.devices.data
-            cursor.execute("SELECT device_id FROM radiology_equipment WHERE device_name = %s", (device_name,))
-            device_id = cursor.fetchone()[0]
+            cursor.execute("SELECT device_id FROM radiology_equipment WHERE device_name = %s",
+                           (device_name,))
+            device_id = cursor.fetchall()[0][0]
+            cursor.execute("ROLLBACK")
 
             cursor.execute(
-                "INSERT INTO report (p_id, d_id, device_id, r_time, r_scan, r_study_area, radiation_dose, r_findings, r_result, billing) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
-                (p_id, d_id, device_id, r_time, relative_photo_path, r_study_area, radiation_dose, r_findings, r_result, billing)
+                "INSERT INTO report (p_id,d_id,device_id,r_time,r_scan,r_study_area,radiation_dose,r_findings,r_result,billing) VALUES (%s, %s, %s, %s,%s,%s, %s, %s, %s,%s)",
+                (p_id, d_id, device_id, r_time, r_scan, r_study_area, radiation_dose, r_findings, r_result, billing)
             )
             connection.commit()
             cursor.close()
             connection.close()
 
             flash('The report was submitted successfully', category='success')
-            return redirect(url_for('radiologist_profile_page'))
-
+            return redirect(url_for('report_page'))
     return render_template('report.html', form=form, data=data)
+
+
+'''
+    @app.route('/register', methods=['GET', 'POST'])
+    def registration_page():
+        form = RegisterForm()
+        if request.method == 'POST':
+            fname = request.form['First_Name']
+            lname = request.form['Last_Name']
+            email = request.form['Email']
+            phone = request.form['Phone_Number']
+            password = request.form['Password']
+            is_admin = True if email.endswith('@company.com') else False
+
+
+@app.route('/register', methods=['GET', 'POST'])
+def registration_page():
+    form = RegisterForm()
+    if request.method == 'POST':
+        fname = request.form['First_Name']
+        lname = request.form['Last_Name']
+        email = request.form['Email']
+        phone = request.form['Phone_Number']
+        password = request.form['Password']
+        is_admin = True if email.endswith('@company.com') else False
+
+            profile_photo = request.files['profile_photo']
+            if profile_photo and profile_photo.filename != '':
+                filename = secure_filename(profile_photo.filename)
+                profile_photo_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                profile_photo.save(profile_photo_path)
+                relative_photo_path = os.path.join('uploads', filename)
+            else:
+                relative_photo_path = None
+            connection = psycopg2.connect(connection_string)
+            cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
+            if form.validate_on_submit():
+                cursor.execute(
+                    "INSERT INTO Credentials (fname, lname, email, phone, password, profile_picture ,is_admin) VALUES (%s, %s, %s, %s, %s, %s , %s)",
+                    (fname, lname, email, phone, password, relative_photo_path, is_admin)
+
+                )
+                connection.commit()
+                cursor.close()
+                connection.close()
+                flash('Registration successful. Please log in.', category='success')
+                return redirect(url_for('login_admin')) 
+            else:
+                flash('Invalid email or password. Please try again.', category='danger')
+
+        return render_template('registration.html', form=RegisterForm())
+'''
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -234,11 +267,20 @@ def login_admin():
     return render_template('login.html', form=LoginForm())
 
 
-
+'''
+    @app.route('/profile')
+    def profile_page():
+        data = session.get('user_data')
+        if data is None:
+            return redirect('/login')
+        if os.name == 'nt' and data['profile_picture'] is not None:
+            data['profile_picture'] = data['profile_picture'].replace("\\", "/")
+        return render_template('profile.html', data=data)
+'''
 
 
 @app.route('/users')
-def admin_page():
+def users_page():
     data = session.get('user_data')
     if data is None or 'admin_id' not in data:
         return redirect('/login')
@@ -321,7 +363,7 @@ def thanks_page():
             return redirect(url_for('login_admin'))  # Redirect to login to refresh
 
         return render_template('edit_profile.html', data=data, form=form)
-
+'''
 
 
 @app.route('/radiologist-register', methods=['GET', 'POST'])
@@ -358,7 +400,7 @@ def radiologist_registration_page():
 
     return render_template('radiologist-registration.html', form=form)
 
-'''
+
 @app.route('/radiologist-login', methods=['GET', 'POST'])
 def radiologist_login():
     if request.method == 'POST':
@@ -379,7 +421,7 @@ def radiologist_login():
             cursor.close()  # Close the cursor once
             return redirect('/radiologist-profile')
         else:
-            flash('Incorrect Email or password. Please try again.', category='error')
+            flash('Incorrect Email or password. Please try again.', category='danger')
 
     return render_template('radiologist-login.html', form=LoginForm())  # check render
 
@@ -387,8 +429,7 @@ def radiologist_login():
 @app.route('/radiologist-profile')
 def radiologist_profile_page():
     data = session.get('user_data')
-    if data is None or 'd_id' not in data:
-        return redirect('/radiologist-login')
+
     cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
     # Fetch appointments for the current user's ID
     cursor.execute("""
@@ -400,25 +441,16 @@ def radiologist_profile_page():
     appointments = cursor.fetchall()
     cursor.close()
 
-    cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
-    # Fetch reports for the current user's ID
-    cursor.execute(""" SELECT report.*, patient.fname, patient.lname
-                   FROM report Join patient ON report.p_id = patient.id
-                   WHERE d_id = %s """, (data['d_id'],))
-    reports = cursor.fetchall()
-    cursor.close()
-
     if data is None:
         return redirect('/radiologist-login')
-    return render_template('radiologist-profile.html', data=data, appointments=appointments , reports=reports)
+    return render_template('radiologist-profile.html', data=data, appointments=appointments)
 
 
 @app.route('/radiologist-edit_profile', methods=['GET', 'POST'])
 def radiologist_edit_profile():
     form = EditProfileForm()
     data = session.get('user_data')
-    if data is None or 'd_id' not in data:
-        return redirect('/radiologist-login')
+
     if request.method == 'POST' and form.validate_on_submit():
         updated_data = {
             'd_name': form.First_Name.data,
@@ -457,7 +489,7 @@ def radiologist_edit_profile():
         cursor.execute(update_query, updated_data)
         connection.commit()
         cursor.close()
-        # connection.close()
+        connection.close()
 
         flash('Your profile has been updated successfully! Please login again', category='success')
         return redirect('/radiologist-login_page')  # Redirect to log in to refresh
@@ -493,7 +525,7 @@ def patient_registration_page():
         )
         connection.commit()
         cursor.close()
-        # connection.close()
+        connection.close()
 
         flash('Registration successful. Please log in.', category='success')
         return redirect('/patient-login_page')
@@ -523,16 +555,17 @@ def patient_login_page():
             cursor.close()  # Close the cursor once
             return redirect('/patient-profile')
         else:
-            flash('Incorrect Email or password. Please try again.', category='error')
+            flash('Incorrect Email or password. Please try again.', category='danger')
 
     return render_template('patient-login.html', form=LoginForm())
 
 
 @app.route('/patient-profile')
 def patient_profile_page():
-    data = session.get('user_data')
-    if data is None or 'id' not in data:
-        return redirect('/patient-login_page')
+    user_data = session.get('user_data')
+    print(f"user_data: {user_data}")  # Inspect the contents of the dictionary
+    data = user_data
+
     cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
     # Fetch appointments for the current user's ID
     cursor.execute("""
@@ -542,12 +575,6 @@ def patient_profile_page():
         WHERE P_ID = %s
     """, (data['id'],))
     appointments = cursor.fetchall()
-    # cursor.close()
-    # Fetch reports for the current user's ID
-    cursor.execute(""" SELECT report.*, radiologist.d_name
-                   FROM report Join radiologist ON report.d_id = radiologist.d_id
-                   WHERE P_id = %s """, (data['id'],))
-    reports = cursor.fetchall()
     cursor.close()
 
     ############################################
@@ -562,14 +589,12 @@ def patient_profile_page():
     #     data['scans'] = data['scans'].replace("\\", "/")
     if data is None:
         return redirect('/patient-login')
-    return render_template('patient-profile.html', data=data, scan_Files=scan_Files, appointments=appointments, reports=reports)
+    return render_template('patient-profile.html', data=data, scan_Files=scan_Files, appointments=appointments)
 
 
 @app.route('/upload_scan', methods=['GET', 'POST'])
 def patient_upload_scan():
     data = session.get('user_data')
-    if data is None or 'id' not in data:
-        return redirect('/patient-login_page')
     scans_folder = "patient" + str(data['id'])  # make a folder for each patient
     scans_path = os.path.join(app.config['UPLOAD_FOLDER'], scans_folder)
     if data is None:
@@ -609,8 +634,7 @@ def patient_upload_scan():
 def patient_edit_profile():
     form = EditProfileForm()
     data = session.get('user_data')
-    if data is None or 'id' not in data:
-        return redirect('/patient-login_page')
+
     if request.method == 'POST' and form.validate_on_submit():
         updated_data = {
             'fname': form.First_Name.data,
@@ -650,7 +674,7 @@ def patient_edit_profile():
         cursor.execute(update_query, updated_data)
         connection.commit()
         cursor.close()
-        # connection.close()
+        connection.close()
 
         flash('Your profile has been updated successfully! Please login again', category='success')
         return redirect('/patient-login_page')  # Redirect to log in to refresh
@@ -669,12 +693,12 @@ def contact_page():
         name = request.form.get('Name')
         email = request.form.get('Email')
         message = request.form.get('Message')
-    
+
         msg = Message(
             subject=f"Mail from {name}",  body=f"Name: {name}\nEmail: {email}\n\n\n{message}", sender="rawanwalid978", recipients="rawanwalid978@gmial.com"
         )
         mail.send(msg)
-        
+
         connection = psycopg2.connect(connection_string)
         cursor = connection.cursor()
         cursor.execute(
@@ -688,35 +712,6 @@ def contact_page():
     return render_template('contact.html')
 
 
-@app.route('/search', methods=["POST"])
-def search():
-    form = SearchForm()
-    names = Patient.query
-    if form.validate_on_submit():
-        # Get data from submitted form
-        post.searched = form.searched.data
-        # Query the Database
-        names = names.filter(Patient.fname.like('%' + post.searched + '%'))
-        names = names.order_by(Patient.id).all()
-        return render_template("search.html",
-                               form=form,
-                               searched=post.searched, names=names)
-
-
-@app.context_processor
-def base():
-    form = SearchForm()
-    return dict(form=form)
-
-
-'''
-    @app.route('/posts')
-    def posts():
-        # Grab all the posts from the database
-        posts = Posts.query.order_by(Posts.date_posted)
-        return render_template("posts.html", posts=posts)
-'''
-
 
 def send_reset_email(patient):
     token = patient.get_reset_token()
@@ -724,10 +719,10 @@ def send_reset_email(patient):
                   sender='noreply@demo.com',
                   recipients=[patient.email])
     msg.body = f'''To reset your password, visit the following link:
-        {url_for('reset_token', token=token, _external=True)}
+{url_for('reset_token', token=token, _external=True)}
 
-        If you did not make this request then simply ignore this email and no changes will be made.
-        '''
+If you did not make this request then simply ignore this email and no changes will be made.
+'''
     mail.send(msg)
 
 
@@ -773,7 +768,7 @@ def reset_token(token):
         cursor.execute(update_query, updated_data)
         connection.commit()
         cursor.close()
-        # connection.close()
+        connection.close()
 
         flash('Your password has been updated successfully! You are now able to log in', category='success')
         return redirect('/patient-login_page')  # Redirect to log in to refresh
@@ -814,7 +809,46 @@ def callback():
         request=token_request,
         audience=GOOGLE_CLIENT_ID
     )
-
     session["google_id"] = id_info.get("sub")
     session["name"] = id_info.get("name")
-    return redirect("/patient-profile")
+
+    email = id_info.get("email")
+    full_name = id_info.get("name")
+    name_parts = full_name.split(" ", 1)
+    first_name = name_parts[0] if len(name_parts) >= 1 else ""
+    last_name = name_parts[1] if len(name_parts) >= 2 else ""
+    if email:
+        # Check user existence
+        user = Patient.query.filter_by(email=email).first()
+        if not user:
+            # Create new user with Google information
+            connection = psycopg2.connect(connection_string)
+            cursor = connection.cursor()
+            cursor.execute(
+                "INSERT INTO Patient (fname, lname, email) VALUES (%s, %s, %s) RETURNING id",
+                (first_name, last_name, email)
+            )
+            # Fetch the returned data (assuming only one new user was inserted)
+            new_user = cursor.fetchone()
+            connection.commit()
+            cursor.close()
+            connection.close()
+            user_data = {
+                "id": new_user[0],
+                "email": email,
+                "fname": first_name,
+                "lname": last_name,
+            }
+            session["user_data"] = user_data
+        else:
+            user_data = {
+                "id": user.id,
+                "email": user.email,
+                "fname": user.fname,  # Assuming your model has attributes fname and lname
+                "lname": user.lname,
+            }
+            session["user_data"] = user_data
+        return redirect("/patient-profile")
+    else:
+        print("Email not found in Google ID token. User creation skipped.")
+    return redirect("/home")
