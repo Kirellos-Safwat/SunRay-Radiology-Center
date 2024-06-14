@@ -148,118 +148,68 @@ def report_page():
     data = session.get('user_data')  # This should be changed to get the patient data from the database
     if data is None or 'd_id' not in data:
         return redirect(url_for('radiologist_login'))
+
     def get_patients():
         connection = psycopg2.connect(connection_string)
         curs = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
-        curs.execute("select concat(fname,' ',lname) AS full_name FROM patient")
+        curs.execute("SELECT concat(fname,' ',lname) AS full_name FROM patient")
         patients = curs.fetchall()
-        curs.execute("ROLLBACK")
-        connection.commit()
-        curs.close()
-        # connection.close()
-        return [patient['full_name'] for patient in patients]
+        connection.close()
+        return [(patient['full_name'], patient['full_name']) for patient in patients]
 
     def get_devices():
         connection = psycopg2.connect(connection_string)
         curs = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
-        curs.execute("SELECT device_name,device_id FROM radiology_equipment")
+        curs.execute("SELECT device_name FROM radiology_equipment")
         devices = curs.fetchall()
-        curs.execute("ROLLBACK")
-        connection.commit()
-        curs.close()
-        # connection.close()
-        return [device['device_name'] for device in devices]
+        connection.close()
+        return [(device['device_name'], device['device_name']) for device in devices]
 
     form.patients.choices = get_patients()
     form.devices.choices = get_devices()
 
     if request.method == 'POST':
-        connection = psycopg2.connect(connection_string)
-        cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
-        d_id = data['d_id']
-
         if form.validate_on_submit():
+            connection = psycopg2.connect(connection_string)
+            cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
+            d_id = data['d_id']
+
             r_time = form.r_time.data
-            r_scan = form.r_scan.data
             r_study_area = form.r_study_area.data
             radiation_dose = form.radiation_dose.data
             r_findings = form.r_findings.data
             r_result = form.r_result.data
             billing = random.randint(500, 1000)
+            
+            profile_photo = form.r_scan.data
+            
+            filename = secure_filename(profile_photo.filename)
+            profile_photo_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            profile_photo.save(profile_photo_path)
+            relative_photo_path = os.path.join('uploads', filename)
+            
+
 
             p_name = form.patients.data
             cursor.execute("SELECT id FROM patient WHERE concat(fname,' ',lname) = %s", (p_name,))
-            p_id = cursor.fetchall()[0][0]
-            cursor.execute("ROLLBACK")
+            p_id = cursor.fetchone()[0]
+
             device_name = form.devices.data
-            cursor.execute("SELECT device_id FROM radiology_equipment WHERE device_name = %s",
-                           (device_name,))
-            device_id = cursor.fetchall()[0][0]
-            cursor.execute("ROLLBACK")
+            cursor.execute("SELECT device_id FROM radiology_equipment WHERE device_name = %s", (device_name,))
+            device_id = cursor.fetchone()[0]
 
             cursor.execute(
-                "INSERT INTO report (p_id,d_id,device_id,r_time,r_scan,r_study_area,radiation_dose,r_findings,r_result,billing) VALUES (%s, %s, %s, %s,%s,%s, %s, %s, %s,%s)",
-                (p_id, d_id, device_id, r_time, r_scan, r_study_area, radiation_dose, r_findings, r_result, billing)
+                "INSERT INTO report (p_id, d_id, device_id, r_time, r_scan, r_study_area, radiation_dose, r_findings, r_result, billing) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
+                (p_id, d_id, device_id, r_time, relative_photo_path, r_study_area, radiation_dose, r_findings, r_result, billing)
             )
             connection.commit()
             cursor.close()
-            # connection.close()
+            connection.close()
 
             flash('The report was submitted successfully', category='success')
             return redirect(url_for('radiologist_profile_page'))
+
     return render_template('report.html', form=form, data=data)
-
-
-'''
-    @app.route('/register', methods=['GET', 'POST'])
-    def registration_page():
-        form = RegisterForm()
-        if request.method == 'POST':
-            fname = request.form['First_Name']
-            lname = request.form['Last_Name']
-            email = request.form['Email']
-            phone = request.form['Phone_Number']
-            password = request.form['Password']
-            is_admin = True if email.endswith('@company.com') else False
-
-
-@app.route('/register', methods=['GET', 'POST'])
-def registration_page():
-    form = RegisterForm()
-    if request.method == 'POST':
-        fname = request.form['First_Name']
-        lname = request.form['Last_Name']
-        email = request.form['Email']
-        phone = request.form['Phone_Number']
-        password = request.form['Password']
-        is_admin = True if email.endswith('@company.com') else False
-
-            profile_photo = request.files['profile_photo']
-            if profile_photo and profile_photo.filename != '':
-                filename = secure_filename(profile_photo.filename)
-                profile_photo_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-                profile_photo.save(profile_photo_path)
-                relative_photo_path = os.path.join('uploads', filename)
-            else:
-                relative_photo_path = None
-            connection = psycopg2.connect(connection_string)
-            cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
-            if form.validate_on_submit():
-                cursor.execute(
-                    "INSERT INTO Credentials (fname, lname, email, phone, password, profile_picture ,is_admin) VALUES (%s, %s, %s, %s, %s, %s , %s)",
-                    (fname, lname, email, phone, password, relative_photo_path, is_admin)
-
-                )
-                connection.commit()
-                cursor.close()
-                connection.close()
-                flash('Registration successful. Please log in.', category='success')
-                return redirect(url_for('login_admin')) 
-            else:
-                flash('Invalid email or password. Please try again.', category='danger')
-
-        return render_template('registration.html', form=RegisterForm())
-'''
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -284,16 +234,7 @@ def login_admin():
     return render_template('login.html', form=LoginForm())
 
 
-'''
-    @app.route('/profile')
-    def profile_page():
-        data = session.get('user_data')
-        if data is None:
-            return redirect('/login')
-        if os.name == 'nt' and data['profile_picture'] is not None:
-            data['profile_picture'] = data['profile_picture'].replace("\\", "/")
-        return render_template('profile.html', data=data)
-'''
+
 
 
 @app.route('/users')
@@ -459,9 +400,17 @@ def radiologist_profile_page():
     appointments = cursor.fetchall()
     cursor.close()
 
+    cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
+    # Fetch reports for the current user's ID
+    cursor.execute(""" SELECT report.*, patient.fname, patient.lname
+                   FROM report Join patient ON report.p_id = patient.id
+                   WHERE d_id = %s """, (data['d_id'],))
+    reports = cursor.fetchall()
+    cursor.close()
+
     if data is None:
         return redirect('/radiologist-login')
-    return render_template('radiologist-profile.html', data=data, appointments=appointments)
+    return render_template('radiologist-profile.html', data=data, appointments=appointments , reports=reports)
 
 
 @app.route('/radiologist-edit_profile', methods=['GET', 'POST'])
@@ -593,6 +542,12 @@ def patient_profile_page():
         WHERE P_ID = %s
     """, (data['id'],))
     appointments = cursor.fetchall()
+    # cursor.close()
+    # Fetch reports for the current user's ID
+    cursor.execute(""" SELECT report.*, radiologist.d_name
+                   FROM report Join radiologist ON report.d_id = radiologist.d_id
+                   WHERE P_id = %s """, (data['id'],))
+    reports = cursor.fetchall()
     cursor.close()
 
     ############################################
@@ -607,7 +562,7 @@ def patient_profile_page():
     #     data['scans'] = data['scans'].replace("\\", "/")
     if data is None:
         return redirect('/patient-login')
-    return render_template('patient-profile.html', data=data, scan_Files=scan_Files, appointments=appointments)
+    return render_template('patient-profile.html', data=data, scan_Files=scan_Files, appointments=appointments, reports=reports)
 
 
 @app.route('/upload_scan', methods=['GET', 'POST'])
