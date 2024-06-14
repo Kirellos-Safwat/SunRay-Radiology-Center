@@ -17,23 +17,14 @@
                 </ul>
                 <a class="btn" href="/BookAppointment">BOOK NOW</a>
             </nav>
-
         </header>
-                       <div >
-        {% with messages = get_flashed_messages(with_categories=true) %}
-  {% for category, message in messages %}
-    <div class="{{ category }}">{{ message }}</div>
-  {% endfor %}
-{% endwith %}
-</div>
-        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/patient-login.css') }}">
-
-        <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+        <!--<link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">-->
         <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/profile.css') }}">
-        <div class="container emp-profile">
+        <div class="container-profile">
             <form method="post">
-                <div class="row">
-                    <div class="col-md-4">
+                <div class="content">
+                <div class="left-side">
+                    <div class="profile">
                         <div class="profile-img">
                             {% if data.profile_picture is none %}
                                 <img src="{{ url_for('static', filename='images/image.png') }}" class="image" height="200"/>
@@ -44,7 +35,6 @@
                                 Change Photo
                                 <input type="file" name="file"/>
                             </div> -->
-
                             <div class="profile-work">
                                 <!-- <p id="p1">Social</p>
                                 <a href={{data.facebook}}><i class="fab fa-facebook"></i> Facebook</a><br/>
@@ -52,26 +42,48 @@
                                 <a href={{data.instagram}} target="_blank"> <i class="fab fa-instagram"></i> Instagram</a><br/>
                                 <a href={{data.twitter}} target="_blank"><i class="fab fa-twitter"></i> Twitter</a> -->
                                 <p> </p>
-                                <a class="edit_profile_btn" href="/patient-edit_profile">Edit Profile</a>
+                                <a class="edit-profile-btn" href="/patient-edit_profile">Edit Profile</a>
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-6">
-                        <div class="profile-head">
-                            <div class="profile-head-content">
+                    <div class="appointments">
+                        {% if appointments %}
+                            <ul>
+                                <h3>Your Appointments</h3>
+                                {% for appointment in appointments %}
+                                <div class ="row">
+                                    <li>
+
+                                        <p><strong>Appointment ID:</strong> {{ appointment.a_id }}</p>
+                                        <p><strong>Date:</strong> {{ appointment.date }}</p>
+                                        <p><strong>With:</strong> {{ appointment.d_name }}</p>
+                                        <!-- Add more fields as needed -->
+                                    </li>
+                                </div>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <p>No appointments found.</p>
+                        {% endif %}
+                        <!-- change the route to add btn functionality -->
+                    <a class="book-appointment-btn" href="/BookAppointment">Book Appointment</a>
+                    </div>
+                </div>
+                <div class="right-side">
+                    <div class="user-data">
+                            <div class="user-data-content">
                                 <h5>
                                     {{ data.fname }} {{ data.lname }}
                                 </h5>
                                 <h6>
                                     {% if data.is_admin == true %}
-                                        admin
+                                        Admin
                                     {% else %}
-                                        user
+                                        Patient
                                     {% endif %}
                                 </h6>
 
                             </div>
-
                             <div class="col-md-8">
                                 <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
                                     <div class="row">
@@ -122,7 +134,6 @@
                                             <p>{{ data.age }}</p>
                                         </div>
                                     </div>
-
                                     <div class="row">
                                         <div class="col-md-6">
                                             <label>gender :</label>
@@ -141,12 +152,8 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </div>
                 </div>
-
-                <div class="activity-section">
-                    <div class="patient">
+                    <div class="scans">
                         <h3>Your scans</h3>
                         <div class="scrollable">
                             <div class="scrollable-content">
@@ -155,35 +162,14 @@
                                         <img src="{{ url_for('static', filename=data.scans+ '/' + image) }}" class="image" height="200"/>
                                     {% endfor %}
                                 {% else %}
-                                    <p>No Scans Were Uploaded</p>
+                                    <p>No scans available</p>
                                 {% endif %}
                             </div>
                         </div>
+                        <a class="upload-scan-btn" href="/upload_scan">Upload Scans</a>
                     </div>
-                    <a class="btn btn-primary" href="/upload_scan">Upload your Scans</a>
-                        {% if appointments %}
-                            <ul>
-                                <h3>Your reserved appointments</h3>
-                                {% for appointment in appointments %}
-                                <div class ="row">
-                                    <li>
-
-                                        <p><strong>Appointment ID:</strong> {{ appointment.a_id }}</p>
-                                        <p><strong>Date:</strong> {{ appointment.date }}</p>
-                                        <p><strong>With:</strong> {{ appointment.d_name }}</p>
-                                        <!-- Add more fields as needed -->
-                                    </li>
-                                </div>
-                                {% endfor %}
-                            </ul>
-                        {% else %}
-                            <p>No appointments found.</p>
-                        {% endif %}
-                        <!-- change the route to add btn functionality -->
-                    <a class="btn btn-primary" href="/BookAppointment">Book an Appointment</a>
-
-
-                    {% if reports %}
+                    <div class="reports">
+                     {% if reports %}
                     <ul>
                         <h3>Your reports</h3>
                         {% for report in reports %}
@@ -191,14 +177,14 @@
                             .row .hidden-item {
                                 display: none;
                             }
-                        
+
                             .row:hover .hidden-item {
                                 display: block;
                             }
                         </style>
                         <div class ="row">
                             <li>
-                               
+
 
                                 <p><strong>report ID:</strong> {{ report.r_id }}</p>
                                 <p><strong>Doctor Name:</strong> {{ report.d_name }}</p>
@@ -211,7 +197,7 @@
                                 <!-- <style>
                                     .flex-container {
                                         display: flex;
-                        
+
                                     }
                                 </style> -->
                                 {% if report.r_scan %}
@@ -220,7 +206,7 @@
                                         <img src="{{ url_for('static', filename=report.r_scan) }}" class="hidden-item" height="200"/>
                                     </div>
                                 {% endif %}
-                                
+
                             </li>
                         </div>
                         {% endfor %}
@@ -228,7 +214,8 @@
                     {% else %}
                     <p>No reports found.</p>
                     {% endif %}
-                
+                </div>
+                </div>
                 </div>
             </form>
         </div>
