@@ -243,14 +243,18 @@ def admin_page():
     if data is None or 'admin_id' not in data:
         return redirect('/login')
     cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
-    cursor.execute('SELECT * FROM patient')
     # patients data
+    cursor.execute('SELECT * FROM patient')
     patients = cursor.fetchall()
-    cursor.execute('SELECT * FROM radiologist')
     # doctors data
+    cursor.execute('SELECT * FROM radiologist')
     doctors = cursor.fetchall()
+    # devices data1x
+    cursor.execute('SELECT * FROM radiology_equipment')
+    devices = cursor.fetchall()
+
     cursor.close()
-    return render_template('users.html', patients=patients, doctors=doctors)
+    return render_template('users.html', patients=patients, doctors=doctors, devices=devices)
 
 
 @app.route('/logout')

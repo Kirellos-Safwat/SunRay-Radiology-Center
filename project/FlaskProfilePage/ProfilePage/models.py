@@ -43,9 +43,10 @@ def __repr__(self):
 
 class radiology_equipment(db.Model, UserMixin):
     device_id = db.Column(db.Integer(), primary_key=True)
-    device_name = db.Column(db.String(length=15), nullable=False)
-    Commission_Date = db.Column(db.String(length=15), nullable=False)
-    Maintenance_Date = db.Column(db.String(length=15), nullable=False)
+    device_name = db.Column(db.String(length=150), nullable=False)
+    commission_Date = db.Column(db.String(length=10), nullable=False)
+    maintenance_Date = db.Column(db.String(length=10), nullable=False)
+    out_of_order = db.Column(db.Boolean(), default=False)
 
 
 

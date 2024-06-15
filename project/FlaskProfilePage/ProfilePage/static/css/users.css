@@ -3,3 +3,61 @@
     margin-left : 65%;
     height: 40px;
 }
+
+.custom-table td:nth-child(n+1):not(:last-child)  {
+ border: 1px solid white; /* Orange border */
+    background: linear-gradient(to right, rgba(18, 172, 142, 0.9), rgba(18, 172, 142, 0.7)); /* Darker green gradient */
+    color: black; /* Orange text color */
+     font-size: 1.2rem;
+}
+td:last-child {
+  background-color: transparent;
+    border:1px solid transparent; ;
+}
+.custom-table th {
+     border: 1px solid white; /* Orange border */
+    background: rgba(245, 123, 24, 0.9);
+    color: black; /* Orange text color */
+     font-size: 1rem;
+}
+
+.custom-table .editable input {
+    background: linear-gradient(to right, rgba(18, 172, 142, 0.9), rgba(18, 172, 142, 0.7)); /* Darker green gradient */
+
+    color: black; /* Orange text color */
+    border: 1px solid white; /* Orange border */
+}
+
+.icon-button {
+        border: none;
+        background: none;
+        padding: 0;
+        cursor: pointer;
+    }
+
+    .icon-button img {
+        width: 30px; /* Adjust the size of the icon */
+        height: auto; /* Maintain aspect ratio */
+    }
+
+.icon-button2 {
+        border: none;
+        background: none;
+        padding: 0;
+        cursor: pointer;
+    }
+
+    .icon-button2 img {
+        height: 35px; /* Adjust the size of the icon */
+        width: auto; /* Maintain aspect ratio */
+    }
+
+.tab-icon {
+    display: inline-block;
+    width: 30px;
+    margin-right: 10px;
+}
+
+
+
+
