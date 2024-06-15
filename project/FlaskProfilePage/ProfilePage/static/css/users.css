@@ -1,14 +1,10 @@
-.searchBar input[type="search"] {
-    width: 250px;
-    margin-left : 65%;
-    height: 40px;
-}
 
 .custom-table td:nth-child(n+1):not(:last-child)  {
  border: 1px solid white; /* Orange border */
     background: linear-gradient(to right, rgba(18, 172, 142, 0.9), rgba(18, 172, 142, 0.7)); /* Darker green gradient */
     color: black; /* Orange text color */
      font-size: 1.2rem;
+    text-align: center;
 }
 td:last-child {
   background-color: transparent;
@@ -19,6 +15,7 @@ td:last-child {
     background: rgba(245, 123, 24, 0.9);
     color: black; /* Orange text color */
      font-size: 1rem;
+    text-align: center;
 }
 
 .custom-table .editable input {
@@ -60,4 +57,19 @@ td:last-child {
 
 
 
+.search-input {
+        position: relative;
+    }
+    .search-input .search-icon {
+        position: absolute;
+        left: 10px;
+        top: 55%;
+        transform: translateY(-50%);
+        width: 16px;
+        height: 16px;
+        pointer-events: none;
+    }
+    .search-input input {
+        padding-left: 50px;
+    }
 
