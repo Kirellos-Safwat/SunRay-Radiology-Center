@@ -15,7 +15,13 @@ import requests
 from google.oauth2 import id_token
 from pip._vendor import cachecontrol
 import google.auth.transport.requests
+import tensorflow as tf
+from tensorflow import keras
+# from keras.models import load_model
+from PIL import Image
 
+# model = tf.keras.models.load_model("/project/FlaskProfilePage/brain_tumor.h5", compile=False)
+# model.compile(Adamax(learning_rate=0.001), loss='categorical_crossentropy', metrics=['accuracy'])
 
 @app.route('/')  # that is the root url of the website
 @app.route('/home')
@@ -883,3 +889,32 @@ def callback():
     else:
         print("Email not found in Google ID token. User creation skipped.")
     return redirect("/home")
+
+
+def preprocess_input(image):
+    img = image.resize((224, 244))
+    img_array = tf.keras.preprocessing.image.img_to_array(img)
+    img_array = tf.expand_dims(img_array, 0)
+    return img_array
+
+@app.route('/predict', methods=['POST'])
+def predict():
+    try:
+        # Get input data from form
+        image_path=''
+        image = Image.open(image_path).convert('RGB')
+        # Preprocess input data
+        features = preprocess_input(image)
+
+        # Make prediction
+        prediction = model.predict(features)
+        class_labels = ['pituitary','notumor','meningioma','glioma']
+        # Return prediction result
+        score = tf.nn.softmax(prediction[0])
+        result = class_labels[tf.argmax(score)]
+        return render_template('result.html', result=result)
+    except Exception as e:
+        # Log the exception (you might want to use logging module for a real-world application)
+        print(e)
+        return render_template('error.html')
+
