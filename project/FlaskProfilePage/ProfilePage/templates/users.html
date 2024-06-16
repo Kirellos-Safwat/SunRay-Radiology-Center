@@ -17,6 +17,7 @@
             background-color: orange;
             color: white;
         }
+        }
         .nav-tabs .nav-link {
             color: green;
         }
@@ -26,6 +27,15 @@
     </style>
 </head>
 <body>
+<script>
+function scrollonclick() {
+    const scrollPosition = document.body.scrollHeight * 0.7;
+    window.scrollTo({
+    top: scrollPosition,
+    behavior: 'smooth'
+});
+        }
+    </script>
     <header>
         <nav class="section__container nav__container">
             <div class="nav__logo">Sun<span>Ray</span></div>
@@ -39,7 +49,6 @@
             </ul>
         </nav>
     </header>
-    <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
     <div class="container mt-5">
         <ul class="nav nav-tabs" id="myTab" role="tablist">
             <li class="nav-item">
@@ -50,7 +59,8 @@
             </li>
             <li class="nav-item">
                 <a class="nav-link" id="devices-tab" data-toggle="tab" href="#devices" role="tab" aria-controls="devices" aria-selected="false">
-    <img src="static/photos/heart.png" class="tab-icon" alt="Device Icon">Commissioned Devices</a>
+                    <img src="static/photos/heart.png" class="tab-icon" alt="Device Icon">Commissioned Devices
+                </a>
             </li>
         </ul>
         <div class="tab-content" id="myTabContent">
@@ -58,7 +68,7 @@
                 <br>
                 <h3>Patients</h3>
                 <br>
-                 <div class="search-input">
+                <div class="search-input">
                     <img src="{{ url_for('static', filename='photos/search.png') }}" class="search-icon" alt="Search Icon">
                     <input type="text" id="patientSearch" class="form-control" placeholder="Search by ID, Name, Email, or Phone Number" style="width: 1035px;">
                 </div>
@@ -74,7 +84,7 @@
                             <th scope="col">Phone Number</th>
                         </tr>
                     </thead>
-                    <tbody id="patientsTable">
+                    <tbody id="patients">
                         {% for patient in patients %}
                         <tr data-id="{{ patient.id }}" data-table="patient">
                             <td>{{ patient.id }}</td>
@@ -84,7 +94,7 @@
                             <td class="editable" data-field="phone">{{ patient.phone }}</td>
                             <td>
                                 <button class="icon-button2 save-btn" style="display: none;"><img class="logo" src="static/photos/savegreen.png"></button>
-                                <button class="icon-button delete-btn"  data-id="{{ patient.id }}" data-table="patient" style="position: relative; left: 10px"  ><img class="logo" src="static/photos/trashred.png"></button>
+                                <button class="icon-button delete-btn" data-id="{{ patient.id }}" data-table="patient" style="position: relative; left: 10px;"><img class="logo" src="static/photos/trashred.png"></button>
                             </td>
                         </tr>
                         {% endfor %}
@@ -94,16 +104,19 @@
             <div class="tab-pane fade" id="doctors" role="tabpanel" aria-labelledby="doctors-tab">
                 <br>
                 <h3>Radiologists</h3>
-                <button class="btn btn-primary" id="add-doctor-btn">Register a New Doctor</button>
-
-                 <div class="search-input">
+                <br>
+                <div class="search-input">
                     <img src="{{ url_for('static', filename='photos/search.png') }}" class="search-icon" alt="Search Icon">
                     <input type="text" id="doctorSearch" class="form-control" placeholder="Search by ID, Name, Email, or Phone Number" style="width: 1031px;">
                 </div>
 
                 <br>
+
+                <button class="btn btn-primary mt-3" id="addDoctorBtn" onclick="scrollonclick()">Register a new Doctor</button>
                 <table class="table custom-table">
+                    <br>
                     <thead>
+                    <br>
                         <tr>
                             <th scope="col">ID</th>
                             <th scope="col">Name</th>
@@ -111,7 +124,7 @@
                             <th scope="col">Phone Number</th>
                         </tr>
                     </thead>
-                    <tbody id="doctorsTable">
+                    <tbody id="doctors">
                         {% for doctor in doctors %}
                         <tr data-id="{{ doctor.d_id }}" data-table="doctor">
                             <td>{{ doctor.d_id }}</td>
@@ -120,18 +133,19 @@
                             <td class="editable" data-field="d_phone">{{ doctor.d_phone }}</td>
                             <td>
                                 <button class="icon-button2 save-btn" style="display: none;"><img class="logo" src="static/photos/savegreen.png"></button>
-                                <button class="icon-button delete-btn"  data-id="{{ doctor.d_id }}" data-table="doctor" style="position: relative; left: 10px"  ><img class="logo" src="static/photos/trashred.png"></button>
+                                <button class="icon-button delete-btn" data-id="{{ doctor.d_id }}" data-table="doctor" style="position: relative; left: 10px;"><img class="logo" src="static/photos/trashred.png"></button>
                             </td>
                         </tr>
                         {% endfor %}
                     </tbody>
                 </table>
+
             </div>
             <div class="tab-pane fade" id="devices" role="tabpanel" aria-labelledby="devices-tab">
                 <br>
                 <h3>Commissioned Devices</h3>
                 <br>
-                 <div class="search-input">
+                <div class="search-input">
                     <img src="{{ url_for('static', filename='photos/search.png') }}" class="search-icon" alt="Search Icon">
                     <input type="text" id="deviceSearch" class="form-control" placeholder="Search by ID, Name, Commission Date, Maintenance Date, or Out Of Order status" style="width: 1045px;">
                 </div>
@@ -151,12 +165,12 @@
                         <tr data-id="{{ device.device_id }}" data-table="device">
                             <td>{{ device.device_id }}</td>
                             <td class="editable" data-field="device_name">{{ device.device_name }}</td>
-                            <td class="editable" data-field="commission_Date">{{ device.commission_Date }}</td>
-                            <td class="editable" data-field="maintenance_Date">{{ device.maintenance_Date }}</td>
+                            <td class="editable" data-field="commission_Date">{{ device.commission_date }}</td>
+                            <td class="editable" data-field="maintenance_Date">{{ device.maintenance_date }}</td>
                             <td class="editable" data-field="out_of_order">{{ device.out_of_order }}</td>
                             <td>
                                 <button class="icon-button2 save-btn" style="display: none;"><img class="logo" src="static/photos/savegreen.png"></button>
-                                <button class="icon-button delete-btn"  data-id="{{ device.device_id }}" data-table="device" style="position: relative; left: 10px"  ><img class="logo" src="static/photos/trashred.png" alt="Delete"></button>
+                                <button class="icon-button delete-btn" data-id="{{ device.device_id }}" data-table="device" style="position: relative; left: 10px;"><img class="logo" src="static/photos/trashred.png" alt="Delete"></button>
                             </td>
                         </tr>
                         {% endfor %}
@@ -166,11 +180,11 @@
         </div>
     </div>
     <!-- Bootstrap core JS and dependencies -->
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.min.js"></script>
 
-    <script>
+<script>
 $(document).ready(function() {
     // Make cells editable on click
     $(document).on('click', '.editable', function() {
@@ -188,7 +202,7 @@ $(document).ready(function() {
         let row = $(this).closest('tr');
         let id = row.data('id');
         let table = row.data('table');
-        let updatedData = { table: table , id: id};
+        let updatedData = { table: table, id: id };
         let valid = true;
 
         if (id === undefined) {
@@ -260,27 +274,27 @@ $(document).ready(function() {
         });
     });
     // Add new doctor row
-    $('#add-doctor-btn').click(function() {
-        let newRow = `
-            <tr data-table="doctor">
-            <br>2
-                <td>New</td>
-                <td class="editable" data-field="d_name"><input type="text" class="form-control"></td>
-                <td class="editable" data-field="d_email"><input type="text" class="form-control"></td>
-                <td class="editable" data-field="d_phone"><input type="number" class="form-control" maxlength="13"></td>
+    $('#addDoctorBtn').click(function() {
+        let newRowHtml = `
+            <tr class="new-row" data-table="doctor">
+                <td data-field="d_id"></td>
+                <td class="editable" data-field="d_name"></td>
+                <td class="editable" data-field="d_email"></td>
+                <td class="editable" data-field="d_phone"></td>
                 <td>
-                     <button class="icon-button2 save-btn"><img class="logo" src="static/photos/savegreen.png"></button>
-                    <button class="icon-button delete-btn" style="position: relative; left: 10px"  ><img class="logo" src="static/photos/trashred.png"></button>
+                    <button class="icon-button2 save-btn" style="display: none;"><img class="logo" src="static/photos/savegreen.png"></button>
+                    <button class="icon-button delete-btn" style="position: relative; left: 10px;"><img class="logo" src="static/photos/trashred.png"></button>
                 </td>
             </tr>
         `;
-        $('#doctors').append(newRow);
+
+        $('#doctors tbody').append(newRowHtml);
     });
 
     // Search functionality for patients table
     $('#patientSearch').on('keyup', function() {
         let value = $(this).val().toLowerCase();
-        $('#patientsTable tr').filter(function() {
+        $('#patients tr').filter(function() {
             $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
         });
     });
@@ -288,7 +302,7 @@ $(document).ready(function() {
     // Search functionality for doctors table
     $('#doctorSearch').on('keyup', function() {
         let value = $(this).val().toLowerCase();
-        $('#doctorsTable tr').filter(function() {
+        $('#doctors tr').filter(function() {
             $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
         });
     });
@@ -301,6 +315,8 @@ $(document).ready(function() {
         });
     });
 });
-    </script>
+</script>
 </body>
 {% endblock %}
+
+

@@ -107,3 +107,19 @@ button:hover {
     cursor: pointer;
     margin-left: 10%;
 }
+.flash-message-success {
+    background-color: #dff0d8;
+    border-color: #d6e9c6;
+    color: #3c763d;
+    padding: 10px;
+    margin-bottom: 15px;
+}
+
+/* Error message */
+.flash-message-error {
+    background-color: #f2dede;
+    border-color: #ebccd1;
+    color: #a94442;
+    padding: 10px;
+    margin-bottom: 15px;
+}
