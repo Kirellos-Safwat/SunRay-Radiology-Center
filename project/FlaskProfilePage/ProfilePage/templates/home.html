@@ -7,43 +7,6 @@
         <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/home.css') }}">
     </head>
     <body>
-        <header>
-            <nav class="section__container nav__container">
-                <div class="nav__logo">Sun<span>Ray</span></div>
-                <ul class="nav__links">
-                    <li class="link"><a href="/home">Home</a></li>
-                    <li class="link"><a href="#about">About Us</a></li>
-                    <li class="link"><a href="#service">Services</a></li>
-                    <li class="link"><a href="#">Blog</a></li>
-                    <li class="link"><a href="/contactUs">Contact Us</a></li>
-                    {% if data is none %}
-                        <li class="link"><a href="#identity">Log In</a></li>
-                    {% elif data.id %}
-                        <li class="link"><a href="/patient-profile">Profile</a></li>
-                        <li class="link"><a href="/logout">Log Out</a></li>
-                    {% elif data.d_id %}
-                    <li class="link"><a href="/radiologist-profile">Profile</a></li>
-                    <li class="link"><a href="/logout">Log Out</a></li>
-                    {% elif data.admin_id %}
-                    <li class="link"><a href="/logout">Log Out</a></li>
-                    {% endif %}
-                </ul>
-                {% if data.id %}
-                <a class="btn" href="/BookAppointment">BOOK NOW</a>
-                {% endif %}
-            </nav>
-            <div class="section__container header__container">
-                <div class="header__content">
-                    <h1>See Clearly, Get Answers Quickly. Exceptional Patient Experience Guaranteed.</h1>
-                    <p>
-                        Our health deserves the best imaging. At our radiology center, we provide a comfortable and
-                        efficient experience with cutting-edge technology and a focus on clear communication. Our team of
-                        expert radiologists and caring technologists is dedicated to both your well-being and providing an
-                        exceptional patient experience.
-                    </p>
-                </div>
-            </div>
-        </header>
         {% if data is none %}
         <section class="section__container identity__container" id="identity">
             <div class="identity__grid">

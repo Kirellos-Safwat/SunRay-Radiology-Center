@@ -1,9 +1,14 @@
 import psycopg2.extras
 from google.oauth2 import id_token
 from sqlalchemy.testing.plugin.plugin_base import post
+from ProfilePage import app, connection, connection_string, mail, flow, GOOGLE_CLIENT_ID
 from ProfilePage import app, db, connection, connection_string, mail, bcrypt, flow, GOOGLE_CLIENT_ID
 from flask_login import current_user
 from flask_mail import Message
+from ProfilePage.models import Patient
+from ProfilePage.forms import LoginForm, EditProfileForm, AppointmentForm, PatientRegisterForm, ReportForm, ForgetForm, \
+    ResetPasswordForm, SearchForm
+from flask import render_template, redirect, url_for, flash, session, request, g
 from ProfilePage.models import appointments, Patient
 from ProfilePage.forms import LoginForm, EditProfileForm, AppointmentForm, PatientRegisterForm, ReportForm, \
     RadiologistRegisterForm, ForgetForm, \
@@ -23,12 +28,15 @@ from PIL import Image
 # model = tf.keras.models.load_model("/project/FlaskProfilePage/brain_tumor.h5", compile=False)
 # model.compile(Adamax(learning_rate=0.001), loss='categorical_crossentropy', metrics=['accuracy'])
 
+@app.before_request
+def load_user_data():
+    g.data = session.get('user_data')  # Use Flask's global `g` object
+
 @app.route('/')  # that is the root url of the website
 @app.route('/home')
 def home_page():
-    data = session.get('user_data')
-    print(data)
-    return render_template('home.html', data=data)
+    print(g.data)
+    return render_template('home.html', data=g.data, template = 'home')
 
 
 @app.route('/edit_data', methods=['POST'])
@@ -86,14 +94,13 @@ def edit_data():
         cursor.execute(update_query, update_data)
     cursor.close()
     connection.commit()
-    return redirect(url_for('users_page'))
+    return redirect(url_for('admin_page'))
 
 
 @app.route('/BookAppointment', methods=['GET', 'POST'])
 def appointment_page():
     form = AppointmentForm()
-    data = session.get('user_data')  # This should be changed to get the patient data from the database
-    if data is None or 'id' not in data:
+    if g.data is None or 'id' not in g.data:
         return redirect(url_for('patient_login_page'))
 
     def get_doctors():
@@ -124,7 +131,7 @@ def appointment_page():
     if request.method == 'POST':
         connection = psycopg2.connect(connection_string)
         cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
-        p_id = data['id']
+        p_id = g.data['id']
         if form.validate_on_submit():
             date = form.date.data
             d_name = form.doctors.data
@@ -145,17 +152,15 @@ def appointment_page():
             cursor.close()
             # connection.close()
 
-
             return redirect(url_for('patient_profile_page'))
         flash('Your appointment has been booked successfully!', category='success')
-    return render_template('appointment.html', form=form, data=data)
+    return render_template('appointment.html', form=form, data=g.data)
 
 
 @app.route('/SubmitReport', methods=['GET', 'POST'])
 def report_page():
     form = ReportForm()
-    data = session.get('user_data')  # This should be changed to get the patient data from the database
-    if data is None or 'd_id' not in data:
+    if g.data is None or 'd_id' not in g.data:
         return redirect(url_for('radiologist_login'))
 
     def get_patients():
@@ -186,7 +191,7 @@ def report_page():
     if request.method == 'POST':
         connection = psycopg2.connect(connection_string)
         cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
-        d_id = data['d_id']
+        d_id = g.data['d_id']
 
         if form.validate_on_submit():
             r_time = form.r_time.data
@@ -217,7 +222,7 @@ def report_page():
 
             flash('The report was submitted successfully', category='success')
             return redirect(url_for('radiologist_profile_page'))
-    return render_template('report.html', form=form, data=data)
+    return render_template('report.html', form=form, data=g.data)
 
 
 '''
@@ -286,12 +291,13 @@ def login_admin():
 
         if user:
             session['user_data'] = dict(user)
+            data = session['user_data']
             cursor.close()  # Close the cursor once
             return redirect('/users')
         else:
             flash('Incorrect Email or password. Please try again.', category='danger')
 
-    return render_template('login.html', form=LoginForm())
+    return render_template('login.html', form=LoginForm(), data= data if 'data' in locals() else None)
 
 
 '''
@@ -307,23 +313,18 @@ def login_admin():
 
 
 @app.route('/users')
-def users_page():
-    data = session.get('user_data')
-    if data is None or 'admin_id' not in data:
+def admin_page():
+    if g.data is None or 'admin_id' not in g.data:
         return redirect('/login')
     cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
-    # patients data
     cursor.execute('SELECT * FROM patient')
+    # patients data
     patients = cursor.fetchall()
-    # doctors data
     cursor.execute('SELECT * FROM radiologist')
+    # doctors data
     doctors = cursor.fetchall()
-    # devices data1x
-    cursor.execute('SELECT * FROM radiology_equipment')
-    devices = cursor.fetchall()
-
     cursor.close()
-    return render_template('users.html', patients=patients, doctors=doctors, devices=devices)
+    return render_template('users.html', patients=patients, doctors=doctors, data= g.data, template='users')
 
 
 @app.route('/logout')
@@ -338,7 +339,7 @@ def logout():
 
 @app.route('/done')
 def thanks_page():
-    return render_template('thank_you.html')
+    return render_template('thank_you.html', data=g.data)
 
 
 '''
@@ -456,13 +457,11 @@ def radiologist_login():
         else:
             flash('Incorrect Email or password. Please try again.', category='danger')
 
-    return render_template('radiologist-login.html', form=LoginForm())  # check render
-
+    return render_template('radiologist-login.html', form=LoginForm(), data=data if 'data' in locals() else None) #
 
 @app.route('/radiologist-profile')
 def radiologist_profile_page():
-    data = session.get('user_data')
-    if data is None or 'd_id' not in data:
+    if g.data is None or 'd_id' not in g.data:
         return redirect('/radiologist-login')
     cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
     # Fetch appointments for the current user's ID
@@ -471,20 +470,19 @@ def radiologist_profile_page():
             FROM appointments
             JOIN patient ON appointments.p_id = patient.id
             WHERE appointments.d_id = %s
-        """, (data['d_id'],))
+        """, (g.data['d_id'],))
     appointments = cursor.fetchall()
     cursor.close()
 
-    if data is None:
+    if g.data is None:
         return redirect('/radiologist-login')
-    return render_template('radiologist-profile.html', data=data, appointments=appointments)
+    return render_template('radiologist-profile.html', data=g.data, appointments=appointments , template = 'radiologist_profile')
 
 
 @app.route('/radiologist-edit_profile', methods=['GET', 'POST'])
 def radiologist_edit_profile():
     form = EditProfileForm()
-    data = session.get('user_data')
-    if data is None or 'd_id' not in data:
+    if g.data is None or 'd_id' not in g.data:
         return redirect('/radiologist-login')
     if request.method == 'POST' and form.validate_on_submit():
         updated_data = {
@@ -507,7 +505,7 @@ def radiologist_edit_profile():
             relative_photo_path = os.path.join('uploads', filename)
             updated_data['profile_picture'] = relative_photo_path
         else:
-            updated_data['profile_picture'] = data['profile_picture']
+            updated_data['profile_picture'] = g.data['profile_picture']
 
         # Update user information in the database
         connection = psycopg2.connect(connection_string)
@@ -519,7 +517,7 @@ def radiologist_edit_profile():
                 d_profile_picture = %(d_profile_picture)s
             WHERE d_id = %(d_id)s;
         """
-        updated_data['d_id'] = data['d_id']
+        updated_data['d_id'] = g.data['d_id']
 
         cursor.execute(update_query, updated_data)
         connection.commit()
@@ -529,7 +527,7 @@ def radiologist_edit_profile():
         flash('Your profile has been updated successfully! Please login again', category='success')
         return redirect('/radiologist-login_page')  # Redirect to log in to refresh
 
-    return render_template('radiologist_edit_profile.html', data=data, form=form)
+    return render_template('radiologist_edit_profile.html', data=g.data, form=form, template = 'radiologist_edit_profile')
 
 
 #######################################################################
@@ -565,7 +563,7 @@ def patient_registration_page():
         flash('Registration successful. Please log in.', category='success')
         return redirect('/patient-login_page')
 
-    return render_template('registration.html', form=form)
+    return render_template('registration.html', form=form, data= None)
 
 
 @app.route('/patient-login_page', methods=['GET', 'POST'])
@@ -597,8 +595,7 @@ def patient_login_page():
 
 @app.route('/patient-profile')
 def patient_profile_page():
-    data = session.get('user_data')
-    if data is None or 'id' not in data:
+    if g.data is None or 'id' not in g.data:
         return redirect('/patient-login_page')
     cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
     # Fetch appointments for the current user's ID
@@ -607,12 +604,12 @@ def patient_profile_page():
         FROM appointments
         JOIN radiologist ON appointments.D_ID = radiologist.d_id
         WHERE P_ID = %s
-    """, (data['id'],))
+    """, (g.data['id'],))
     appointments = cursor.fetchall()
     cursor.close()
 
     ############################################
-    scans_folder = "patient" + str(data['id'])  # make a folder for each patient
+    scans_folder = "patient" + str(g.data['id'])  # make a folder for each patient
     scans_path = os.path.join(app.config['UPLOAD_FOLDER'], scans_folder)
     if os.path.exists(scans_path):
         scan_Files = os.listdir(scans_path)  # must be absolute path
@@ -621,19 +618,18 @@ def patient_profile_page():
     ############################################
     # if os.name == 'nt' and data['scans'] is not None:
     #     data['scans'] = data['scans'].replace("\\", "/")
-    if data is None:
+    if g.data is None:
         return redirect('/patient-login')
-    return render_template('patient-profile.html', data=data, scan_Files=scan_Files, appointments=appointments)
+    return render_template('patient-profile.html', data=g.data, scan_Files=scan_Files, appointments=appointments, reports=reports)
 
 
 @app.route('/upload_scan', methods=['GET', 'POST'])
 def patient_upload_scan():
-    data = session.get('user_data')
-    if data is None or 'id' not in data:
+    if g.data is None or 'id' not in g.data:
         return redirect('/patient-login_page')
-    scans_folder = "patient" + str(data['id'])  # make a folder for each patient
+    scans_folder = "patient" + str(g.data['id'])  # make a folder for each patient
     scans_path = os.path.join(app.config['UPLOAD_FOLDER'], scans_folder)
-    if data is None:
+    if g.data is None:
         return redirect('/patient-login')
 
     if not os.path.exists(scans_path):
@@ -658,19 +654,18 @@ def patient_upload_scan():
     cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
     cursor.execute(
         "UPDATE patient SET scans = %s WHERE id = %s",
-        (relative_scan_folder, data['id'])
+        (relative_scan_folder, g.data['id'])
     )  # insert to the specific patient
     connection.commit()
     cursor.close()
 
-    return render_template('upload_scan.html', data=data, scan_files=scan_files)
+    return render_template('upload_scan.html', data=g.data, scan_files=scan_files)
 
 
 @app.route('/patient-edit_profile', methods=['GET', 'POST'])
 def patient_edit_profile():
     form = EditProfileForm()
-    data = session.get('user_data')
-    if data is None or 'id' not in data:
+    if g.data is None or 'id' not in g.data:
         return redirect('/patient-login_page')
     if request.method == 'POST' and form.validate_on_submit():
         updated_data = {
@@ -694,7 +689,7 @@ def patient_edit_profile():
             relative_photo_path = os.path.join('uploads', filename)
             updated_data['profile_picture'] = relative_photo_path
         else:
-            updated_data['profile_picture'] = data['profile_picture']
+            updated_data['profile_picture'] = g.data['profile_picture']
 
         # Update user information in the database
         connection = psycopg2.connect(connection_string)
@@ -706,7 +701,7 @@ def patient_edit_profile():
                 profile_picture = %(profile_picture)s
             WHERE id = %(id)s;
         """
-        updated_data['id'] = data['id']
+        updated_data['id'] = g.data['id']
 
         cursor.execute(update_query, updated_data)
         connection.commit()
@@ -716,7 +711,7 @@ def patient_edit_profile():
         flash('Your profile has been updated successfully! Please login again', category='success')
         return redirect('/patient-login_page')  # Redirect to log in to refresh
 
-    return render_template('edit_profile.html', data=data, form=form)
+    return render_template('edit_profile.html', data=g.data, form=form)
 
 
 @app.route('/contactUs', methods=['GET', 'POST'])
@@ -746,7 +741,7 @@ def contact_page():
         cursor.close()
         connection.close()
     '''
-    return render_template('contact.html')
+    return render_template('contact.html', data= g.data)
 
 
 
@@ -773,7 +768,7 @@ def reset_request():
         send_reset_email(patient)
         flash('An email has been sent with instructions to reset your password.', 'info')
         return redirect(url_for('patient_login_page'))
-    return render_template("forgetPassword.html", form=form)
+    return render_template("forgetPassword.html", form=form, data=None)
 
 
 @app.route("/forgetPassword/<token>", methods=['GET', 'POST'])
@@ -787,7 +782,6 @@ def reset_token(token):
         return redirect(url_for('reset_request'))
     '''
     form = ResetPasswordForm()
-    data = session.get('user_data')
     if request.method == 'POST' and form.validate_on_submit():
         updated_data = {
             'password': form.new_password.data,
@@ -800,7 +794,7 @@ def reset_token(token):
             SET password = %(password)s
             WHERE id = %(id)s;
         """
-        updated_data['id'] = data['id']
+        updated_data['id'] = g.data['id']
 
         cursor.execute(update_query, updated_data)
         connection.commit()
@@ -809,7 +803,7 @@ def reset_token(token):
 
         flash('Your password has been updated successfully! You are now able to log in', category='success')
         return redirect('/patient-login_page')  # Redirect to log in to refresh
-    return render_template("ResetPassword.html", form=form)
+    return render_template("ResetPassword.html", form=form, data=None)
 
 
 def login_is_required(function):
@@ -869,7 +863,7 @@ def callback():
             new_user = cursor.fetchone()
             connection.commit()
             cursor.close()
-            connection.close()
+            # connection.close()
             user_data = {
                 "id": new_user[0],
                 "email": email,
@@ -918,3 +912,16 @@ def predict():
         print(e)
         return render_template('error.html')
 
+
+@app.route("/dashboard")
+def dashboard():
+    appointments_data = {
+        'Monday': 10,
+        'Tuesday': 15,
+        'Wednesday': 7,
+        'Thursday': 20,
+        'Friday': 13,
+        'Saturday': 9,
+        'Sunday': 5
+    }
+    return render_template('dashboard.html', days=appointments_data, data= g.data)
