@@ -94,7 +94,7 @@ def edit_data():
         cursor.execute(update_query, update_data)
     cursor.close()
     connection.commit()
-    return redirect(url_for('admin_page'))
+    return redirect(url_for('users_page'))
 
 
 @app.route('/BookAppointment', methods=['GET', 'POST'])
@@ -224,59 +224,6 @@ def report_page():
             return redirect(url_for('radiologist_profile_page'))
     return render_template('report.html', form=form, data=g.data)
 
-
-'''
-    @app.route('/register', methods=['GET', 'POST'])
-    def registration_page():
-        form = RegisterForm()
-        if request.method == 'POST':
-            fname = request.form['First_Name']
-            lname = request.form['Last_Name']
-            email = request.form['Email']
-            phone = request.form['Phone_Number']
-            password = request.form['Password']
-            is_admin = True if email.endswith('@company.com') else False
-
-
-@app.route('/register', methods=['GET', 'POST'])
-def registration_page():
-    form = RegisterForm()
-    if request.method == 'POST':
-        fname = request.form['First_Name']
-        lname = request.form['Last_Name']
-        email = request.form['Email']
-        phone = request.form['Phone_Number']
-        password = request.form['Password']
-        is_admin = True if email.endswith('@company.com') else False
-
-            profile_photo = request.files['profile_photo']
-            if profile_photo and profile_photo.filename != '':
-                filename = secure_filename(profile_photo.filename)
-                profile_photo_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-                profile_photo.save(profile_photo_path)
-                relative_photo_path = os.path.join('uploads', filename)
-            else:
-                relative_photo_path = None
-            connection = psycopg2.connect(connection_string)
-            cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
-            if form.validate_on_submit():
-                cursor.execute(
-                    "INSERT INTO Credentials (fname, lname, email, phone, password, profile_picture ,is_admin) VALUES (%s, %s, %s, %s, %s, %s , %s)",
-                    (fname, lname, email, phone, password, relative_photo_path, is_admin)
-
-                )
-                connection.commit()
-                cursor.close()
-                connection.close()
-                flash('Registration successful. Please log in.', category='success')
-                return redirect(url_for('login_admin')) 
-            else:
-                flash('Invalid email or password. Please try again.', category='danger')
-
-        return render_template('registration.html', form=RegisterForm())
-'''
-
-
 @app.route('/login', methods=['GET', 'POST'])
 def login_admin():
     if request.method == 'POST':
@@ -297,34 +244,28 @@ def login_admin():
         else:
             flash('Incorrect Email or password. Please try again.', category='danger')
 
-    return render_template('login.html', form=LoginForm(), data= data if 'data' in locals() else None)
-
-
-'''
-    @app.route('/profile')
-    def profile_page():
-        data = session.get('user_data')
-        if data is None:
-            return redirect('/login')
-        if os.name == 'nt' and data['profile_picture'] is not None:
-            data['profile_picture'] = data['profile_picture'].replace("\\", "/")
-        return render_template('profile.html', data=data)
-'''
+    return render_template('admin_login.html', form=LoginForm(), data= data if 'data' in locals() else None)
 
 
 @app.route('/users')
-def admin_page():
-    if g.data is None or 'admin_id' not in g.data:
+def users_page():
+    data = session.get('user_data')
+    if data is None or 'admin_id' not in data:
         return redirect('/login')
     cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
-    cursor.execute('SELECT * FROM patient')
     # patients data
+    cursor.execute('SELECT * FROM patient')
     patients = cursor.fetchall()
-    cursor.execute('SELECT * FROM radiologist')
     # doctors data
+    cursor.execute('SELECT * FROM radiologist')
     doctors = cursor.fetchall()
+    # devices data1x
+    cursor.execute('SELECT * FROM radiology_equipment')
+    devices = cursor.fetchall()
+
     cursor.close()
-    return render_template('users.html', patients=patients, doctors=doctors, data= g.data, template='users')
+    return render_template('users.html', patients=patients, doctors=doctors, devices=devices, data= g.data, template='users')
+
 
 
 @app.route('/logout')
@@ -335,104 +276,6 @@ def logout():
     except:
         pass
     return redirect('/')
-
-
-@app.route('/done')
-def thanks_page():
-    return render_template('thank_you.html', data=g.data)
-
-
-'''
-    @app.route('/edit_profile', methods=['GET', 'POST'])
-    def edit_profile():
-        form = EditProfileForm()
-        data = session.get('user_data')
-
-        if request.method == 'POST' and form.validate_on_submit():
-            updated_data = {
-                'fname': form.First_Name.data,
-                'lname': form.Last_Name.data,
-                'email': form.Email.data,
-                'phone': form.Phone_Number.data,
-                'is_admin': True if form.Email.data.endswith('@company.com') else False,
-                'facebook': form.Facebook.data,
-                'twitter': form.Twitter.data,
-                'instagram': form.Instagram.data,
-                'linkedin': form.LinkedIn.data,
-            }
-
-            profile_photo = form.profile_photo.data
-
-            if profile_photo:
-                filename = secure_filename(profile_photo.filename)
-                profile_photo_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-                profile_photo.save(profile_photo_path)
-                relative_photo_path = os.path.join('uploads', filename)
-                updated_data['profile_picture'] = relative_photo_path
-            else:
-                updated_data['profile_picture'] = data['profile_picture']
-
-            # Update user information in the database
-            connection = psycopg2.connect(connection_string)
-            cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
-            update_query = """
-                UPDATE Credentials
-                SET fname = %(fname)s, lname = %(lname)s, email = %(email)s,
-                    phone = %(phone)s, is_admin = %(is_admin)s, 
-                    facebook = %(facebook)s, twitter = %(twitter)s, 
-                    instagram = %(instagram)s, linkedin = %(linkedin)s,
-                    profile_picture = %(profile_picture)s
-                WHERE id = %(id)s;
-            """
-            updated_data['id'] = data['id']
-
-            cursor.execute(update_query, updated_data)
-            connection.commit()
-            cursor.close()
-            connection.close()
-
-            flash('Your profile has been updated successfully! Please login again', category='success')
-            return redirect(url_for('login_admin'))  # Redirect to login to refresh
-
-        return render_template('edit_profile.html', data=data, form=form)
-
-
-
-@app.route('/radiologist-register', methods=['GET', 'POST'])
-def radiologist_registration_page():
-    form = RadiologistRegisterForm()
-    if form.validate_on_submit():
-        d_name = form.D_Name.data
-        d_email = form.Email.data
-        print(d_email)
-        d_phone = form.Phone_Number.data
-        d_password = form.Password.data
-
-        profile_photo = form.profile_photo.data
-        if profile_photo:
-            filename = secure_filename(profile_photo.filename)
-            profile_photo_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-            profile_photo.save(profile_photo_path)
-            relative_photo_path = os.path.join('uploads', filename)
-        else:
-            relative_photo_path = None
-
-        connection = psycopg2.connect(connection_string)
-        cursor = connection.cursor()
-        cursor.execute(
-            "INSERT INTO radiologist (d_name,d_email, d_phone, d_password, d_profile_picture) VALUES (%s, %s, %s, %s, %s)",
-            (d_name, d_email, d_phone, d_password, relative_photo_path)
-        )
-        connection.commit()
-        cursor.close()
-        connection.close()
-
-        flash('Registration successful. Please log in.', category='success')
-        return redirect('/radiologist-login_page')
-
-    return render_template('radiologist-registration.html', form=form)
-
-'''
 
 
 @app.route('/radiologist-login', methods=['GET', 'POST'])
@@ -563,7 +406,7 @@ def patient_registration_page():
         flash('Registration successful. Please log in.', category='success')
         return redirect('/patient-login_page')
 
-    return render_template('registration.html', form=form, data= None)
+    return render_template('patient_registration.html', form=form, data= None)
 
 
 @app.route('/patient-login_page', methods=['GET', 'POST'])
@@ -711,7 +554,7 @@ def patient_edit_profile():
         flash('Your profile has been updated successfully! Please login again', category='success')
         return redirect('/patient-login_page')  # Redirect to log in to refresh
 
-    return render_template('edit_profile.html', data=g.data, form=form)
+    return render_template('patient_edit_profile.html', data=g.data, form=form)
 
 
 @app.route('/contactUs', methods=['GET', 'POST'])

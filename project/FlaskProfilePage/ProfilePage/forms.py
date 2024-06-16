@@ -116,12 +116,6 @@ class contactForm(FlaskForm):
     submit = SubmitField(label='Send Now')
 '''
 
-
-class SearchForm(FlaskForm):
-    searched = StringField("Searched", validators=[DataRequired()])
-    submit = SubmitField("Submit")
-
-
 class ForgetForm(FlaskForm):
     email = StringField(label='Email Address', validators=[Email(), DataRequired()])
     submit = SubmitField(label='Request Reset Password')

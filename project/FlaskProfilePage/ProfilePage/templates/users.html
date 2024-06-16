@@ -3,75 +3,175 @@
     Users Page
 {% endblock %}
 {% block content %}
-    <body>
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/users.css') }}">
-        <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
-        
-        <h2>patients</h2>
-        <table class="table table-hover table-dark" style=" position:relative; border: 1px solid; text-align: center;tr:hover; {background-color: coral;};  top:50px; color:white">
-            <thead>
-                <tr>
-                    <!-- Your Columns HERE -->
-                    <th scope="col">ID</th>
-                    <th scope="col">First Name</th>
-                    <th scope="col">Last Name</th>
-                    <th scope="col">Email</th>
-                    <th scope="col">Phone Number</th>
-                    <th scope="col">Options</th>
-                </tr>
-            </thead>
-            <tbody id="patients">
-                {% for patient in patients %}
-                <tr data-id="{{ patient.id }}" data-table="patient">
-                    <td>{{ patient.id }}</td>
-                    <td class="editable" data-field="fname">{{ patient.fname }}</td>
-                    <td class="editable" data-field="lname">{{ patient.lname }}</td>
-                    <td class="editable" data-field="email">{{ patient.email }}</td>
-                    <td class="editable" data-field="phone">{{ patient.phone }}</td>
-                    <td>
-                        <button class="btn btn-outline btn-success save-btn" style="display: none;">Save</button>
-                        <button class="btn btn-outline btn-danger delete-btn" data-id="{{ patient.id }}" data-table="patient">Delete</button>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
 
-        <br></br>
-        <h2>Radiologists</h2>
-        <button class="btn btn-primary" id="add-doctor-btn">Add</button>
-        <table class="table table-hover table-dark" style="border: 1px solid; text-align: center; color:white">
-            <thead>
-                <tr>
-                    <th scope="col">ID</th>
-                    <th scope="col">Name</th>
-                    <th scope="col">Email</th>
-                    <th scope="col">Phone Number</th>
-                    <th scope="col">Options</th>
-                </tr>
-            </thead>
-            <tbody id="doctors">
-                {% for doctor in doctors %}
-                <tr data-id="{{ doctor.d_id }}" data-table="doctor">
-                    <td>{{ doctor.d_id }}</td>
-                    <td class="editable" data-field="d_name">{{ doctor.d_name }}</td>
-                    <td class="editable" data-field="d_email">{{ doctor.d_email }}</td>
-                    <td class="editable" data-field="d_phone">{{ doctor.d_phone }}</td>
-                    <td>
-                        <button class="btn btn-outline btn-success save-btn" style="display: none;">Save</button>
-                        <button class="btn btn-outline btn-danger delete-btn" data-id="{{ doctor.d_id }}" data-table="doctor">Delete</button>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Users Page</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/users.css') }}">
+    <style>
+        /* Custom styles for tabs */
+        .nav-tabs .nav-link.active {
+            background-color: orange;
+            color: white;
+        }
+        }
+        .nav-tabs .nav-link {
+            color: green;
+        }
+        .nav-tabs .nav-link:hover {
+            color: darkorange;
+        }
+    </style>
+</head>
+<body>
+<script>
+function scrollonclick() {
+    const scrollPosition = document.body.scrollHeight * 0.7;
+    window.scrollTo({
+    top: scrollPosition,
+    behavior: 'smooth'
+});
+        }
+    </script>
+    <div class="container mt-5">
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link active" id="patients-tab" data-toggle="tab" href="#patients" role="tab" aria-controls="patients" aria-selected="true"><img src="https://cdn-icons-png.flaticon.com/128/4228/4228704.png" class="tab-icon" alt="Device Icon">Patients</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="doctors-tab" data-toggle="tab" href="#doctors" role="tab" aria-controls="doctors" aria-selected="false"><img src="static/photos/doctor.png" class="tab-icon" alt="Device Icon">Radiologists</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="devices-tab" data-toggle="tab" href="#devices" role="tab" aria-controls="devices" aria-selected="false">
+                    <img src="static/photos/heart.png" class="tab-icon" alt="Device Icon">Commissioned Devices
+                </a>
+            </li>
+        </ul>
+        <div class="tab-content" id="myTabContent">
+            <div class="tab-pane fade show active" id="patients" role="tabpanel" aria-labelledby="patients-tab">
+                <br>
+                <h3>Patients</h3>
+                <br>
+                <div class="search-input">
+                    <img src="{{ url_for('static', filename='photos/search.png') }}" class="search-icon" alt="Search Icon">
+                    <input type="text" id="patientSearch" class="form-control" placeholder="Search by ID, Name, Email, or Phone Number" style="width: 1035px;">
+                </div>
+
+                <br>
+                <table class="table custom-table">
+                    <thead>
+                        <tr>
+                            <th scope="col">ID</th>
+                            <th scope="col">First Name</th>
+                            <th scope="col">Last Name</th>
+                            <th scope="col">Email</th>
+                            <th scope="col">Phone Number</th>
+                        </tr>
+                    </thead>
+                    <tbody id="patients">
+                        {% for patient in patients %}
+                        <tr data-id="{{ patient.id }}" data-table="patient">
+                            <td>{{ patient.id }}</td>
+                            <td class="editable" data-field="fname">{{ patient.fname }}</td>
+                            <td class="editable" data-field="lname">{{ patient.lname }}</td>
+                            <td class="editable" data-field="email">{{ patient.email }}</td>
+                            <td class="editable" data-field="phone">{{ patient.phone }}</td>
+                            <td>
+                                <button class="icon-button2 save-btn" style="display: none;"><img class="logo" src="static/photos/savegreen.png"></button>
+                                <button class="icon-button delete-btn" data-id="{{ patient.id }}" data-table="patient" style="position: relative; left: 10px;"><img class="logo" src="static/photos/trashred.png"></button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="tab-pane fade" id="doctors" role="tabpanel" aria-labelledby="doctors-tab">
+                <br>
+                <h3>Radiologists</h3>
+                <br>
+                <div class="search-input">
+                    <img src="{{ url_for('static', filename='photos/search.png') }}" class="search-icon" alt="Search Icon">
+                    <input type="text" id="doctorSearch" class="form-control" placeholder="Search by ID, Name, Email, or Phone Number" style="width: 1031px;">
+                </div>
+
+                <br>
+
+                <button class="btn btn-primary mt-3" id="addDoctorBtn" onclick="scrollonclick()">Register a new Doctor</button>
+                <table class="table custom-table">
+                    <br>
+                    <thead>
+                    <br>
+                        <tr>
+                            <th scope="col">ID</th>
+                            <th scope="col">Name</th>
+                            <th scope="col">Email</th>
+                            <th scope="col">Phone Number</th>
+                        </tr>
+                    </thead>
+                    <tbody id="doctors">
+                        {% for doctor in doctors %}
+                        <tr data-id="{{ doctor.d_id }}" data-table="doctor">
+                            <td>{{ doctor.d_id }}</td>
+                            <td class="editable" data-field="d_name">{{ doctor.d_name }}</td>
+                            <td class="editable" data-field="d_email">{{ doctor.d_email }}</td>
+                            <td class="editable" data-field="d_phone">{{ doctor.d_phone }}</td>
+                            <td>
+                                <button class="icon-button2 save-btn" style="display: none;"><img class="logo" src="static/photos/savegreen.png"></button>
+                                <button class="icon-button delete-btn" data-id="{{ doctor.d_id }}" data-table="doctor" style="position: relative; left: 10px;"><img class="logo" src="static/photos/trashred.png"></button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+            </div>
+            <div class="tab-pane fade" id="devices" role="tabpanel" aria-labelledby="devices-tab">
+                <br>
+                <h3>Commissioned Devices</h3>
+                <br>
+                <div class="search-input">
+                    <img src="{{ url_for('static', filename='photos/search.png') }}" class="search-icon" alt="Search Icon">
+                    <input type="text" id="deviceSearch" class="form-control" placeholder="Search by ID, Name, Commission Date, Maintenance Date, or Out Of Order status" style="width: 1045px;">
+                </div>
+                <br>
+                <table class="table custom-table">
+                    <thead>
+                        <tr>
+                            <th scope="col">ID</th>
+                            <th scope="col">Name</th>
+                            <th scope="col">Commission Date</th>
+                            <th scope="col">Maintenance Date</th>
+                            <th scope="col">Out of Order</th>
+                        </tr>
+                    </thead>
+                    <tbody id="devicesTable">
+                        {% for device in devices %}
+                        <tr data-id="{{ device.device_id }}" data-table="device">
+                            <td>{{ device.device_id }}</td>
+                            <td class="editable" data-field="device_name">{{ device.device_name }}</td>
+                            <td class="editable" data-field="commission_Date">{{ device.commission_date }}</td>
+                            <td class="editable" data-field="maintenance_Date">{{ device.maintenance_date }}</td>
+                            <td class="editable" data-field="out_of_order">{{ device.out_of_order }}</td>
+                            <td>
+                                <button class="icon-button2 save-btn" style="display: none;"><img class="logo" src="static/photos/savegreen.png"></button>
+                                <button class="icon-button delete-btn" data-id="{{ device.device_id }}" data-table="device" style="position: relative; left: 10px;"><img class="logo" src="static/photos/trashred.png" alt="Delete"></button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
-    
     <!-- Bootstrap core JS and dependencies -->
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.min.js"></script>
-    <script>
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.min.js"></script>
+
+<script>
 $(document).ready(function() {
     // Make cells editable on click
     $(document).on('click', '.editable', function() {
@@ -89,13 +189,13 @@ $(document).ready(function() {
         let row = $(this).closest('tr');
         let id = row.data('id');
         let table = row.data('table');
-        let updatedData = { table: table , id: id};
+        let updatedData = { table: table, id: id };
         let valid = true;
 
         if (id === undefined) {
             updatedData['new'] = true; // Indicate a new entry
         }
-        
+
         row.find('.editable').each(function() {
             let input = $(this).find('input');
             if (input.length > 0) {
@@ -161,23 +261,48 @@ $(document).ready(function() {
         });
     });
     // Add new doctor row
-    $('#add-doctor-btn').click(function() {
-        let newRow = `
-            <tr data-table="doctor">
-                <td>New</td>
-                <td class="editable" data-field="d_name"><input type="text" class="form-control"></td>
-                <td class="editable" data-field="d_email"><input type="text" class="form-control"></td>
-                <td class="editable" data-field="d_phone"><input type="number" class="form-control" maxlength="13"></td>
+    $('#addDoctorBtn').click(function() {
+        let newRowHtml = `
+            <tr class="new-row" data-table="doctor">
+                <td data-field="d_id"></td>
+                <td class="editable" data-field="d_name"></td>
+                <td class="editable" data-field="d_email"></td>
+                <td class="editable" data-field="d_phone"></td>
                 <td>
-                    <button class="btn btn-outline btn-success save-btn">Save</button>
-                    <button class="btn btn-outline btn-danger delete-btn">Delete</button>
+                    <button class="icon-button2 save-btn" style="display: none;"><img class="logo" src="static/photos/savegreen.png"></button>
+                    <button class="icon-button delete-btn" style="position: relative; left: 10px;"><img class="logo" src="static/photos/trashred.png"></button>
                 </td>
             </tr>
         `;
-        $('#doctors').append(newRow);
+
+        $('#doctors tbody').append(newRowHtml);
     });
 
+    // Search functionality for patients table
+    $('#patientSearch').on('keyup', function() {
+        let value = $(this).val().toLowerCase();
+        $('#patients tr').filter(function() {
+            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+        });
+    });
+
+    // Search functionality for doctors table
+    $('#doctorSearch').on('keyup', function() {
+        let value = $(this).val().toLowerCase();
+        $('#doctors tr').filter(function() {
+            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+        });
+    });
+
+    // Search functionality for devices table
+    $('#deviceSearch').on('keyup', function() {
+        let value = $(this).val().toLowerCase();
+        $('#devicesTable tr').filter(function() {
+            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+        });
+    });
 });
-    </script>
+</script>
 </body>
 {% endblock %}
+

@@ -11,36 +11,6 @@ def load_user(user_id):
     return Patient.query.get(int(user_id))
 
 
-class Credentials(db.Model, UserMixin):
-    id = db.Column(db.Integer(), primary_key=True)
-    fname = db.Column(db.String(length=15), nullable=False)
-    lname = db.Column(db.String(length=15), nullable=False)
-    email = db.Column(db.String(length=30), nullable=False, unique=True)
-    phone = db.Column(db.String(length=13), nullable=False, unique=True)
-    password = db.Column(db.String(length=60), nullable=False)  # Will be changed later to false
-    profile_picture = db.Column(db.String(length=255))
-    is_admin = db.Column(db.Boolean(), default=False)
-    facebook = db.Column(db.String(length=255))
-    twitter = db.Column(db.String(length=255))
-    instagram = db.Column(db.String(length=255))
-    linkedin = db.Column(db.String(length=255))
-
-    @property
-    def password(self):
-        return self.password
-
-    @password.setter
-    def password(self, plain_text_password):
-        self.password_hash = bcrypt.generate_password_hash(plain_text_password).decode('utf-8')
-
-    def check_password_correction(self, attempted_password):
-        return bcrypt.check_password_hash(self.password_hash, attempted_password)
-
-
-def __repr__(self):
-    return f'Credentials {self.fname}'
-
-
 class radiology_equipment(db.Model, UserMixin):
     device_id = db.Column(db.Integer(), primary_key=True)
     device_name = db.Column(db.String(length=150), nullable=False)
