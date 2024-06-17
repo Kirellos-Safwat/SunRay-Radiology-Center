@@ -35,12 +35,17 @@
     outline: none;
     border: none;
     font-size: 18px;
-    font-weight: 600px;
+    font-weight: bold;
     white-space: nowrap;
     color: var(--white);
     background-color: var(--secondary-color);
     border-radius: 5px;
     cursor: pointer;
+}
+.btn:hover {
+    cursor: pointer;
+    -webkit-box-shadow: 0 0 3px 3px rgba(66, 133, 244, .3);
+    box-shadow: 0 0 3px 3px #e9f7f7;
 }
 
 img {

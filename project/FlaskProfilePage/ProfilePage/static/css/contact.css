@@ -58,7 +58,7 @@
   color: white;
 }
 .content .left-side .details a:hover{
-    color: #000000;
+    color: #000080;
 }
 .content .left-side .contactSocials {
     display: flex;
@@ -79,8 +79,8 @@
   margin-left: 75px;
 }
 .content .right-side .topic-text{
-  font-size: 23px;
-  font-weight: 600;
+  font-size: 25px;
+  font-weight: bold;
   color: white;
 }
 .content .right-side .Problem{
@@ -106,7 +106,7 @@
     padding: 16px 16px;
     border-radius: 10px;
     border-color: white;
-    margin-bottom: 15px;
+    margin-bottom: 10px;
 }
 
 .right-side input :focus-within {
@@ -115,18 +115,25 @@
   border-width: 3px;
 }
 
-.right-side button {
-  background-color: var(--secondary-color);
-  color: white;
-  border-radius: 20px;
-  border-color: white;
-  font-size: 18px;
-  padding: 10px 18px;
-  text-align: center;
-  display: flex;
-  margin-left: 5px;
-  margin-top: 20px;
-  width: 125px;
+.right-side .form button {
+    border: none;
+    outline: none;
+    height: 50px;
+    border-radius: 5px;
+    color: white;
+    font-size: 20px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 20px;
+    margin-left: 13%;
+    width: 260px;
+    height: 50px;
+    background: #fb923c;
+}
+.right-side .form button:hover {
+    cursor: pointer;
+    -webkit-box-shadow: 0 0 3px 3px rgba(66, 133, 244, .3);
+    box-shadow: 0 0 3px 3px #e9f7f7;
 }
 
 .right-side button:hover {

@@ -1,12 +1,13 @@
 .loginBox{
     width: 350px;
-    height: 520px;
+    height: auto;
     background: rgb(18, 172, 142);
     color: white;
-    margin-top: 5%;
+    margin-top: 10%;
     margin-left: 39%;
-    border-radius: 10px;
+    border-radius: 5px;
 }
+
 .logo{
     width: 100px;
     height:100px;
@@ -16,88 +17,95 @@
 }
 
 .error {
-   position: relative;  /* For icon positioning */
+    position: relative;  /* For icon positioning */
     left:545px;
-  display: inline-block;  /* Allow wrapping to next line if needed */
-  padding: 15px 15px 15px 15px;  /* Adjust padding for icon */
-  margin: 15px auto;  /* Center horizontally */
-  border-radius: 5px;
-  font-weight: bold;
-  color: #fff;  /* White text */
-  background-color: #e74c3c;  /* Red background */
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  text-align: center;  /* Center text */
-  width: fit-content;  /* Adjust width to fit content */
+    display: inline-block;  /* Allow wrapping to next line if needed */
+    padding: 15px 15px 15px 15px;  /* Adjust padding for icon */
+    margin: 15px auto;  /* Center horizontally */
+    border-radius: 5px;
+    font-weight: bold;
+    color: #fff;  /* White text */
+    background-color: #e74c3c;  /* Red background */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    text-align: center;  /* Center text */
+    width: fit-content;  /* Adjust width to fit content */
 }
-.success {
-   position: relative;  /* For icon positioning */
-    left:580px;
-  display: inline-block;  /* Allow wrapping to next line if needed */
-  padding: 15px 15px 15px 15px;  /* Adjust padding for icon */
-  margin: 15px auto;  /* Center horizontally */
-  border-radius: 5px;
-  font-weight: bold;
-  color: #fff;  /* White text */
-  background-color:  #2ecc71;  /* Red background */
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  text-align: center;  /* Center text */
-  width: fit-content;  /* Adjust width to fit content */
 
+.success {
+    position: relative;  /* For icon positioning */
+    left:580px;
+    display: inline-block;  /* Allow wrapping to next line if needed */
+    padding: 15px 15px 15px 15px;  /* Adjust padding for icon */
+    margin: 15px auto;  /* Center horizontally */
+    border-radius: 5px;
+    font-weight: bold;
+    color: #fff;  /* White text */
+    background-color:  #2ecc71;  /* Red background */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    text-align: center;  /* Center text */
+    width: fit-content;  /* Adjust width to fit content */
 }
+
 .loginBox h1{
     text-align: center;
     margin-top: -60px;
 }
+
 .loginBox a{
-    text-decoration: none;
+    font-size: 15px;
     color: white;
     margin-bottom: 5%;
 }
-.loginBox a:hover {
-    cursor: pointer;
-    /*-webkit-box-shadow: 0 0 3px 3px #0d846c;
-    box-shadow: 0 0 3px 3px #0d846c;*/
+
+.loginBox a:hover{
+    color:  #000080;
 }
-.signUp{
+
+#signUp{
     margin-left: 25%;
     margin-bottom: 20%;
 }
-.pass{
+
+#forgetPassword{
     margin-left: 5%;
-    color: #1a79ca;
-    font-size: 15px;
     font-weight: 600px;
 }
+
 .form-signin label{
     font-size: 18px;
     display: block;
     margin-left: 20px;
 }
+
 .form-signin input{
-    width: 80%;
     margin: 0 0 20px 20px;
 }
+
 .form-signin input[type="text"],input[type="password"]{
     border: none;
-    background: transparent;
+    background: #fafafa;
     border-bottom: 1px solid #fff;
     height: 40px;
     outline: none;
-    color: white;
+    color: black;
     font-size: 16px;
     margin-bottom: 5%;
+    border-radius: 5px;
+    width: 80%;
 }
+
 .form-signin input[type="submit"]{
     border: none;
     outline: none;
     height: 50px;
-    border-radius: 20px;
+    border-radius: 5px;
     color: white;
     font-size: 20px;
     cursor: pointer;
     margin-top: 20px;
-    margin-left: 10%;
-    margin-bottom: 50px;
+    margin-left: 13%;
+    width: 260px;
+    height: 50px;
 }
 
 .form-signin input[type="submit"]:hover {
@@ -109,7 +117,7 @@
 .form-signin .g-sign-in-button {
   position: relative;
   top: 55%;
-  left: 48%;
+  left: 47%;
   transform: translate(-50%, -50%);
   margin: 10px;
   display: inline-block;
@@ -117,9 +125,10 @@
   height: 50px;
   background-color: #4285f4;
   color: #fff;
-  border-radius: 20px;
+  border-radius: 5px;
   box-shadow: 0 2px 4px 0 rgba(0, 0, 0, .25);
   transition: background-color .218s, border-color .218s, box-shadow .218s;
+  font-weight: bold;
 }
 
 .form-signin .g-sign-in-button:hover {
@@ -149,13 +158,13 @@
   background: #fff;
   width: 48px;
   height: 100%;
-  border-radius: 20px;
+  border-radius: 5px;
   display: inline-block;
 }
 
 .form-signin .g-sign-in-button .text-container {
-  font-family: "Roboto", arial, sans-serif;
-  font-weight: 500;
+  /*font-family: "Roboto", arial, sans-serif;
+  font-weight: 500;*/
   letter-spacing: .21px;
   font-size: 16px;
   line-height: 48px;

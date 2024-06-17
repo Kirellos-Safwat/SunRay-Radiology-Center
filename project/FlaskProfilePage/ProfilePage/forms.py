@@ -4,6 +4,8 @@ from wtforms.validators import Length, EqualTo, Email, DataRequired, ValidationE
 from ProfilePage.models import Patient, radiologist
 from flask_wtf.file import FileField, FileAllowed
 
+
+
 class LoginForm(FlaskForm):
     Email = StringField(label='Email:', validators=[Email(), DataRequired()])
     Password = PasswordField(label='Password:', validators=[Length(min=6), DataRequired()])

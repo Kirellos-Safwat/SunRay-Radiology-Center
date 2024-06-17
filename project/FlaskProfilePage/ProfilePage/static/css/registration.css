@@ -1,9 +1,9 @@
-.registerBox{
+.formBox{
     width: 370px;
-    height: 820px;
+    height: auto;
     background: rgb(18, 172, 142);
     color: white;
-    margin-top: 5%;
+    margin-top: 10%;
     margin-left: 38%;
     border-radius: 10px;
 }
@@ -14,40 +14,62 @@
     top: -70px;
     left: calc(50% - 50px);
 }
-.registerBox h1{
+.formBox h1{
     text-align: center;
     margin-top: -60px;
 }
-.registerBox a{
+.formBox a{
     text-decoration: none;
     color: white;
     margin-left: 20%;
+    font-size: 15px;
 }
-.registerBox label{
+
+.formBox a:hover{
+    color:  #000080;
+}
+
+.formBox label{
     font-size: 18px;
     display: block;
     margin-left: 20px;
 }
-.registerBox input{
+.formBox input{
     width: 80%;
     margin: 0 0 20px 20px;
+    height: 40px;
+    border-radius: 5px;
+    border: none
 }
-.registerBox input[type="text"],input[type="password"]{
+
+.formBox input[type="text"],input[type="password"]{
     border: none;
-    background: transparent;
+    background: #fafafa;
     border-bottom: 1px solid #fff;
     height: 40px;
     outline: none;
-    color: white;
+    color: black;
     font-size: 16px;
+    border-radius: 5px;
+    width: 80%;
 }
-.registerBox input[type="submit"]{
+.formBox input[type="submit"]{
     border: none;
     outline: none;
-    height: 40px;
-    border-radius: 20px;
+    height: 50px;
+    border-radius: 5px;
     color: white;
     font-size: 20px;
     cursor: pointer;
-    margin-left: 10%;
+    margin-top: 20px;
+    margin-left: 13%;
+    margin-bottom: 30px;
+    width: 260px;
+    height: 50px;
+}
+
+.formBox input[type="submit"]:hover {
+    cursor: pointer;
+    -webkit-box-shadow: 0 0 3px 3px rgba(66, 133, 244, .3);
+    box-shadow: 0 0 3px 3px #e9f7f7;
 }

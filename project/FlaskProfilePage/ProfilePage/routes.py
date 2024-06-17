@@ -1,4 +1,5 @@
 import psycopg2.extras
+from datetime import datetime
 from google.oauth2 import id_token
 from sqlalchemy.testing.plugin.plugin_base import post
 from ProfilePage import app, connection, connection_string, mail, flow, GOOGLE_CLIENT_ID
@@ -304,6 +305,7 @@ def radiologist_login():
 
 @app.route('/radiologist-profile')
 def radiologist_profile_page():
+    form = EditProfileForm()
     if g.data is None or 'd_id' not in g.data:
         return redirect('/radiologist-login')
     cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
@@ -327,7 +329,7 @@ def radiologist_profile_page():
 
     if g.data is None:
         return redirect('/radiologist-login')
-    return render_template('radiologist-profile.html', data=g.data, appointments=appointments, reports=reports , template = 'radiologist_profile')
+    return render_template('radiologist-profile.html', data=g.data, appointments=appointments , template = 'radiologist_profile',reports=reports)
 
 
 @app.route('/radiologist-edit_profile', methods=['GET', 'POST'])
@@ -441,7 +443,7 @@ def patient_login_page():
         else:
             flash('Incorrect Email or password. Please try again.', category='danger')
 
-    return render_template('patient-login.html', form=LoginForm())
+    return render_template('patient-login.html', form=LoginForm(),data= data if 'data' in locals() else None)
 
 
 @app.route('/patient-profile')
@@ -473,7 +475,7 @@ def patient_profile_page():
     # Fetch reports for the current user's ID
     cursor.execute(""" SELECT report.*, patient.fname, patient.lname
                    FROM report Join patient ON report.p_id = patient.id
-                   WHERE d_id = %s """, (g.data['d_id'],))
+                   WHERE id = %s """, (g.data['id'],))
     reports = cursor.fetchall()
     cursor.close()
     if g.data is None:
@@ -773,13 +775,148 @@ def predict():
 
 @app.route("/dashboard")
 def dashboard():
-    appointments_data = {
-        'Monday': 10,
-        'Tuesday': 15,
-        'Wednesday': 7,
-        'Thursday': 20,
-        'Friday': 13,
-        'Saturday': 9,
-        'Sunday': 5
-    }
-    return render_template('dashboard.html', days=appointments_data, data= g.data)
+    connection = psycopg2.connect(connection_string)
+    # most crowded day
+    def appointments_per_day():
+        cursor = connection.cursor()
+        cursor.execute("SELECT date FROM appointments")
+        dates = cursor.fetchall()
+        cursor.close()
+        days = []
+        for date in dates:
+            days.append(datetime.strptime(date[0], "%Y-%m-%d").strftime("%A"))
+        appointments_per_day = {
+            'Monday': days.count('Monday'),
+            'Tuesday': days.count('Tuesday'),
+            'Wednesday': days.count('Wednesday'),
+            'Thursday': days.count('Thursday'),
+            'Friday': days.count('Friday'),
+            'Saturday': days.count('Saturday'),
+            'Sunday': days.count('Sunday')
+        }
+        return appointments_per_day
+
+    # age/gender demographics
+    def demographics():
+        cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
+        cursor.execute('''
+        SELECT males FROM (SELECT CASE 
+        WHEN age BETWEEN 0 AND 18 THEN '0-18'
+        WHEN age BETWEEN 19 AND 30 THEN '19-30'
+        WHEN age BETWEEN 31 AND 45 THEN '31-45'
+        WHEN age BETWEEN 46 AND 60 THEN '46-60'
+        WHEN age > 60 THEN '60+' END AS age_groups, 
+        gender, COUNT(*) AS males
+        FROM patient
+        WHERE gender = 'M'
+        GROUP BY age_groups, gender
+        ORDER BY age_groups);
+        ''')
+        males = cursor.fetchall()
+        cursor.execute('''
+        SELECT males FROM (SELECT CASE 
+        WHEN age BETWEEN 0 AND 18 THEN '0-18'
+        WHEN age BETWEEN 19 AND 30 THEN '19-30'
+        WHEN age BETWEEN 31 AND 45 THEN '31-45'
+        WHEN age BETWEEN 46 AND 60 THEN '46-60'
+        WHEN age > 60 THEN '60+' END AS age_groups, 
+        gender, COUNT(*) AS males
+        FROM patient
+        WHERE gender = 'F'
+        GROUP BY age_groups, gender
+        ORDER BY age_groups);
+        ''')
+        females = cursor.fetchall()
+        cursor.close()
+        demographics_data = {
+            'age_groups': ['0-18', '19-30', '31-45', '46-60', '60+'],
+            'male': [i[0] for i in males],
+            'female': [i[0] for i in females]
+        }
+        return demographics_data
+
+    # most served age group
+    def most_served_age_group():
+        cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
+        cursor.execute('''
+        SELECT CASE 
+        WHEN age BETWEEN 0 AND 18 THEN '0-18'
+        WHEN age BETWEEN 19 AND 30 THEN '19-30'
+        WHEN age BETWEEN 31 AND 45 THEN '31-45'
+        WHEN age BETWEEN 46 AND 60 THEN '46-60'
+        WHEN age > 60 THEN '60+' END AS age_groups, COUNT(*) AS count
+        FROM patient
+        GROUP BY age_groups
+        ORDER BY count DESC
+        LIMIT 1;
+        ''')
+        age_group = cursor.fetchone()
+        cursor.close()
+        return age_group
+
+    # most contributing doctor
+    def most_contributing_doctors():
+        cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
+        cursor.execute('''
+        SELECT rad.d_id, d_name, d_profile_picture, SUM(billing) AS toal_billing, COUNT(*) AS appointments
+        FROM radiologist AS rad JOIN report AS rep ON rad.d_id = rep.d_id
+        GROUP BY rad.d_id, d_name, d_profile_picture
+        ORDER BY toal_billing DESC
+        LIMIT 3;
+        ''')
+        doctors_data = cursor.fetchall()
+        cursor.close()
+        return doctors_data
+
+    # total number of patients, doctors, equipments
+    def total_patients_docotrs_equipments():
+        cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
+        cursor.execute('''
+        SELECT COUNT(id) FROM patient
+        ''')
+        total_patients = cursor.fetchone()
+        cursor.execute('''
+        SELECT COUNT(d_id) FROM radiologist
+        ''')
+        total_doctors = cursor.fetchone()
+        cursor.execute('''
+        SELECT COUNT(device_id) FROM radiology_equipment
+        ''')
+        total_equipments = cursor.fetchone()
+        cursor.close()
+        return (total_patients, total_doctors, total_equipments)
+
+    # total revenues last month and last year
+    def total_revenues_last_month_last_year():
+        cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
+        current_month = datetime.today().month
+        year = datetime.today().year
+        last_month = current_month - 1 if current_month > 1 else 12
+        last_month = str('0'+str(last_month)) if last_month < 10 else str(last_month)
+        last_month_year = str(year) if current_month > 1 else str(year - 1)
+        cursor.execute(f'''
+        SELECT SUM(billing) 
+        FROM report
+        WHERE r_time LIKE '{last_month_year}-{last_month}-%'
+        ''')
+        last_month = cursor.fetchone()
+        cursor.execute(f'''
+        SELECT SUM(billing) 
+        FROM report
+        WHERE r_time LIKE '{year - 1}%'
+        ''')
+        last_year = cursor.fetchone()
+        cursor.close()
+        return (last_month, last_year)
+
+    # upcoming maintenances
+    def upcoming_maintenances():
+        cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
+        current_month = datetime.today()
+        cursor.execute('''
+        
+        ''')
+    return render_template('dashboard.html', days=appointments_per_day(), data= g.data,
+        most_crowded_day=max(appointments_per_day(), key=appointments_per_day().get), demographics=demographics(),
+        most_served_age_group=most_served_age_group(), most_contributing_doctors=most_contributing_doctors(),
+        total_patients_docotrs_equipments=total_patients_docotrs_equipments(), total_revenues_last_month_last_year=total_revenues_last_month_last_year())
