@@ -7,7 +7,7 @@ from flask_login import current_user
 from flask_mail import Message
 from ProfilePage.models import Patient
 from ProfilePage.forms import LoginForm, EditProfileForm, AppointmentForm, PatientRegisterForm, ReportForm, ForgetForm, \
-    ResetPasswordForm, SearchForm
+    ResetPasswordForm
 from flask import render_template, redirect, url_for, flash, session, request, g
 from ProfilePage.models import appointments, Patient
 from ProfilePage.forms import LoginForm, EditProfileForm, AppointmentForm, PatientRegisterForm, ReportForm, \
@@ -20,8 +20,8 @@ import requests
 from google.oauth2 import id_token
 from pip._vendor import cachecontrol
 import google.auth.transport.requests
-import tensorflow as tf
-from tensorflow import keras
+# import tensorflow as tf
+# from tensorflow import keras
 # from keras.models import load_model
 from PIL import Image
 
@@ -166,59 +166,59 @@ def report_page():
     def get_patients():
         connection = psycopg2.connect(connection_string)
         curs = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
-        curs.execute("select concat(fname,' ',lname) AS full_name FROM patient")
+        curs.execute("SELECT concat(fname,' ',lname) AS full_name FROM patient")
         patients = curs.fetchall()
-        curs.execute("ROLLBACK")
-        connection.commit()
-        curs.close()
-        # connection.close()
-        return [patient['full_name'] for patient in patients]
+        connection.close()
+        return [(patient['full_name'], patient['full_name']) for patient in patients]
 
     def get_devices():
         connection = psycopg2.connect(connection_string)
         curs = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
-        curs.execute("SELECT device_name,device_id FROM radiology_equipment")
+        curs.execute("SELECT device_name FROM radiology_equipment")
         devices = curs.fetchall()
-        curs.execute("ROLLBACK")
-        connection.commit()
-        curs.close()
-        # connection.close()
-        return [device['device_name'] for device in devices]
+        connection.close()
+        return [(device['device_name'], device['device_name']) for device in devices]
 
     form.patients.choices = get_patients()
     form.devices.choices = get_devices()
 
     if request.method == 'POST':
-        connection = psycopg2.connect(connection_string)
-        cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
-        d_id = g.data['d_id']
-
         if form.validate_on_submit():
+            connection = psycopg2.connect(connection_string)
+            cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
+            d_id = g.data['d_id']
+
             r_time = form.r_time.data
-            r_scan = form.r_scan.data
             r_study_area = form.r_study_area.data
             radiation_dose = form.radiation_dose.data
             r_findings = form.r_findings.data
             r_result = form.r_result.data
             billing = random.randint(500, 1000)
 
+            profile_photo = form.r_scan.data
+
+            filename = secure_filename(profile_photo.filename)
+            profile_photo_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            profile_photo.save(profile_photo_path)
+            relative_photo_path = os.path.join('uploads', filename)
+
+
+
             p_name = form.patients.data
             cursor.execute("SELECT id FROM patient WHERE concat(fname,' ',lname) = %s", (p_name,))
-            p_id = cursor.fetchall()[0][0]
-            cursor.execute("ROLLBACK")
+            p_id = cursor.fetchone()[0]
+
             device_name = form.devices.data
-            cursor.execute("SELECT device_id FROM radiology_equipment WHERE device_name = %s",
-                           (device_name,))
-            device_id = cursor.fetchall()[0][0]
-            cursor.execute("ROLLBACK")
+            cursor.execute("SELECT device_id FROM radiology_equipment WHERE device_name = %s", (device_name,))
+            device_id = cursor.fetchone()[0]
 
             cursor.execute(
-                "INSERT INTO report (p_id,d_id,device_id,r_time,r_scan,r_study_area,radiation_dose,r_findings,r_result,billing) VALUES (%s, %s, %s, %s,%s,%s, %s, %s, %s,%s)",
-                (p_id, d_id, device_id, r_time, r_scan, r_study_area, radiation_dose, r_findings, r_result, billing)
+                "INSERT INTO report (p_id, d_id, device_id, r_time, r_scan, r_study_area, radiation_dose, r_findings, r_result, billing) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
+                (p_id, d_id, device_id, r_time, relative_photo_path, r_study_area, radiation_dose, r_findings, r_result, billing)
             )
             connection.commit()
             cursor.close()
-            # connection.close()
+            connection.close()
 
             flash('The report was submitted successfully', category='success')
             return redirect(url_for('radiologist_profile_page'))
@@ -317,9 +317,17 @@ def radiologist_profile_page():
     appointments = cursor.fetchall()
     cursor.close()
 
+    cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
+    # Fetch reports for the current user's ID
+    cursor.execute(""" SELECT report.*, patient.fname, patient.lname
+                   FROM report Join patient ON report.p_id = patient.id
+                   WHERE d_id = %s """, (g.data['d_id'],))
+    reports = cursor.fetchall()
+    cursor.close()
+
     if g.data is None:
         return redirect('/radiologist-login')
-    return render_template('radiologist-profile.html', data=g.data, appointments=appointments , template = 'radiologist_profile')
+    return render_template('radiologist-profile.html', data=g.data, appointments=appointments, reports=reports , template = 'radiologist_profile')
 
 
 @app.route('/radiologist-edit_profile', methods=['GET', 'POST'])
@@ -461,6 +469,13 @@ def patient_profile_page():
     ############################################
     # if os.name == 'nt' and data['scans'] is not None:
     #     data['scans'] = data['scans'].replace("\\", "/")
+    cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
+    # Fetch reports for the current user's ID
+    cursor.execute(""" SELECT report.*, patient.fname, patient.lname
+                   FROM report Join patient ON report.p_id = patient.id
+                   WHERE d_id = %s """, (g.data['d_id'],))
+    reports = cursor.fetchall()
+    cursor.close()
     if g.data is None:
         return redirect('/patient-login')
     return render_template('patient-profile.html', data=g.data, scan_Files=scan_Files, appointments=appointments, reports=reports)
