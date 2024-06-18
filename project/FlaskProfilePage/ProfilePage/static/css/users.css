@@ -1,7 +1,7 @@
 
 .custom-table td:nth-child(n+1):not(:last-child)  {
  border: 1px solid white; /* Orange border */
-    background: linear-gradient(to right, rgba(18, 172, 142, 0.9), rgba(18, 172, 142, 0.7)); /* Darker green gradient */
+    background: lightseagreen; /* Darker green gradient */
     color: black; /* Orange text color */
      font-size: 1.2rem;
     text-align: center;
@@ -19,7 +19,7 @@ td:last-child {
 }
 
 .custom-table .editable input {
-    background: linear-gradient(to right, rgba(18, 172, 142, 0.9), rgba(18, 172, 142, 0.7)); /* Darker green gradient */
+    background: lightcyan; /* Darker green gradient */
 
     color: black; /* Orange text color */
     border: 1px solid white; /* Orange border */

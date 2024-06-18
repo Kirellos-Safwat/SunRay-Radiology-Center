@@ -21,16 +21,19 @@ import requests
 from google.oauth2 import id_token
 from pip._vendor import cachecontrol
 import google.auth.transport.requests
-# import tensorflow as tf
+import tensorflow as tf
 # from tensorflow import keras
 # from keras.models import load_model
-# from PIL import Image
+# # from PIL import Image
 # from keras.src.optimizers import Adamax
-
+# from tensorflow.keras.preprocessing import image
+# from keras.preprocessing.image import load_img, img_to_array
+#
 # model = tf.keras.models.load_model(
 #     r"C:\Users\Egypt_Laptop\Desktop\database final project\his-finalproject-database_sbe_spring24_team6\project\FlaskProfilePage\ProfilePage\brain_tumor_v2.h5",
 #     compile=False)
 # model.compile(Adamax(learning_rate=0.001), loss='categorical_crossentropy', metrics=['accuracy'])
+
 
 
 @app.before_request
@@ -254,7 +257,7 @@ def login_admin():
             (email, password)
         )
         user = cursor.fetchone()
-
+        data = None
         if user:
             session['user_data'] = dict(user)
             data = session['user_data']
@@ -308,7 +311,7 @@ def radiologist_login():
             (d_email, d_password)
         )
         user = cursor.fetchone()
-
+        data = None
         if user:
             session['user_data'] = dict(user)
             data = session['user_data']
@@ -454,7 +457,7 @@ def patient_login_page():
             (email, password)
         )
         user = cursor.fetchone()
-
+        data = None
         if user:
             session['user_data'] = dict(user)
             data = session['user_data']
