@@ -620,7 +620,8 @@ def contact_page():
         cursor.close()
         connection.close()
     '''
-    return render_template('contact.html', data=g.data)
+    return render_template('contact.html', data= g.data)
+
 
 
 def send_reset_email(patient):
@@ -660,7 +661,6 @@ def reset_token(token):
         return redirect(url_for('reset_request'))
     '''
     form = ResetPasswordForm()
-    data = session.get('user_data')
     if request.method == 'POST' and form.validate_on_submit():
         updated_data = {
             'password': form.new_password.data,
@@ -790,7 +790,6 @@ def predict():
 @app.route("/dashboard")
 def dashboard():
     connection = psycopg2.connect(connection_string)
-
     # most crowded day
     def appointments_per_day():
         cursor = connection.cursor()
@@ -870,14 +869,13 @@ def dashboard():
         return age_group
 
     # most contributing doctor
-    def most_contributing_doctors():
+    def doctors_data():
         cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
         cursor.execute('''
-        SELECT rad.d_id, d_name, d_profile_picture, SUM(billing) AS toal_billing, COUNT(*) AS appointments
+        SELECT rad.d_id, d_name, SUM(billing) AS toal_billing, COUNT(*) AS appointments
         FROM radiologist AS rad JOIN report AS rep ON rad.d_id = rep.d_id
         GROUP BY rad.d_id, d_name, d_profile_picture
-        ORDER BY toal_billing DESC
-        LIMIT 3;
+        ORDER BY toal_billing DESC;
         ''')
         doctors_data = cursor.fetchall()
         cursor.close()
@@ -907,7 +905,7 @@ def dashboard():
         current_month = datetime.today().month
         year = datetime.today().year
         last_month = current_month - 1 if current_month > 1 else 12
-        last_month = str('0' + str(last_month)) if last_month < 10 else str(last_month)
+        last_month = str('0'+str(last_month)) if last_month < 10 else str(last_month)
         last_month_year = str(year) if current_month > 1 else str(year - 1)
         cursor.execute(f'''
         SELECT SUM(billing) 
@@ -927,15 +925,16 @@ def dashboard():
     # upcoming maintenances
     def upcoming_maintenances():
         cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
-        current_month = datetime.today()
-        cursor.execute('''
-        
-        ''')
-
-    return render_template('dashboard.html', days=appointments_per_day(), data=g.data,
-                           most_crowded_day=max(appointments_per_day(), key=appointments_per_day().get),
-                           demographics=demographics(),
-                           most_served_age_group=most_served_age_group(),
-                           most_contributing_doctors=most_contributing_doctors(),
-                           total_patients_docotrs_equipments=total_patients_docotrs_equipments(),
-                           total_revenues_last_month_last_year=total_revenues_last_month_last_year())
+        print(datetime.today().strftime('%d/%m/%Y'))
+        # cursor.execute(f'''
+        # SELECT device_id, device_name, maintenance_date
+        # FROM radiology_equipment
+        # WHERE TO_DATE(maintenance_date, '%d/%m/%Y') > TO_DATE({datetime.today().strftime('%d/%m/%Y')}, '%d/%m/%Y');
+        # ''')
+        # upcoming_maintenances = cursor.fetchall()
+        return None
+    print(upcoming_maintenances())
+    return render_template('dashboard.html', days=appointments_per_day(), data= g.data,
+        most_crowded_day=max(appointments_per_day(), key=appointments_per_day().get), demographics=demographics(),
+        most_served_age_group=most_served_age_group(), doctors_data=doctors_data(),
+        total_patients_docotrs_equipments=total_patients_docotrs_equipments(), total_revenues_last_month_last_year=total_revenues_last_month_last_year())
