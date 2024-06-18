@@ -122,3 +122,18 @@
     margin-bottom: 5%;
     color: #fafafa;
 }
+
+.uploadBox input[type="file"] {
+    width: 30%;
+    position: relative !important;
+    left: -275px!important;
+    height: 40px;
+    border-radius: 5px;
+    border: none;
+    background: #fafafa;
+    color: black;
+    font-size: 16px;
+    outline: none;
+    padding: 10px;
+    cursor: pointer;
+}

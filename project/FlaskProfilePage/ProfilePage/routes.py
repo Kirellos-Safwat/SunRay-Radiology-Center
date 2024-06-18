@@ -313,7 +313,7 @@ def radiologist_login():
             session['user_data'] = dict(user)
             data = session['user_data']
             if os.name == 'nt' and data['d_profile_picture'] is not None:
-                data['profile_picture'] = data['profile_picture'].replace("\\", "/")
+                data['profile_picture'] = data['d_profile_picture'].replace("\\", "/")
             cursor.close()  # Close the cursor once
             return redirect('/radiologist-profile')
         else:

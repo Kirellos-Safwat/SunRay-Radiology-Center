@@ -250,7 +250,7 @@ header {
     opacity: 0;
     animation: fadeIn 0.5s forwards;
     text-align: center;
-    width: 100%;
+    width: max-content;
 }
 
 .flash-success {
@@ -261,9 +261,9 @@ header {
     border-radius: 5px;
     font-weight: bold;
     color: #fff;  /* White text */
-    background-color:  #2ecc71;  /* Red background */
+    background-color:  #2ecc71;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    width: fit-content;  /* Adjust width to fit content */
+    width: max-content;  /* Adjust width to fit content */
 }
 
 .flash-error {
@@ -275,7 +275,7 @@ header {
     color: #fff;  /* White text */
     background-color: #e74c3c;  /* Red background */
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    width: fit-content;  /* Adjust width to fit content */
+    width: max-content;  /* Adjust width to fit content */
 }
 
 .flash-info {
@@ -285,8 +285,49 @@ header {
     border-radius: 5px;
     font-weight: bold;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    width: fit-content;  /* Adjust width to fit content */
+    width: max-content;  /* Adjust width to fit content */
     color: #0c5460;
     background-color: #d1ecf1;
     border-color: #bee5eb;
+}
+
+.form-group select {
+    /* Your styles here */
+    width: 83%;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #3367D6;
+    border-radius: 10px;
+    box-sizing: border-box;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-control {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+.form-control:focus {
+    border-color: #80bdff;
+    outline: none;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+button {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #0056b3;
 }
