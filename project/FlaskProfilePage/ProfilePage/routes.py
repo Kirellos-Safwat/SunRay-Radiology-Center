@@ -24,20 +24,37 @@ import google.auth.transport.requests
 # import tensorflow as tf
 # from tensorflow import keras
 # from keras.models import load_model
-from PIL import Image
+# from PIL import Image
+# from keras.src.optimizers import Adamax
 
-# model = tf.keras.models.load_model("/project/FlaskProfilePage/brain_tumor.h5", compile=False)
+# model = tf.keras.models.load_model(
+#     r"C:\Users\Egypt_Laptop\Desktop\database final project\his-finalproject-database_sbe_spring24_team6\project\FlaskProfilePage\ProfilePage\brain_tumor_v2.h5",
+#     compile=False)
 # model.compile(Adamax(learning_rate=0.001), loss='categorical_crossentropy', metrics=['accuracy'])
+
 
 @app.before_request
 def load_user_data():
     g.data = session.get('user_data')  # Use Flask's global `g` object
 
+
 @app.route('/')  # that is the root url of the website
 @app.route('/home')
 def home_page():
     print(g.data)
-    return render_template('home.html', data=g.data, template = 'home')
+    cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
+    cursor.execute('''
+            SELECT id, name, picture
+            FROM(
+                SELECT rad.d_id AS id, rad.d_name AS name,rad.d_profile_picture AS picture, SUM(billing) AS toal_billing
+                FROM radiologist AS rad JOIN report AS rep ON rad.d_id = rep.d_id
+                GROUP BY rad.d_id, d_name, d_profile_picture
+                ORDER BY toal_billing DESC
+                LIMIT 3);
+            ''')
+    special_doctors = cursor.fetchall()
+    cursor.close()
+    return render_template('home.html', data=g.data, template='home', special_doctors=special_doctors)
 
 
 @app.route('/edit_data', methods=['POST'])
@@ -62,10 +79,10 @@ def edit_data():
     # handle editing
     elif 'new' in data:
         doctor_data = {
-                'd_name': data['d_name'],
-                'd_phone': data['d_phone'],
-                'd_email': data['d_email']
-            }
+            'd_name': data['d_name'],
+            'd_phone': data['d_phone'],
+            'd_email': data['d_email']
+        }
         add_query = """
             INSERT INTO radiologist(d_name, d_email, d_phone)
             VALUES(%(d_name)s, %(d_email)s, %(d_phone)s)
@@ -219,11 +236,12 @@ def report_page():
             )
             connection.commit()
             cursor.close()
-            connection.close()
+            # connection.close()
 
             flash('The report was submitted successfully', category='success')
             return redirect(url_for('radiologist_profile_page'))
     return render_template('report.html', form=form, data=g.data)
+
 
 @app.route('/login', methods=['GET', 'POST'])
 def login_admin():
@@ -245,7 +263,7 @@ def login_admin():
         else:
             flash('Incorrect Email or password. Please try again.', category='danger')
 
-    return render_template('admin_login.html', form=LoginForm(), data= data if 'data' in locals() else None)
+    return render_template('admin_login.html', form=LoginForm(), data=data if 'data' in locals() else None)
 
 
 @app.route('/users')
@@ -265,7 +283,7 @@ def users_page():
     devices = cursor.fetchall()
 
     cursor.close()
-    return render_template('users.html', patients=patients, doctors=doctors, devices=devices, data= g.data, template='users')
+    return render_template('users.html', patients=patients, doctors=doctors, devices=devices, data=g.data, template='users')
 
 
 
@@ -303,9 +321,9 @@ def radiologist_login():
 
     return render_template('radiologist-login.html', form=LoginForm(), data=data if 'data' in locals() else None) #
 
+
 @app.route('/radiologist-profile')
 def radiologist_profile_page():
-    form = EditProfileForm()
     if g.data is None or 'd_id' not in g.data:
         return redirect('/radiologist-login')
     cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
@@ -416,7 +434,7 @@ def patient_registration_page():
         flash('Registration successful. Please log in.', category='success')
         return redirect('/patient-login_page')
 
-    return render_template('patient_registration.html', form=form, data= None)
+    return render_template('patient_registration.html', form=form, data=None)
 
 
 @app.route('/patient-login_page', methods=['GET', 'POST'])
@@ -443,7 +461,7 @@ def patient_login_page():
         else:
             flash('Incorrect Email or password. Please try again.', category='danger')
 
-    return render_template('patient-login.html', form=LoginForm(),data= data if 'data' in locals() else None)
+    return render_template('patient-login.html', form=LoginForm(), data=data if 'data' in locals() else None)
 
 
 @app.route('/patient-profile')
@@ -601,8 +619,7 @@ def contact_page():
         cursor.close()
         connection.close()
     '''
-    return render_template('contact.html', data= g.data)
-
+    return render_template('contact.html', data=g.data)
 
 
 def send_reset_email(patient):
@@ -751,22 +768,25 @@ def preprocess_input(image):
     img_array = tf.expand_dims(img_array, 0)
     return img_array
 
+
 @app.route('/predict', methods=['POST'])
 def predict():
     try:
         # Get input data from form
-        image_path=''
+        image_file = request.files['brain_image']
+        image_path = "./images/" + image_file.filename
+        image_file.save(image_path)
         image = Image.open(image_path).convert('RGB')
         # Preprocess input data
         features = preprocess_input(image)
 
         # Make prediction
         prediction = model.predict(features)
-        class_labels = ['pituitary','notumor','meningioma','glioma']
+        class_labels = ['pituitary', 'notumor', 'meningioma', 'glioma']
         # Return prediction result
         score = tf.nn.softmax(prediction[0])
         result = class_labels[tf.argmax(score)]
-        return render_template('result.html', result=result)
+        return render_template("result.html", result=result)
     except Exception as e:
         # Log the exception (you might want to use logging module for a real-world application)
         print(e)
@@ -776,6 +796,7 @@ def predict():
 @app.route("/dashboard")
 def dashboard():
     connection = psycopg2.connect(connection_string)
+
     # most crowded day
     def appointments_per_day():
         cursor = connection.cursor()
@@ -892,7 +913,7 @@ def dashboard():
         current_month = datetime.today().month
         year = datetime.today().year
         last_month = current_month - 1 if current_month > 1 else 12
-        last_month = str('0'+str(last_month)) if last_month < 10 else str(last_month)
+        last_month = str('0' + str(last_month)) if last_month < 10 else str(last_month)
         last_month_year = str(year) if current_month > 1 else str(year - 1)
         cursor.execute(f'''
         SELECT SUM(billing) 
@@ -916,7 +937,11 @@ def dashboard():
         cursor.execute('''
         
         ''')
-    return render_template('dashboard.html', days=appointments_per_day(), data= g.data,
-        most_crowded_day=max(appointments_per_day(), key=appointments_per_day().get), demographics=demographics(),
-        most_served_age_group=most_served_age_group(), most_contributing_doctors=most_contributing_doctors(),
-        total_patients_docotrs_equipments=total_patients_docotrs_equipments(), total_revenues_last_month_last_year=total_revenues_last_month_last_year())
+
+    return render_template('dashboard.html', days=appointments_per_day(), data=g.data,
+                           most_crowded_day=max(appointments_per_day(), key=appointments_per_day().get),
+                           demographics=demographics(),
+                           most_served_age_group=most_served_age_group(),
+                           most_contributing_doctors=most_contributing_doctors(),
+                           total_patients_docotrs_equipments=total_patients_docotrs_equipments(),
+                           total_revenues_last_month_last_year=total_revenues_last_month_last_year())
