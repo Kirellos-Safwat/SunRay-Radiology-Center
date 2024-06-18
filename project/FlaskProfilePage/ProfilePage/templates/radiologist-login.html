@@ -9,13 +9,7 @@
     </head>
 
     <body>
-<div >
-        {% with messages = get_flashed_messages(with_categories=true) %}
-  {% for category, message in messages %}
-    <div class="{{ category }}">{{ message }}</div>
-  {% endfor %}
-{% endwith %}
-</div>
+
         <div class="loginBox">
             <img class="logo" src="https://cdn-icons-png.flaticon.com/128/709/709094.png">
             <h1>Log In</h1>

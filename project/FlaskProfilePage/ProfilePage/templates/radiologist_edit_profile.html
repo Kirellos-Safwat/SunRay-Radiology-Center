@@ -9,9 +9,6 @@
 <body>
 
     <!--<link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">-->
-    {% for message in get_flashed_messages() %}
-        <div class="alert alert-{{ message[0] }}" role="alert">{{ message[1] }}</div>
-    {% endfor %}
     <div class="formBox">
         <img class="logo" src="https://cdn-icons-png.flaticon.com/128/709/709094.png">
         <h1>Edit Profile</h1>

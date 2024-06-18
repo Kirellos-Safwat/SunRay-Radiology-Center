@@ -169,9 +169,8 @@ def appointment_page():
             connection.commit()
             cursor.close()
             # connection.close()
-
+            flash('Your appointment has been booked successfully!', category='success')
             return redirect(url_for('patient_profile_page'))
-        flash('Your appointment has been booked successfully!', category='success')
     return render_template('appointment.html', form=form, data=g.data)
 
 
@@ -223,6 +222,7 @@ def report_page():
 
 
             p_name = form.patients.data
+
             cursor.execute("SELECT id FROM patient WHERE concat(fname,' ',lname) = %s", (p_name,))
             p_id = cursor.fetchone()[0]
 
@@ -261,7 +261,7 @@ def login_admin():
             cursor.close()  # Close the cursor once
             return redirect('/users')
         else:
-            flash('Incorrect Email or password. Please try again.', category='danger')
+            flash('Incorrect Email or password. Please try again.', category='error')
 
     return render_template('admin_login.html', form=LoginForm(), data=data if 'data' in locals() else None)
 
@@ -317,7 +317,7 @@ def radiologist_login():
             cursor.close()  # Close the cursor once
             return redirect('/radiologist-profile')
         else:
-            flash('Incorrect Email or password. Please try again.', category='danger')
+            flash('Incorrect Email or password. Please try again.', category='error')
 
     return render_template('radiologist-login.html', form=LoginForm(), data=data if 'data' in locals() else None) #
 
@@ -331,7 +331,7 @@ def radiologist_profile_page():
     cursor.execute("""
             SELECT appointments.*, patient.fname, patient.lname
             FROM appointments
-            JOIN patient ON appointments.p_id = patient.id
+            JOIN patient ON appointments.p_id = Patient.id
             WHERE appointments.d_id = %s
         """, (g.data['d_id'],))
     appointments = cursor.fetchall()
@@ -457,9 +457,10 @@ def patient_login_page():
             if os.name == 'nt' and data['profile_picture'] is not None:
                 data['profile_picture'] = data['profile_picture'].replace("\\", "/")
             cursor.close()  # Close the cursor once
+            flash('Welcome back!', category='success')
             return redirect('/patient-profile')
         else:
-            flash('Incorrect Email or password. Please try again.', category='danger')
+            flash('Incorrect Email or password. Please try again.', category='error')
 
     return render_template('patient-login.html', form=LoginForm(), data=data if 'data' in locals() else None)
 
@@ -523,7 +524,7 @@ def patient_upload_scan():
             scan_file.save(scan_file_path)
             flash('Scan uploaded successfully!', category='success')
         else:
-            flash('No scan file selected!', category='danger')
+            flash('No scan file selected!', category='error')
 
     scan_files = []  # this list stores paths to the scan files
     if os.path.exists(scans_path):
@@ -659,6 +660,7 @@ def reset_token(token):
         return redirect(url_for('reset_request'))
     '''
     form = ResetPasswordForm()
+    data = session.get('user_data')
     if request.method == 'POST' and form.validate_on_submit():
         updated_data = {
             'password': form.new_password.data,
@@ -762,35 +764,27 @@ def callback():
     return redirect("/home")
 
 
-def preprocess_input(image):
-    img = image.resize((224, 244))
-    img_array = tf.keras.preprocessing.image.img_to_array(img)
-    img_array = tf.expand_dims(img_array, 0)
-    return img_array
 
-
-@app.route('/predict', methods=['POST'])
+@app.route('/predict', methods=['GET', 'POST'])
 def predict():
-    try:
-        # Get input data from form
-        image_file = request.files['brain_image']
-        image_path = "./images/" + image_file.filename
+    if request.method == 'POST':
+        image_file = request.files['imagefile']
+        image_path = r"C:\Users\Egypt_Laptop\Desktop\database final project\his-finalproject-database_sbe_spring24_team6\project\FlaskProfilePage\ProfilePage\images" + image_file.filename
         image_file.save(image_path)
-        image = Image.open(image_path).convert('RGB')
-        # Preprocess input data
-        features = preprocess_input(image)
-
+        img = image.load_img(image_path)
+        img_array = image.img_to_array(img)
+        img_array = tf.image.resize(img_array, [224, 244])
+        img_array = tf.keras.applications.efficientnet.preprocess_input(img_array)
+        img_array = tf.expand_dims(img_array, axis=0)
         # Make prediction
-        prediction = model.predict(features)
-        class_labels = ['pituitary', 'notumor', 'meningioma', 'glioma']
+        prediction = model.predict(img_array)
+        class_labels = ['glioma', 'meningioma', 'notumor', 'pituitary']
         # Return prediction result
         score = tf.nn.softmax(prediction[0])
         result = class_labels[tf.argmax(score)]
         return render_template("result.html", result=result)
-    except Exception as e:
-        # Log the exception (you might want to use logging module for a real-world application)
-        print(e)
-        return render_template('error.html')
+    else:
+        return render_template('index.html')
 
 
 @app.route("/dashboard")

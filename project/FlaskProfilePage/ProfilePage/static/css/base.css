@@ -227,3 +227,66 @@ header {
     }
 
 }
+
+.flash-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    width: 90%;
+    max-width: 500px;
+}
+
+.flash-message {
+    padding: 15px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    font-size: 16px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    opacity: 0;
+    animation: fadeIn 0.5s forwards;
+    text-align: center;
+    width: 100%;
+}
+
+.flash-success {
+
+    display: inline-block;  /* Allow wrapping to next line if needed */
+    padding: 15px 15px 15px 15px;  /* Adjust padding for icon */
+    margin: 15px auto;  /* Center horizontally */
+    border-radius: 5px;
+    font-weight: bold;
+    color: #fff;  /* White text */
+    background-color:  #2ecc71;  /* Red background */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    width: fit-content;  /* Adjust width to fit content */
+}
+
+.flash-error {
+    display: inline-block;  /* Allow wrapping to next line if needed */
+    padding: 15px 15px 15px 15px;  /* Adjust padding for icon */
+    margin: 15px auto;  /* Center horizontally */
+    border-radius: 5px;
+    font-weight: bold;
+    color: #fff;  /* White text */
+    background-color: #e74c3c;  /* Red background */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    width: fit-content;  /* Adjust width to fit content */
+}
+
+.flash-info {
+    display: inline-block;  /* Allow wrapping to next line if needed */
+    padding: 15px 15px 15px 15px;  /* Adjust padding for icon */
+    margin: 15px auto;  /* Center horizontally */
+    border-radius: 5px;
+    font-weight: bold;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    width: fit-content;  /* Adjust width to fit content */
+    color: #0c5460;
+    background-color: #d1ecf1;
+    border-color: #bee5eb;
+}

@@ -7,15 +7,7 @@
         <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/upload.css') }}">
     </head>
     <body>
-        <!-- Display flash messages if any -->
-        <div class="flash-message">
-            {% with messages = get_flashed_messages(with_categories=true) %}
-                {% if messages %}
-                    {% for category, message in messages %}
-                        <div class="alert alert-{{ category }}" role="alert">{{ message }}</div>
-                    {% endfor %}
-                {% endif %}
-            {% endwith %}
+
         </div>
         <div class="container">
             </br>
