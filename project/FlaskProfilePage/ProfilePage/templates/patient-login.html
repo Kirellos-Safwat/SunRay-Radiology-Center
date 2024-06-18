@@ -23,8 +23,8 @@
                 {{ form.Email(class="form-control",placeholder="Email") }}
                 {{ form.Password.label() }}
                 {{ form.Password(class="form-control",placeholder="Password") }}
-                <a class="pass" href="{{ url_for('reset_request') }}">Forgot Password?</a>
-                {{ form.submit(class="btn btn-lg btn-block btn-success") }}
+                <a href="{{ url_for('reset_request') }}" id="forgetPassword">Forgot Password?</a>
+                {{ form.submit(class="btn btn-lg btn-block btn-success") }} </br> </br>
                 <div class="container">
                   <a href="/googleLogin">
                     <div class="g-sign-in-button">
@@ -40,7 +40,7 @@
                   </a>
                 </div>
             </form>
-            <a class="signUp" href="/patient-register">Don't have an account?</a>
+            <a href="/patient-register" id="signUp">Don't have an account?</a> </br> </br> </br>
         </div>
     </body>
 {% endblock %}

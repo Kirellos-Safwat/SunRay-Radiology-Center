@@ -8,7 +8,7 @@
     </head>
     <body>
         <!-- Display flash messages if any -->
-        <div class="container">
+        <div class="flash-message">
             {% with messages = get_flashed_messages(with_categories=true) %}
                 {% if messages %}
                     {% for category, message in messages %}
@@ -17,13 +17,15 @@
                 {% endif %}
             {% endwith %}
         </div>
+        <div class="container">
+            </br>
         <div class="uploadBox">
             <div class="content">  <br> <br> <br>
                 <h1>Upload Scans</h1>
                 <p>Welcome, {{ data.fname }}!</p>
                 <form action="/upload_scan" method="post" enctype="multipart/form-data">
                     <div class="mb-3">
-                        <label for="scan_file" class="form-label">Select scan file:</label>
+                        <label for="scan_file" class="form-label">Select Scan File:</label>
                         <input type="file" class="form-control" id="scan_file" name="scan_file" accept=".pdf,.jpg,.png,.jpeg" required>
                     </div>
                     <button type="submit">Upload</button>
@@ -32,14 +34,16 @@
                 </form>
             </div>
         </div>
-        <div class="container2">
+        <div class="scan-photos">
             {%if data.scans %}
                 {% for scan_file in scan_files %}
-                    <img src="{{ url_for('static', filename=data.scans+ '/' + scan_file) }}" class="image" height="200"/>
+                    <img src="{{ url_for('static', filename=data.scans+ '/' + scan_file) }}" class="image" height="300"/>
                 {% endfor %}
             {% else %}
                 <p>No scans uploaded yet.</p>
             {% endif %}
+        </div>
+            </br> </br>
         </div>
         <!-- Bootstrap JavaScript -->
         <!--<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>-->

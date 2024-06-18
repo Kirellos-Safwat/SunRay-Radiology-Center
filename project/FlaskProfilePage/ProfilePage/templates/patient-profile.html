@@ -4,18 +4,19 @@
 {% endblock %}
 {% block content %}
     <body>
-        <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+        <!--<link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">-->
         <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/profile.css') }}">
         <div class="container-profile">
+            </br>
             <form method="post">
                 <div class="content">
                 <div class="left-side">
                     <div class="profile">
                         <div class="profile-img">
                             {% if data.profile_picture is none %}
-                                <img src="{{ url_for('static', filename='images/image.png') }}" class="image" height="200"/>
+                                <img src="{{ url_for('static', filename='images/image.png') }}" class="image" />
                             {% else %}
-                                <img src="{{ url_for('static', filename=data.profile_picture) }}" class="image" height="200"/>
+                                <img src="{{ url_for('static', filename=data.profile_picture) }}" class="image" />
                             {% endif %}
                             <!-- <div class="file btn btn-lg btn-primary">
                                 Change Photo
@@ -32,10 +33,13 @@
                             </div>
                         </div>
                     </div>
-                    <div class="appointments">
+                    </br> </br>
+                    <div class="tabs">
+                        <input type="radio" id="tab-appointment" name="mytabs" checked="checked">
+                        <label  class="appointment" for="tab-appointment">Appointments</label>
+                    <div class="tab" role="tabpanel" aria-labelledby="appointments-tab">
                         {% if appointments %}
                             <ul>
-                                <h3>Your Appointments</h3>
                                 {% for appointment in appointments %}
                                 <div class ="row">
                                     <li>
@@ -49,115 +53,17 @@
                                 {% endfor %}
                             </ul>
                         {% else %}
-                            <p>No appointments found.</p>
+                            <p>No Appointments Found.</p>
                         {% endif %}
                         <!-- change the route to add btn functionality -->
                     <a class="book-appointment-btn" href="/BookAppointment">Book Appointment</a>
                     </div>
-                </div>
-                <div class="right-side">
-                    <div class="user-data">
-                            <div class="user-data-content">
-                                <h5>
-                                    {{ data.fname }} {{ data.lname }}
-                                </h5>
-                                <h6>
-                                    {% if data.is_admin == true %}
-                                        Admin
-                                    {% else %}
-                                        Patient
-                                    {% endif %}
-                                </h6>
-
-                            </div>
-                            <div class="col-md-8">
-                                <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <label>User Id :</label>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <p>{{ data.id }}</p>
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <label>First Name :</label>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <p>{{ data.fname }}</p>
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <label>Last Name :</label>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <p>{{ data.lname }}</p>
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <label>Email :</label>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <p>{{ data.email }}</p>
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <label>Phone :</label>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <p>{{ data.phone }}</p>
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <label>Age :</label>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <p>{{ data.age }}</p>
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <label>gender :</label>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <p>{{ data.gender }}</p>
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <label>Address :</label>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <p>{{ data.address }}</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                </div>
-                    <div class="scans">
-                        <h3>Your scans</h3>
-                        <div class="scrollable">
-                            <div class="scrollable-content">
-                                {% if data.scans %}
-                                    {% for image in scan_Files %}
-                                        <img src="{{ url_for('static', filename=data.scans+ '/' + image) }}" class="image" height="200"/>
-                                    {% endfor %}
-                                {% else %}
-                                    <p>No scans available</p>
-                                {% endif %}
-                            </div>
-                        </div>
-                        <a class="upload-scan-btn" href="/upload_scan">Upload Scans</a>
-                    </div>
-                    <div class="reports">
+                        <input type="radio" id="tab-reports" name="mytabs">
+                        <label class="reports" for="tab-reports">Reports</label>
+                        <div class="tab" role="tabpanel" aria-labelledby="reports-tab">
                      {% if reports %}
                     <ul>
-                        <h3>Your reports</h3>
+                        </br>
                         {% for report in reports %}
                         <style>
                             .row .hidden-item {
@@ -188,8 +94,8 @@
                                 </style> -->
                                 {% if report.r_scan %}
                                     <div class="flex-container">
-                                        <p class="hidden-item"><strong>scan:</strong> </p>
-                                        <img src="{{ url_for('static', filename=report.r_scan) }}" class="hidden-item" height="200"/>
+                                        <p class="hidden-item"><strong>Scan:</strong> </p>
+                                        <img src="{{ url_for('static', filename=report.r_scan) }}" class="hidden-item" height="300"/>
                                     </div>
                                 {% endif %}
 
@@ -198,12 +104,119 @@
                         {% endfor %}
                     </ul>
                     {% else %}
-                    <p>No reports found.</p>
+                        </br>
+                    <p>No Reports Found.</p>
+                        </br>
                     {% endif %}
                 </div>
+                    </div>
+                </div>
+                <div class="right-side">
+                    <div class="user-data">
+                            <div class="user-data-content">
+                                <h5>
+                                    {{ data.fname }} {{ data.lname }}
+                                </h5>
+                                <h6>
+                                    {% if data.is_admin == true %}
+                                        Admin
+                                    {% else %}
+                                        Patient
+                                    {% endif %}
+                                </h6>
+
+                            </div>
+                            <div class="Info">
+                                <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <label>User Id:</label>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <p>{{ data.id }}</p>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <label>First Name:</label>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <p>{{ data.fname }}</p>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <label>Last Name:</label>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <p>{{ data.lname }}</p>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <label>Email:</label>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <p>{{ data.email }}</p>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <label>Phone:</label>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <p>{{ data.phone }}</p>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <label>Age:</label>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <p>{{ data.age }}</p>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <label>gender:</label>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <p>{{ data.gender }}</p>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <label>Address:</label>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <p>{{ data.address }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                </br>
+                            </div>
+                </div>
+                    </br> </br>
+                    <div class="scans">
+                        </br>
+                        <div class="scrollable">
+                            <div class="scrollable-content">
+                                {% if data.scans %}
+                                    {% for image in scan_Files %}
+                                        <img src="{{ url_for('static', filename=data.scans+ '/' + image) }}" class="image" height="300"/>
+                                    {% endfor %}
+                                {% else %}
+                                    <p>No Scans Available</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <a class="upload-scan-btn" href="/upload_scan">Upload Scans</a>
+                        </br>
+                    </div>
                 </div>
                 </div>
             </form>
+            </br>
         </div>
     </body>
 {% endblock %}

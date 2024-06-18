@@ -96,7 +96,7 @@ class contactForm(FlaskForm):
 '''
 
 class ForgetForm(FlaskForm):
-    email = StringField(label='Email Address', validators=[Email(), DataRequired()])
+    email = StringField(label='Email Address:', validators=[Email(), DataRequired()])
     submit = SubmitField(label='Request Reset Password')
 
     def validate_Email(self, email_to_check):
