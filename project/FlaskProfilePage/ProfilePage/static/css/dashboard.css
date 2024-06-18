@@ -1,112 +1,120 @@
-body {
-    font-family: 'Arial', sans-serif;
-    background-color: #f8f9fa;
-    margin: 0;
+.tab {
+    display: none;
+}
+.tab.active {
+    display: block;
+}
+.tabs-container {
+    width: 75%;
+    margin: auto;
+}
+.tabs-menu {
+    display: flex;
+    justify-content: space-around;
+    list-style-type: none;
     padding: 0;
+    margin: 20px 0;
+    cursor: pointer;
 }
-
-.nav-tabs .nav-link.active {
-    background-color: #ffa500;
-    color: white;
+.tabs-menu-item {
+    padding: 10px 20px;
+    background-color: #f0f0f0;
+    border-radius: 5px 5px 0 0;
 }
-
-.nav-tabs .nav-link {
-    color: #008000;
-    transition: color 0.3s ease;
+.tabs-menu-item.active {
+    background-color: orange;
 }
-
-.nav-tabs .nav-link:hover {
-    color: #ff8c00;
-}
-
 .tab-content {
     margin-top: 20px;
 }
+.card-container
+{
+    position: center;
+top: 50px;
+padding: 10px;
+}
 
-.content-container {
-    width: 75%;
-    margin: auto;
-    background-color: #ffffff;
+.card {
+    background: linear-gradient(to right, #283593, #1976d2);
+    color: #ffffff;
     padding: 20px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    border-radius: 8px;
-}
-
-.content-container h2 {
-    font-size: 24px;
-    color: #333;
-    text-align: center;
-}
-
-.content-container p {
-    font-size: 18px;
-    color: #666;
-    text-align: center;
-}
-
-.tab-icon {
-    width: 20px;
-    height: 20px;
-    margin-right: 8px;
-}
-
-.section__header {
-    font-size: 24px;
-    color: #333;
+    border-radius: 10px;
+    margin-right: 20px;
+    margin-left: 27px;
     margin-bottom: 20px;
+    display: inline-block;
+    width: 45%; /* Adjust width for 2x2 grid */
+    height: 300px;
+    box-sizing: border-box;
+    position: relative; /* Positioning for image overlay */
+    text-align: center;
+}
+.card img {
+    position: absolute;
+    margin: 20px;
+    top: 180px;
+    left: 225px;
+    transform: translate(-50%, -50%);
+    width: 60px; /* Adjust image size */
+    height: 60px; /* Adjust image size */
 }
 
-.doctors__container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+.custom-table  {
+ border: 1px solid white; /* Orange border */
+    background: linear-gradient(to right, rgba(18, 172, 142, 0.9), rgba(18, 172, 142, 0.7)); /* Darker green gradient */
+    color: black; /* Orange text color */
+     font-size: 1.2rem;
+    text-align: center;
+}
+td{
+  background-color: transparent;
+    border:1px solid transparent; ;
+}
+.custom-table th {
+     border: 1px solid white; /* Orange border */
+    background: rgba(245, 123, 24, 0.9);
+    color: black; /* Orange text color */
+     font-size: 1rem;
+    text-align: center;
+}
+#tab-contributions table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 18px;
+    text-align: left;
 }
 
-.doctors__grid {
-    display: flex;
-    justify-content: space-around;
-    flex-wrap: wrap;
+#tab-contributions th, #tab-contributions td {
+    padding: 12px;
+    border-bottom: 1px solid #ddd;
 }
 
-.doctors__card {
-    background-color: #ffffff;
-    padding: 15px;
-    margin: 10px;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+#tab-contributions th {
+    background-color: #f2f2f2;
+    color: #333;
+}
+
+#tab-contributions tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+#tab-contributions tr:hover {
+    background-color: #f1f1f1;
+}
+
+#tab-contributions tr[data-id]:hover {
+    cursor: pointer;
+    background-color: #e0e0e0;
+}
+
+#tab-contributions th, #tab-contributions td {
     text-align: center;
 }
 
-.doctors__card__image img {
-    width: 100px;
-    height: 100px;
-    border-radius: 50%;
-}
-
-.doctors__socials {
-    display: flex;
-    justify-content: center;
-    margin-top: 10px;
-}
-
-.doctors__socials span {
-    margin: 0 5px;
-    cursor: pointer;
-    color: #008000;
-    transition: color 0.3s ease;
-}
-
-.doctors__socials span:hover {
-    color: #ffa500;
-}
-
-.doctors__card h4 {
-    font-size: 18px;
+#tab-contributions h3 {
+    margin-bottom: 20px;
     color: #333;
-    margin-top: 10px;
+    font-size: 24px;
 }
 
-.doctors__card p {
-    font-size: 16px;
-    color: #666;
-}

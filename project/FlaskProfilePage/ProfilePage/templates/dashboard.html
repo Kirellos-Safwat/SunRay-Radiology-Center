@@ -1,7 +1,5 @@
 {% extends 'base.html' %}
-{% block title %}
-    Users Page
-{% endblock %}
+
 {% block content %}
 <head>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css"/>
@@ -12,121 +10,208 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <div style="width: 75%; margin: auto;">
-        <h2>{{total_patients_docotrs_equipments[0][0]}} patient, {{total_patients_docotrs_equipments[1][0]}} radiologist, {{total_patients_docotrs_equipments[2][0]}} equipment</h2>
+    <div class="tabs-container">
+        <ul class="tabs-menu">
+            <li class="tabs-menu-item active" data-tab="tab-statistics"><p>Statistics</p></li>
+            <li class="tabs-menu-item" data-tab="tab-appointments"><p>Appointments</p></li>
+            <li class="tabs-menu-item" data-tab="tab-demographics"><p>Demographics</p></li>
+            <li class="tabs-menu-item" data-tab="tab-contributions"><p>Contributions</p></li>
+        </ul>
+<br><br><br><br>
+        <div id="tab-statistics" class="tab active">
+            <div class="card-container">
+                <div class="card">
+                    <br>
+                    <br>
+                    <h1 class="counter" data-target="{{total_patients_docotrs_equipments[0][0]}}">0</h1><h1>Patients</h1>
+                    <br>
+                    <img src="{{ url_for('static', filename='photos/patient.png') }}" alt="Patient" style="width: 60px;height: 60px">
+                </div>
+                <div class="card">
+                    <br>
+                    <br>
+                    <h1 class="counter" data-target="{{total_patients_docotrs_equipments[1][0]}}">0</h1><h1>Radiologists</h1>
+                    <br>
+                    <img src="{{ url_for('static', filename='photos/doctor.png') }}" alt="Radiologist" style="width: 60px;height: 60px">
+                </div>
+                <div class="card">
+                    <br>
+                    <br>
+                    <h1 class="counter" data-target="{{total_patients_docotrs_equipments[2][0]}}">0</h1><h1>Devices</h1>
+                    <br>
+                    <img src="{{ url_for('static', filename='photos/devices2.png') }}" alt="Equipment" style="width: 80px;height: auto">
+                </div>
+                <div class="card">
+                    <br>
+                    <br>
+                    <h1 class="counter dollar-sign" data-target="{{total_revenues_last_month_last_year[0][0]}}">0</h1><h1>Last month revenue</h1>
+                    <br>
+                    <img src="{{ url_for('static', filename='photos/money.png') }}" alt="Last month revenue" style="width: 80px;height: auto">
+                </div>
+            </div>
+        </div>
+        <div id="tab-appointments" class="tab">
+            <div>
+                <h2>The Most Crowded Day is: {{ most_crowded_day }}</h2>
+                <canvas id="appointmentsChart"></canvas>
+            </div>
+        </div>
+
+        <div id="tab-demographics" class="tab">
+            <div>
+                <h2>Age/Gender Demographics</h2>
+                <p>Most Served Age Group: {{ most_served_age_group[0] }} With {{most_served_age_group[1]}} patient</p>
+                <canvas id="demographicsChart"></canvas>
+            </div>
+        </div>
+
+        <div id="tab-contributions" class="tab">
+            <div>
+                <table >
+                    <thead>
+                        <tr>
+                            <th scope="col">ID</th>
+                            <th scope="col">Name</th>
+                            <th scope="col">Total Revenue</th>
+                            <th scope="col">Number Of appointments</th>
+                        </tr>
+                    </thead>
+                    <tbody id="doctors">
+                        {% for doctor in doctors_data %}
+                        <tr data-id="{{ doctor.d_id }}" data-table="doctor">
+                            <td>{{ doctor.d_id }}</td>
+                            <td data-field="d_name">{{ doctor.d_name }}</td>
+                            <td data-field="d_email">{{ doctor.toal_billing }}</td>
+                            <td data-field="d_phone">{{ doctor.appointments }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
-    <br>
-    <div style="width: 75%; margin: auto;">
-        <h2>{{total_revenues_last_month_last_year[0][0]}}$ Last month revenues, {{total_revenues_last_month_last_year[1][0]}}$ Last year revenues</h2>
-    </div>
-    <br>
-    <div style="width: 75%; margin: auto;">
-        <h2>The Most Crowded Day is: {{ most_crowded_day }}</h2>
-        <canvas id="appointmentsChart"></canvas>
-    </div>
-    <div style="width: 75%; margin: auto; margin-top: 50px;">
-        <h2>Age/Gender Demographics</h2>
-        <p>Most Served Age Group: {{ most_served_age_group[0] }} With {{most_served_age_group[1]}} patient</p>
-        <canvas id="demographicsChart"></canvas>
-    </div>
-    <div class="tab-pane fade" id="doctors" role="tabpanel" aria-labelledby="doctors-tab">
-        <br>
-        <h3>Radiologists Insights</h3>
-        <br>
-        <table class="table custom-table">
-            <br>
-            <thead>
-            <br>
-                <tr>
-                    <th scope="col">ID</th>
-                    <th scope="col">Name</th>
-                    <th scope="col">Total Revenues</th>
-                    <th scope="col">Number Of appointments</th>
-                </tr>
-            </thead>
-            <tbody id="doctors">
-                {% for doctor in doctors_data %}
-                <tr data-id="{{ doctor.d_id }}" data-table="doctor">
-                    <td>{{ doctor.d_id }}</td>
-                    <td data-field="d_name">{{ doctor.d_name }}</td>
-                    <td data-field="d_email">{{ doctor.toal_billing }}</td>
-                    <td data-field="d_phone">{{ doctor.appointments }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
+
     <script>
-        // Data for Most Crowded Day Chart passed from Flask
-        const appointmentsData = {{ days | tojson }};
-        const labels = Object.keys(appointmentsData);
-        const data = Object.values(appointmentsData);
+        document.addEventListener('DOMContentLoaded', function() {
+            const tabsMenuItems = document.querySelectorAll('.tabs-menu-item');
+            const tabs = document.querySelectorAll('.tab');
 
-        const ctx1 = document.getElementById('appointmentsChart').getContext('2d');
-        const appointmentsChart = new Chart(ctx1, {
-            type: 'bar',
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: 'Number of Appointments',
-                    data: data,
-                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                    borderColor: 'rgba(75, 192, 192, 1)',
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                animation: {
-                    duration: 2000, // Animation duration in milliseconds
-                    easing: 'easeOutBounce' // Animation easing effect
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    }
-                }
-            }
-        });
+            tabsMenuItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    const selectedTab = this.getAttribute('data-tab');
 
-        // Data for Age/Gender Demographics Chart passed from Flask
-        const demographicsData = {{ demographics | tojson }};
-        const ageGroups = demographicsData.age_groups;
-        const maleData = demographicsData.male;
-        const femaleData = demographicsData.female;
+                    tabs.forEach(tab => {
+                        if (tab.id === selectedTab) {
+                            tab.classList.add('active');
+                        } else {
+                            tab.classList.remove('active');
+                        }
+                    });
 
-        const ctx2 = document.getElementById('demographicsChart').getContext('2d');
-        const demographicsChart = new Chart(ctx2, {
-            type: 'bar',
-            data: {
-                labels: ageGroups,
-                datasets: [
-                    {
-                        label: 'Male',
-                        data: maleData,
-                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                        borderColor: 'rgba(54, 162, 235, 1)',
+                    tabsMenuItems.forEach(item => {
+                        if (item.getAttribute('data-tab') === selectedTab) {
+                            item.classList.add('active');
+                        } else {
+                            item.classList.remove('active');
+                        }
+                    });
+                });
+            });
+
+            // Data for Most Crowded Day Chart passed from Flask
+            const appointmentsData = {{ days | tojson }};
+            const labels = Object.keys(appointmentsData);
+            const data = Object.values(appointmentsData);
+
+            const ctx1 = document.getElementById('appointmentsChart').getContext('2d');
+            const appointmentsChart = new Chart(ctx1, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Number of Appointments',
+                        data: data,
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
                         borderWidth: 1
+                    }]
+                },
+                options: {
+                    animation: {
+                        duration: 2000, // Animation duration in milliseconds
+                        easing: 'easeOutBounce' // Animation easing effect
                     },
-                    {
-                        label: 'Female',
-                        data: femaleData,
-                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                        borderColor: 'rgba(255, 99, 132, 1)',
-                        borderWidth: 1
-                    }
-                ]
-            },
-            options: {
-                animation: {
-                    duration: 2000, // Animation duration in milliseconds
-                    easing: 'easeOutBounce' // Animation easing effect
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
                     }
                 }
-            }
+            });
+
+            // Data for Age/Gender Demographics Chart passed from Flask
+            const demographicsData = {{ demographics | tojson }};
+            const ageGroups = demographicsData.age_groups;
+            const maleData = demographicsData.male;
+            const femaleData = demographicsData.female;
+
+            const ctx2 = document.getElementById('demographicsChart').getContext('2d');
+            const demographicsChart = new Chart(ctx2, {
+                type: 'bar',
+                data: {
+                    labels: ageGroups,
+                    datasets: [
+                        {
+                            label: 'Male',
+                            data: maleData,
+                            backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Female',
+                            data: femaleData,
+                            backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                            borderColor: 'rgba(255, 99, 132, 1)',
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    animation: {
+                        duration: 2000, // Animation duration in milliseconds
+                        easing: 'easeOutBounce' // Animation easing effect
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+
+            // Animated counter logic
+            const counters = document.querySelectorAll('.counter');
+            counters.forEach(counter => {
+                const updateCounter = () => {
+                    const target = +counter.getAttribute('data-target');
+                    const current = +counter.innerText;
+                    const increment = target / 200; // Adjust the divisor to control speed
+
+                    if (current < target) {
+                        counter.innerText = Math.ceil(current + increment);
+                        setTimeout(updateCounter, 20); // Adjust the delay to control speed
+                    } else {
+                        if (counter.classList.contains('dollar-sign')) {
+                            counter.innerText = target + ' $';
+                        } else {
+                            counter.innerText = target;
+                        }
+                    }
+                };
+
+                updateCounter();
+            });
         });
     </script>
 </body>
