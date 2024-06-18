@@ -343,6 +343,12 @@ def radiologist_profile_page():
                    FROM report Join patient ON report.p_id = patient.id
                    WHERE d_id = %s """, (g.data['d_id'],))
     reports = cursor.fetchall()
+    if os.name == 'nt':
+        for report in reports:
+            if report['r_scan'] is not None:
+                report['r_scan'] = report['r_scan'].replace("\\", "/")
+
+    print(reports)
     cursor.close()
 
     if g.data is None:
