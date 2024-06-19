@@ -1,24 +1,22 @@
 .AppointmentBox{
     width: 350px;
-    height: 500px;
+    height: 520px;
     background: rgb(18, 172, 142);
     color: white;
-    margin-top: 5%;
-    margin-left: 40%;
-    border-radius: 10px;
+    margin: auto;
+    margin-top: 10%;
+    border-radius: 5px;
      font-size: 16px;
 }
 .ReportBox{
-    position: relative;
-    left: -220px;
-    width: 750px;
+    width: 715px;
     height: 550px;
     background: rgb(18, 172, 142);
     color: white;
-    margin-top: 5%;
-    margin-left: 40%;
-    border-radius: 10px;
-     font-size: 16px;
+    margin: auto;
+    margin-top: 10%;
+    border-radius: 5px;
+    font-size: 16px;
 }
 
 .AppointmentBox h1{
@@ -30,10 +28,24 @@
     width: 83%;
     padding: 10px;
     font-size: 16px;
-    border: 1px solid #3367D6;
-    border-radius: 10px;
+    border: 1px solid #fb923c;
+    border-radius: 5px;
     box-sizing: border-box;
+    margin: auto;
 }
+
+.report-select{
+
+
+      width: 83%;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #fb923c;
+    border-radius: 5px;
+    box-sizing: border-box;
+
+}
+
 
 .form-group {
     margin-bottom: 15px;
@@ -42,29 +54,16 @@
 .form-control {
     width: 100%;
     padding: 10px;
-    border: 1px solid #ced4da;
-    border-radius: 4px;
+    border: 1px solid #fb923c;
+    border-radius: 5px;
     box-sizing: border-box;
 }
 
 .form-control:focus {
-    border-color: #80bdff;
+    /*border-color: black;*/
     outline: none;
-    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
 }
 
-button {
-    background-color: #007bff;
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-}
-
-button:hover {
-    background-color: #0056b3;
-}
 .form-control {
     display: block;
     width: 100%;
@@ -74,34 +73,44 @@ button:hover {
     color: #495057;
     background-color: #fff;
     background-clip: padding-box;
-    border: 1px solid #3367D6;
-    border-radius: 10px;
-    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    border: 1px solid #fb923c;
+    border-radius: 5px;
+    /*transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;*/
 }
-.AppointmentBox label{
+.label1{
     font-size: 18px;
     display: block;
     margin-left: 2%;
     margin-top: 5%;
     margin-bottom: 3%;
 }
+
+.label2 {
+
+     font-size: 18px;
+    display: block;
+    margin-left: 10%;
+    margin-top: 5%;
+    margin-bottom: 3%;
+
+}
+
 .AppointmentForm {
     font-size: 18px;
     position: relative;
-    margin-left: 5%;
+    margin-left: 10%;
 }
 .AppointmentBox input{
-    width: 80%;
-    margin: 0 0 20px 20px;
+    width: 83%;
+    margin: auto;
     font-size: 18px;
-    margin-left: 2%;
-    margin-bottom: 3%;
+
 }
 .AppointmentBox input[type="submit"]{
     border: none;
     outline: none;
-    height: 40px;
-    border-radius: 20px;
+    height: 50px;
+    border-radius: 5px;
     color: white;
     font-size: 20px;
     cursor: pointer;
@@ -122,4 +131,20 @@ button:hover {
     color: #a94442;
     padding: 10px;
     margin-bottom: 15px;
+}
+@media (max-width: 950px) {
+  .AppointmentBox{
+    width: 90%;
+    padding: 30px 40px 40px 35px ;
+  }
+}
+
+@media (max-width: 820px) {
+  .AppointmentBox{
+    margin: 40px 0;
+    height: 100%;
+  }
+  .AppointmentBox .content{
+    flex-direction: column-reverse;
+  }
 }

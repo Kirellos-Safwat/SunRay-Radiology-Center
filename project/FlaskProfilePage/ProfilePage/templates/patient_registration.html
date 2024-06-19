@@ -4,11 +4,28 @@
 {% endblock %}
 {% block content %}
     <head>
-        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/registration.css') }}">
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/register.css') }}">
     </head>
     <body >
         <!--<link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">-->
+
+
+        <div class="flash-container">
+            <div style="position: center">
+         {% for error in form.Email.errors %}
+                     <div class="flash-error">{{ error }}</div>
+          {% endfor %}
+            </div>
+            <div style="position: center">
+         {% for error in form.Phone_Number.errors %}
+                     <div class="flash-error">{{ error }}</div>
+          {% endfor %}
+            </div>
+             </div>
+
+
         <div class="formBox">
+            <div class="content">
             <img class="logo" src="https://cdn-icons-png.flaticon.com/128/4228/4228704.png">
             <h1>Sign Up</h1>
             <form method="POST" class="form-register" enctype="multipart/form-data">
@@ -45,6 +62,7 @@
                 {{ form.submit(class="btn btn-lg btn-block btn-success") }}
             </form>
             <a href="/patient-login_page">Already have an account?</a> </br> </br> </br>
+        </div>
         </div>
     </body>
 {% endblock %}

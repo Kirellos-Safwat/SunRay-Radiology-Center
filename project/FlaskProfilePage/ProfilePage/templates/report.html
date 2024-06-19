@@ -11,26 +11,47 @@
                                     document.getElementById('date').setAttribute('min', today);
                                 }
                                          </script>
+
    <style>
         .container {
             display: flex;
-            flex-wrap: wrap;
         }
-        .column {
+        .column1 {
             flex: 50%;
             box-sizing: border-box;
             padding: 10px;
+            margin-left: 5%;
         }
-        .column input {
-            width: 100%;
+        .column1 input{
+            width: 260px;
+            padding: 10px;
+            margin: 5px 0;
+            margin-bottom: 15px;
+        }
+       .column {
+            flex: 50%;
+            box-sizing: border-box;
+            padding: 10px;
+            margin-left: 5%;
+        }
+        .column input{
+            width: 260px;
             padding: 10px;
             margin: 5px 0;
         }
+        .column select{
+            width: 260px;
+            margin-left: 0%;
+        }
+         .column1 select{
+            width: 260px;
+        }
+
     </style>
 
 
         <div class="ReportBox"> <br>
-            <h2 align="center">Submit a Report</h2>
+            <h2 align="center">Make Report</h2>
 
 
 <!--
@@ -39,19 +60,19 @@
             <div class="card-body">-->
                 <form action="" method='POST' name="ReportForm" enctype="multipart/form-data">
 <div class="container">
-                    <div class="column">
+                    <div class="column1">
 
                     {{ form.hidden_tag() }}
                     <div class="form-group">
-                    <label for="Patient Name">{{ form.patients.label }}</label>
+                    <label for="Patient Name">{{ form.patients.label(placeholder="Patient Name") }}</label>
                              {{ form.patients }}
                          </div>
 
 
 
                    <div class="form-group">
-                        <label for="Study Area">{{ form.r_study_area.label }}</label>
-                             {{ form.r_study_area(class="form-control") }}
+                        <label for="Study Area">{{ form.r_study_area.label}}</label>
+                             {{ form.r_study_area(class="form-control", placeholder="Study Area") }}
                          </div>
 
                          <div class="mb-3">
@@ -72,30 +93,26 @@
 
                      <div class="form-group">
                     <label for="Radiation dose">{{ form.radiation_dose.label }}</label>
-                             {{ form.radiation_dose(class="form-control") }}
+                             {{ form.radiation_dose(class="form-control", placeholder="Radiation Dose") }}
                          </div>
 
 
 
                      <div class="form-group">
                     <label for="Findings">{{ form.r_findings.label }}</label>
-                             {{ form.r_findings(class="form-control") }}
+                             {{ form.r_findings(class="form-control", placeholder="Findings") }}
                          </div>
                      <div class="form-group">
                     <label for="Impressions">{{ form.r_result.label }}</label>
-                             {{ form.r_result(class="form-control") }}
+                             {{ form.r_result(class="form-control", placeholder="Impressions") }}
                          </div>
     </div>
 </div>
                     <br>
-
-
-                   <br>
                     <div align="center" >{{ form.submit(class="btn btn-lg btn-block btn-primary") }}</div>
 
                 </form>
             </div>
-
     <!-- Bootstrap JavaScript -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>

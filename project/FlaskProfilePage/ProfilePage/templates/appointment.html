@@ -17,28 +17,31 @@
 
 
         <div class="AppointmentBox"> <br>
-            <h2 align="center">Make an Appointment</h2>
+            <div class="content">
+            <h2 align="center">Book Appointment</h2>
 
 
                 <form action="" method='POST' name="AppointmentForm">
 
                     <div class="form-group">
                         {{ form.hidden_tag() }}
-                    {{ form.date.label }} {{form.date(class='form-control datepicker')}}
+                    <label class="label2" for="Preferred Day">{{ form.date.label }}</label>
+                        {{form.date(class='form-control datepicker')}}
                     </div>
 
                     <div class="form-group"  >
-                    <label for="Preferred Doctor">{{ form.doctors.label }}</label>
-                    <label class="dropList"> {{ form.doctors(class="form-control") }} </label>
+                    <label class="label2" for="Preferred Doctor">{{ form.doctors.label }}</label>
+                    <label class="dropList label1"> {{ form.doctors(class="form-control") }} </label>
                 </div>
 
                 <div class="form-group">
-                    <label for="Examination Type">{{ form.devices.label }}</label>
-                    <label class="dropList"> {{ form.devices(class="form-control") }} </label>
+                    <label class="label2" for="Examination Type">{{ form.devices.label }}</label>
+                    <label class="dropList label1"> {{ form.devices(class="form-control") }} </label>
                 </div>
                 <br>
                 {{ form.submit(class="btn btn-lg btn-block btn-primary") }}
             </form>
+                </div>
         </div>
         <!-- Bootstrap JavaScript -->
         <!--<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>-->

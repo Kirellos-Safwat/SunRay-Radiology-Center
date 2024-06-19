@@ -12,9 +12,19 @@ class LoginForm(FlaskForm):
     submit = SubmitField(label='Sign In')
 
 
-class EditProfileForm(FlaskForm):
+class PatientEditProfileForm(FlaskForm):
     First_Name = StringField(label='First Name:', validators=[Length(min=2, max=50), DataRequired()])
     Last_Name = StringField(label='Last Name:', validators=[Length(min=2, max=30), DataRequired()])
+    Email = StringField(label='Email:', validators=[Email(), DataRequired()])
+    Phone_Number = StringField(label='Phone Number:', validators=[Length(min=11, max=13), DataRequired()])
+    profile_photo = FileField('Profile Photo', validators=[FileAllowed(['jpg', 'png'])])
+    Gender = StringField(label='Gender:', validators=[DataRequired()])
+    Age = IntegerField(label='Age:', validators=[NumberRange(min=0, max=120), DataRequired()])
+    Address = StringField(label='Address:', validators=[DataRequired()])
+    submit = SubmitField(label='Save Changes')
+
+class RadiologistEditProfileForm(FlaskForm):
+    Name = StringField(label='Name:', validators=[Length(min=2, max=50), DataRequired()])
     Email = StringField(label='Email:', validators=[Email(), DataRequired()])
     Phone_Number = StringField(label='Phone Number:', validators=[Length(min=11, max=13), DataRequired()])
     profile_photo = FileField('Profile Photo', validators=[FileAllowed(['jpg', 'png'])])
@@ -68,11 +78,13 @@ class ReportForm(FlaskForm):
 class PatientRegisterForm(FlaskForm):
     def validate_Email(self, email_to_check):
         patient_email = Patient.query.filter_by(email=email_to_check.data).first()
+        print(patient_email)
         if patient_email:
             raise ValidationError('This Email has been used before')
 
     def validate_Phone_Number(self, phone_to_check):
         patient_phone = Patient.query.filter_by(phone=phone_to_check.data).first()
+        print(patient_phone)
         if patient_phone:
             raise ValidationError('This Phone number has been used before')
 
@@ -96,16 +108,11 @@ class contactForm(FlaskForm):
 '''
 
 class ForgetForm(FlaskForm):
-    email = StringField(label='Email Address', validators=[Email(), DataRequired()])
-    submit = SubmitField(label='Request Reset Password')
-
-    def validate_Email(self, email_to_check):
-        patient = Patient.query.filter_by(email=email_to_check.data).first()
-        if patient is None:
-            raise ValidationError('There is no account for that email. Please register first.')
+    email = StringField(label='Email Address:', validators=[Email(), DataRequired()])
+    submit = SubmitField(label='Reset Password')
 
 
 class ResetPasswordForm(FlaskForm):
     new_password = PasswordField(label='Reset Password:', validators=[Length(min=6), DataRequired()])
-    confirm_password = PasswordField(label='Confirm Password:', validators=[EqualTo('Password'), DataRequired()])
+    confirm_password = PasswordField(label='Confirm Password:', validators=[EqualTo('new_password'), DataRequired()])
     submit = SubmitField(label='Reset Password')

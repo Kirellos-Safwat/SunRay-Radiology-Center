@@ -2,16 +2,13 @@ import psycopg2.extras
 from datetime import datetime
 from google.oauth2 import id_token
 from sqlalchemy.testing.plugin.plugin_base import post
-from ProfilePage import app, connection, connection_string, mail, flow, GOOGLE_CLIENT_ID
-from ProfilePage import app, db, connection, connection_string, mail, bcrypt, flow, GOOGLE_CLIENT_ID
+from ProfilePage import app, db, connection_string, mail, bcrypt, flow, GOOGLE_CLIENT_ID
 from flask_login import current_user
 from flask_mail import Message
 from ProfilePage.models import Patient
-from ProfilePage.forms import LoginForm, EditProfileForm, AppointmentForm, PatientRegisterForm, ReportForm, ForgetForm, \
-    ResetPasswordForm
 from flask import render_template, redirect, url_for, flash, session, request, g
 from ProfilePage.models import appointments, Patient
-from ProfilePage.forms import LoginForm, EditProfileForm, AppointmentForm, PatientRegisterForm, ReportForm, \
+from ProfilePage.forms import LoginForm, RadiologistEditProfileForm, PatientEditProfileForm, AppointmentForm, PatientRegisterForm, ReportForm, \
     RadiologistRegisterForm, ForgetForm, \
     ResetPasswordForm
 from flask import render_template, redirect, url_for, flash, session, request, json, jsonify
@@ -39,13 +36,14 @@ import tensorflow as tf
 @app.before_request
 def load_user_data():
     g.data = session.get('user_data')  # Use Flask's global `g` object
+    g.connection = psycopg2.connect(connection_string)
+
 
 
 @app.route('/')  # that is the root url of the website
 @app.route('/home')
 def home_page():
-    print(g.data)
-    cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
+    cursor = g.connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
     cursor.execute('''
             SELECT id, name, picture
             FROM(
@@ -64,7 +62,7 @@ def home_page():
 def edit_data():
     data = request.get_json()
     table = data.get('table')
-    cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
+    cursor = g.connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
     # handle deleting
     if 'delete_id' in data:
         delete_id = data['delete_id']
@@ -114,7 +112,7 @@ def edit_data():
             """
         cursor.execute(update_query, update_data)
     cursor.close()
-    connection.commit()
+    g.connection.commit()
     return redirect(url_for('users_page'))
 
 
@@ -125,33 +123,30 @@ def appointment_page():
         return redirect(url_for('patient_login_page'))
 
     def get_doctors():
-        connection = psycopg2.connect(connection_string)
-        curs = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
+        curs = g.connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
         curs.execute("SELECT d_name FROM radiologist")
         doctors = curs.fetchall()
         curs.execute("ROLLBACK")
-        connection.commit()
+        g.connection.commit()
         curs.close()
-        # connection.close()
         return [doctor['d_name'] for doctor in doctors]
 
     def get_devices():
-        connection = psycopg2.connect(connection_string)
-        curs = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
+        # connection = psycopg2.connect(connection_string)
+        curs = g.connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
         curs.execute("SELECT device_name,device_id FROM radiology_equipment")
         devices = curs.fetchall()
         curs.execute("ROLLBACK")
-        connection.commit()
+        g.connection.commit()
         curs.close()
-        # connection.close()
         return [device['device_name'] for device in devices]
 
     form.doctors.choices = get_doctors()
     form.devices.choices = get_devices()
 
     if request.method == 'POST':
-        connection = psycopg2.connect(connection_string)
-        cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
+        # connection = psycopg2.connect(connection_string)
+        cursor = g.connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
         p_id = g.data['id']
         if form.validate_on_submit():
             date = form.date.data
@@ -169,9 +164,8 @@ def appointment_page():
                 "INSERT INTO appointments (d_id,device_name,device_id,date,d_name,p_id) VALUES (%s, %s, %s, %s,%s,%s)",
                 (d_id, device_name, device_id, date, d_name, p_id)
             )
-            connection.commit()
+            g.connection.commit()
             cursor.close()
-            # connection.close()
             flash('Your appointment has been booked successfully!', category='success')
             return redirect(url_for('patient_profile_page'))
     return render_template('appointment.html', form=form, data=g.data)
@@ -184,19 +178,17 @@ def report_page():
         return redirect(url_for('radiologist_login'))
 
     def get_patients():
-        connection = psycopg2.connect(connection_string)
-        curs = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
+        # connection = psycopg2.connect(connection_string)
+        curs = g.connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
         curs.execute("SELECT concat(fname,' ',lname) AS full_name FROM patient")
         patients = curs.fetchall()
-        connection.close()
         return [(patient['full_name'], patient['full_name']) for patient in patients]
 
     def get_devices():
-        connection = psycopg2.connect(connection_string)
-        curs = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
+        # g.connection = psycopg2.connect(connection_string)
+        curs = g.connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
         curs.execute("SELECT device_name FROM radiology_equipment")
         devices = curs.fetchall()
-        connection.close()
         return [(device['device_name'], device['device_name']) for device in devices]
 
     form.patients.choices = get_patients()
@@ -204,8 +196,8 @@ def report_page():
 
     if request.method == 'POST':
         if form.validate_on_submit():
-            connection = psycopg2.connect(connection_string)
-            cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
+            # connection = psycopg2.connect(connection_string)
+            cursor = g.connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
             d_id = g.data['d_id']
 
             r_time = form.r_time.data
@@ -237,9 +229,8 @@ def report_page():
                 "INSERT INTO report (p_id, d_id, device_id, r_time, r_scan, r_study_area, radiation_dose, r_findings, r_result, billing) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
                 (p_id, d_id, device_id, r_time, relative_photo_path, r_study_area, radiation_dose, r_findings, r_result, billing)
             )
-            connection.commit()
+            g.connection.commit()
             cursor.close()
-            # connection.close()
 
             flash('The report was submitted successfully', category='success')
             return redirect(url_for('radiologist_profile_page'))
@@ -251,7 +242,7 @@ def login_admin():
     if request.method == 'POST':
         email = request.form['Email']
         password = request.form['Password']
-        cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
+        cursor = g.connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
         cursor.execute(
             "SELECT * FROM admin WHERE a_email = %s AND password = %s",
             (email, password)
@@ -274,7 +265,7 @@ def users_page():
     data = session.get('user_data')
     if data is None or 'admin_id' not in data:
         return redirect('/login')
-    cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
+    cursor = g.connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
     # patients data
     cursor.execute('SELECT * FROM patient')
     patients = cursor.fetchall()
@@ -305,7 +296,7 @@ def radiologist_login():
     if request.method == 'POST':
         d_email = request.form['Email']
         d_password = request.form['Password']
-        cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
+        cursor = g.connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
         cursor.execute(
             "SELECT * FROM radiologist WHERE d_email = %s AND d_password = %s",
             (d_email, d_password)
@@ -322,14 +313,14 @@ def radiologist_login():
         else:
             flash('Incorrect Email or password. Please try again.', category='error')
 
-    return render_template('radiologist-login.html', form=LoginForm(), data=data if 'data' in locals() else None) #
+    return render_template('radiologist-login.html', form=LoginForm(), data=data if 'data' in locals() else None, template='radiologist_login')
 
 
 @app.route('/radiologist-profile')
 def radiologist_profile_page():
     if g.data is None or 'd_id' not in g.data:
         return redirect('/radiologist-login')
-    cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
+    cursor = g.connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
     # Fetch appointments for the current user's ID
     cursor.execute("""
             SELECT appointments.*, patient.fname, patient.lname
@@ -340,7 +331,7 @@ def radiologist_profile_page():
     appointments = cursor.fetchall()
     cursor.close()
 
-    cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
+    cursor = g.connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
     # Fetch reports for the current user's ID
     cursor.execute(""" SELECT report.*, patient.fname, patient.lname
                    FROM report Join patient ON report.p_id = patient.id
@@ -353,27 +344,22 @@ def radiologist_profile_page():
 
     print(reports)
     cursor.close()
-
-    if g.data is None:
-        return redirect('/radiologist-login')
     return render_template('radiologist-profile.html', data=g.data, appointments=appointments , template = 'radiologist_profile',reports=reports)
 
 
-@app.route('/radiologist-edit_profile', methods=['GET', 'POST'])
+@app.route('/radiologist_edit_profile', methods=['GET', 'POST'])
 def radiologist_edit_profile():
-    form = EditProfileForm()
+    form = RadiologistEditProfileForm()
     if g.data is None or 'd_id' not in g.data:
         return redirect('/radiologist-login')
     if request.method == 'POST' and form.validate_on_submit():
         updated_data = {
-            'd_name': form.First_Name.data,
+            'd_name': form.Name.data,
             'd_email': form.Email.data,
             'd_phone': form.Phone_Number.data,
             'd_gender': form.Gender.data,
             'd_age': form.Age.data,
-            'd_address': form.Address.data,
-            'd_is_admin': True if form.Email.data.endswith('@company.com') else False,
-
+            'd_address': form.Address.data
         }
 
         profile_photo = form.profile_photo.data
@@ -383,13 +369,13 @@ def radiologist_edit_profile():
             profile_photo_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             profile_photo.save(profile_photo_path)
             relative_photo_path = os.path.join('uploads', filename)
-            updated_data['profile_picture'] = relative_photo_path
+            updated_data['d_profile_picture'] = relative_photo_path
         else:
-            updated_data['profile_picture'] = g.data['profile_picture']
+            updated_data['d_profile_picture'] = g.data['d_profile_picture']
 
         # Update user information in the database
-        connection = psycopg2.connect(connection_string)
-        cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
+        # connection = psycopg2.connect(connection_string)
+        cursor = g.connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
         update_query = """
             UPDATE radiologist
             SET d_name = %(d_name)s, d_email = %(d_email)s,
@@ -400,12 +386,11 @@ def radiologist_edit_profile():
         updated_data['d_id'] = g.data['d_id']
 
         cursor.execute(update_query, updated_data)
-        connection.commit()
+        g.connection.commit()
         cursor.close()
-        # connection.close()
 
         flash('Your profile has been updated successfully! Please login again', category='success')
-        return redirect('/radiologist-login_page')  # Redirect to log in to refresh
+        return redirect('/radiologist-login')  # Redirect to log in to refresh
 
     return render_template('radiologist_edit_profile.html', data=g.data, form=form, template = 'radiologist_edit_profile')
 
@@ -430,20 +415,18 @@ def patient_registration_page():
         else:
             relative_photo_path = None
 
-        connection = psycopg2.connect(connection_string)
-        cursor = connection.cursor()
+        # connection = psycopg2.connect(connection_string)
+        cursor = g.connection.cursor()
         cursor.execute(
             "INSERT INTO Patient (fname, lname, email, phone, password, profile_picture) VALUES (%s, %s, %s, %s, %s, %s)",
             (fname, lname, email, phone, password, relative_photo_path)
         )
-        connection.commit()
+        g.connection.commit()
         cursor.close()
-        # connection.close()
 
         flash('Registration successful. Please log in.', category='success')
         return redirect('/patient-login_page')
-
-    return render_template('patient_registration.html', form=form, data=None)
+    return render_template('patient_registration.html', form=form, data=None, template='patient_register')
 
 
 @app.route('/patient-login_page', methods=['GET', 'POST'])
@@ -451,7 +434,7 @@ def patient_login_page():
     if request.method == 'POST':
         email = request.form['Email']
         password = request.form['Password']
-        cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
+        cursor = g.connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
         cursor.execute(
             "SELECT * FROM patient WHERE email = %s AND password = %s",
             (email, password)
@@ -466,19 +449,18 @@ def patient_login_page():
             if os.name == 'nt' and data['profile_picture'] is not None:
                 data['profile_picture'] = data['profile_picture'].replace("\\", "/")
             cursor.close()  # Close the cursor once
-            flash('Welcome back!', category='success')
             return redirect('/patient-profile')
         else:
             flash('Incorrect Email or password. Please try again.', category='error')
 
-    return render_template('patient-login.html', form=LoginForm(), data=data if 'data' in locals() else None)
+    return render_template('patient-login.html', form=LoginForm(), data=data if 'data' in locals() else None, template = 'patient_login')
 
 
 @app.route('/patient-profile')
 def patient_profile_page():
     if g.data is None or 'id' not in g.data:
         return redirect('/patient-login_page')
-    cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
+    cursor = g.connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
     # Fetch appointments for the current user's ID
     cursor.execute("""
         SELECT appointments.*, radiologist.d_name
@@ -499,7 +481,7 @@ def patient_profile_page():
     ############################################
     # if os.name == 'nt' and data['scans'] is not None:
     #     data['scans'] = data['scans'].replace("\\", "/")
-    cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
+    cursor = g.connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
     # Fetch reports for the current user's ID
     cursor.execute(""" SELECT report.*, patient.fname, patient.lname
                    FROM report Join patient ON report.p_id = patient.id
@@ -539,12 +521,12 @@ def patient_upload_scan():
     if os.path.exists(scans_path):
         scan_files = os.listdir(scans_path)
     relative_scan_folder = os.path.join('uploads', scans_folder)
-    cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
+    cursor = g.connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
     cursor.execute(
         "UPDATE patient SET scans = %s WHERE id = %s",
         (relative_scan_folder, g.data['id'])
     )  # insert to the specific patient
-    connection.commit()
+    g.connection.commit()
     cursor.close()
 
     return render_template('upload_scan.html', data=g.data, scan_files=scan_files)
@@ -552,7 +534,7 @@ def patient_upload_scan():
 
 @app.route('/patient-edit_profile', methods=['GET', 'POST'])
 def patient_edit_profile():
-    form = EditProfileForm()
+    form = PatientEditProfileForm()
     if g.data is None or 'id' not in g.data:
         return redirect('/patient-login_page')
     if request.method == 'POST' and form.validate_on_submit():
@@ -563,9 +545,7 @@ def patient_edit_profile():
             'phone': form.Phone_Number.data,
             'gender': form.Gender.data,
             'age': form.Age.data,
-            'address': form.Address.data,
-            'is_admin': True if form.Email.data.endswith('@company.com') else False,
-
+            'address': form.Address.data
         }
 
         profile_photo = form.profile_photo.data
@@ -580,8 +560,8 @@ def patient_edit_profile():
             updated_data['profile_picture'] = g.data['profile_picture']
 
         # Update user information in the database
-        connection = psycopg2.connect(connection_string)
-        cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
+        # connection = psycopg2.connect(connection_string)
+        cursor = g.connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
         update_query = """
             UPDATE patient
             SET fname = %(fname)s, lname = %(lname)s, email = %(email)s,
@@ -592,9 +572,8 @@ def patient_edit_profile():
         updated_data['id'] = g.data['id']
 
         cursor.execute(update_query, updated_data)
-        connection.commit()
+        g.connection.commit()
         cursor.close()
-        # connection.close()
 
         flash('Your profile has been updated successfully! Please login again', category='success')
         return redirect('/patient-login_page')  # Redirect to log in to refresh
@@ -619,18 +598,15 @@ def contact_page():
         )
         mail.send(msg)
 
-        connection = psycopg2.connect(connection_string)
-        cursor = connection.cursor()
+        cursor = g.connection.cursor()
         cursor.execute(
             "INSERT INTO Patient (Message) VALUES (%s)",
             (message)
         )
-        connection.commit()
+        g.connection.commit()
         cursor.close()
-        connection.close()
     '''
     return render_template('contact.html', data= g.data)
-
 
 
 def send_reset_email(patient):
@@ -653,9 +629,13 @@ def reset_request():
     form = ForgetForm()
     if form.validate_on_submit():
         patient = Patient.query.filter_by(email=form.email.data).first()
-        send_reset_email(patient)
-        flash('An email has been sent with instructions to reset your password.', 'info')
-        return redirect(url_for('patient_login_page'))
+        if not patient:
+            flash('Email not found', 'info')
+            return redirect(url_for('reset_request'))
+        else:
+            send_reset_email(patient)
+            flash('An email has been sent with instructions to reset your password.', 'info')
+            return redirect(url_for('patient_login_page'))
     return render_template("forgetPassword.html", form=form, data=None)
 
 
@@ -663,18 +643,19 @@ def reset_request():
 def reset_token(token):
     if current_user.is_authenticated:
         return redirect(url_for('home'))
-    '''
+    form = ResetPasswordForm()
+
+    # Verify token and retrieve patient
     patient = Patient.verify_reset_token(token)
     if patient is None:
         flash('That is an invalid or expired token', category='warning')
         return redirect(url_for('reset_request'))
-    '''
-    form = ResetPasswordForm()
+
     if request.method == 'POST' and form.validate_on_submit():
+        # Update password using patient.id
         updated_data = {
             'password': form.new_password.data,
         }
-        # Update user information in the database
         connection = psycopg2.connect(connection_string)
         cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
         update_query = """
@@ -682,15 +663,14 @@ def reset_token(token):
             SET password = %(password)s
             WHERE id = %(id)s;
         """
-        updated_data['id'] = g.data['id']
+        updated_data['id'] = patient.id
 
         cursor.execute(update_query, updated_data)
         connection.commit()
         cursor.close()
-        # connection.close()
-
         flash('Your password has been updated successfully! You are now able to log in', category='success')
-        return redirect('/patient-login_page')  # Redirect to log in to refresh
+        return redirect('/patient-login_page')  # Redirect to log in
+
     return render_template("ResetPassword.html", form=form, data=None)
 
 
@@ -741,17 +721,16 @@ def callback():
         user = Patient.query.filter_by(email=email).first()
         if not user:
             # Create new user with Google information
-            connection = psycopg2.connect(connection_string)
-            cursor = connection.cursor()
+            # connection = psycopg2.connect(connection_string)
+            cursor = g.connection.cursor()
             cursor.execute(
                 "INSERT INTO Patient (fname, lname, email) VALUES (%s, %s, %s) RETURNING id",
                 (first_name, last_name, email)
             )
             # Fetch the returned data (assuming only one new user was inserted)
             new_user = cursor.fetchone()
-            connection.commit()
+            g.connection.commit()
             cursor.close()
-            # connection.close()
             user_data = {
                 "id": new_user[0],
                 "email": email,
@@ -798,10 +777,9 @@ def predict():
 
 @app.route("/dashboard")
 def dashboard():
-    connection = psycopg2.connect(connection_string)
     # most crowded day
     def appointments_per_day():
-        cursor = connection.cursor()
+        cursor = g.connection.cursor()
         cursor.execute("SELECT date FROM appointments")
         dates = cursor.fetchall()
         cursor.close()
@@ -821,7 +799,7 @@ def dashboard():
 
     # age/gender demographics
     def demographics():
-        cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
+        cursor = g.connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
         cursor.execute('''
         SELECT males FROM (SELECT CASE 
         WHEN age BETWEEN 0 AND 18 THEN '0-18'
@@ -860,7 +838,7 @@ def dashboard():
 
     # most served age group
     def most_served_age_group():
-        cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
+        cursor = g.connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
         cursor.execute('''
         SELECT CASE 
         WHEN age BETWEEN 0 AND 18 THEN '0-18'
@@ -879,7 +857,7 @@ def dashboard():
 
     # most contributing doctor
     def doctors_data():
-        cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
+        cursor = g.connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
         cursor.execute('''
         SELECT rad.d_id, d_name, SUM(billing) AS toal_billing, COUNT(*) AS appointments
         FROM radiologist AS rad JOIN report AS rep ON rad.d_id = rep.d_id
@@ -892,7 +870,7 @@ def dashboard():
 
     # total number of patients, doctors, equipments
     def total_patients_docotrs_equipments():
-        cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
+        cursor = g.connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
         cursor.execute('''
         SELECT COUNT(id) FROM patient
         ''')
@@ -910,7 +888,7 @@ def dashboard():
 
     # total revenues last month and last year
     def total_revenues_last_month_last_year():
-        cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
+        cursor = g.connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
         current_month = datetime.today().month
         year = datetime.today().year
         last_month = current_month - 1 if current_month > 1 else 12
@@ -933,15 +911,16 @@ def dashboard():
 
     # upcoming maintenances
     def upcoming_maintenances():
-        cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
+        cursor = g.connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
         print(datetime.today().strftime('%d/%m/%Y'))
-        # cursor.execute(f'''
-        # SELECT device_id, device_name, maintenance_date
-        # FROM radiology_equipment
-        # WHERE TO_DATE(maintenance_date, '%d/%m/%Y') > TO_DATE({datetime.today().strftime('%d/%m/%Y')}, '%d/%m/%Y');
-        # ''')
-        # upcoming_maintenances = cursor.fetchall()
-        return None
+        cursor.execute(f'''
+        SELECT device_id, device_name, maintenance_date
+        FROM radiology_equipment
+        WHERE maintenance_date > '{datetime.today().strftime('%Y-%m-%d')}'
+        ORDER BY maintenance_date ASC;
+        ''')
+        upcoming_maintenances = cursor.fetchall()
+        return upcoming_maintenances
     print(upcoming_maintenances())
     return render_template('dashboard.html', days=appointments_per_day(), data= g.data,
         most_crowded_day=max(appointments_per_day(), key=appointments_per_day().get), demographics=demographics(),

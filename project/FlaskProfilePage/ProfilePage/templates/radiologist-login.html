@@ -5,12 +5,13 @@
 {% block content %}
 <!--xmlns="http://www.w3.org/1999/html"-->
     <head>
-        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/patient-login.css') }}">
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/login.css') }}">
     </head>
 
     <body>
 
         <div class="loginBox">
+            <div class="content">
             <img class="logo" src="https://cdn-icons-png.flaticon.com/128/709/709094.png">
             <h1>Log In</h1>
             <form method="POST" class="form-signin">
@@ -23,5 +24,6 @@
                 {{ form.submit(class="btn btn-lg btn-block btn-success") }} </br> </br>
             </form>
         </div>
+            </div>
     </body>
 {% endblock %}

@@ -16,10 +16,10 @@
                         <div class="profile-img">
                             
                             
-                        {% if data.profile_picture is none %}
+                        {% if data.d_profile_picture is none %}
                             <img src="{{ url_for('static', filename='images/image.png') }}" class="image"/>
                         {% else %}
-                            <img src="{{ url_for('static', filename=data.profile_picture) }}" class="image"/>
+                            <img src="{{ url_for('static', filename=data.d_profile_picture) }}" class="image"/>
                         {% endif %}
                         <!-- <div class="file btn btn-lg btn-primary">
                             Change Photo
@@ -33,7 +33,7 @@
                             <a href={{data.twitter}} target="_blank"><i class="fab fa-twitter"></i> Twitter</a> -->
                             <p> </p>
                             </br>
-                            <a class="edit-profile-btn" href="/radiologist-edit_profile">Edit Profile</a>
+                            <a class="edit-profile-btn" href="/radiologist_edit_profile">Edit Profile</a>
                         </div>
                     </div>
                 </div>

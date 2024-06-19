@@ -11,7 +11,7 @@
     margin-top: 10%;
     margin-left: 13%;
     height: auto;
-    width: 1030px;
+    width: 990px;
     background: var(--primary-color);
     border-radius: 5px;
     display: flex;
@@ -45,16 +45,16 @@
     width: 390px;
     background: #fafafa;
     border-radius: 5px;
+    margin-top: 58px;
     padding: 20px 60px 30px 40px;
     box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
-    padding-top: 20px;
     height: 400px;
 }
 
 .content .left-side .profile .profile-img{
     text-align: center;
     padding: 10px;
-    padding-top: 20p;
+    padding-top: 20px;
 }
 
 .content .left-side .profile .profile-img img{
@@ -62,6 +62,8 @@
     width: 70%;
     height: 100%;
     border-radius: 5px;
+    position: relative;
+    top: 60px;
 }
 
 .content .left-side .profile .profile-img .file {
@@ -87,6 +89,8 @@
 .content .left-side .edit-profile-btn {
     background-color: #fb923c;
     color: white;
+    position: absolute;
+    top: 620px;
     border-radius: 5px;
     border-color: white;
     padding: 10px 18px;
@@ -94,7 +98,7 @@
     display: flex;
     font-size: 20px;
     cursor: pointer;
-    /*margin-top: 20px;*/
+    margin-top: 20px;
     width: 150px;
     height: 40px;
     align-items: center;
@@ -255,7 +259,7 @@
 
 .container-profile .content .right-side{
   width: 75%;
-  margin-left: 75px;
+  margin-left: 35px;
 }
 
 .content .left-side .user-data{

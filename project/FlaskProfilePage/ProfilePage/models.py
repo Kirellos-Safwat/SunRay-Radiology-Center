@@ -4,6 +4,7 @@ from ProfilePage import db, login_manager
 from ProfilePage import bcrypt
 from flask_login import UserMixin
 from itsdangerous import URLSafeTimedSerializer as Serializer
+from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 
 
 @login_manager.user_loader
@@ -44,18 +45,18 @@ class Patient(db.Model):
     profile_picture = db.Column(db.String(200))
     scans = db.Column(db.String(200))
 
-    def get_reset_token(self):
-        s = Serializer(current_app.config['SECRET_KEY'])
-        return s.dumps({'Patient_id': self.id}).encode('utf-8')
+    def get_reset_token(self, expires_sec=1800):
+        s = Serializer(current_app.config['SECRET_KEY'], expires_sec)
+        return s.dumps({'user_id': self.id}).decode('utf-8')
 
     @staticmethod
     def verify_reset_token(token):
         s = Serializer(current_app.config['SECRET_KEY'])
         try:
-            Patient_id = s.loads(token)['Patient_id']
+            user_id = s.loads(token)['user_id']
         except:
             return None
-        return Patient.query.get(Patient_id)
+        return Patient.query.get(user_id)
 
 
 class radiologist(db.Model):

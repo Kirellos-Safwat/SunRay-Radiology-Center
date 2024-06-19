@@ -13,7 +13,6 @@
     </head>
 
     <body>
-
         <header>
             <nav class="section__container nav__container">
                 <div class="nav__logo">Sun<span>Ray</span></div>
@@ -29,10 +28,14 @@
                         <li class="link"><a href="#service">Services</a></li>
                     {% endif %}
                     <li class="link"><a href="/contactUs">Contact Us</a></li>
-                    {% if template != 'home' and data is none %}
+                    {% if template == 'patient_login' %}
+                        <li class="link"><a href="/patient-register">Register</a></li>
+                    {% elif template == 'patient_register' %}
+                        <li class="link"><a href="/patient-login_page">Log In</a></li>
+                    {% elif template not in ['home', 'radiologist_login'] and data is none %}
                         <li class="link"><a href="/patient-login_page">Log In</a></li>
                         <li class="link"><a href="/patient-register">Register</a></li>
-                    {% elif data.id and template is undefined %}
+                    {% elif data.id %}
                         <li class="link"><a href="/patient-profile">Profile</a></li>    
                     {% elif data.d_id %}
                         <li class="link"><a href="/radiologist-profile">Profile</a></li>
@@ -45,7 +48,6 @@
                     <a class="btn" href="/BookAppointment">BOOK NOW</a>
                 {% endif %}
             </nav>
-
             {% if template == 'home' %}
             <div class="section__container header__container">
                 <div class="header__content">

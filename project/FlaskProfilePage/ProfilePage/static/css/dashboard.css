@@ -35,7 +35,9 @@ padding: 10px;
 }
 
 .card {
-    background: linear-gradient(to right, #283593, #1976d2);
+    background: linear-gradient(to right,
+            rgba(18, 172, 142, 0.9),
+            rgba(18, 172, 142, 0.7));
     color: #ffffff;
     padding: 20px;
     border-radius: 10px;

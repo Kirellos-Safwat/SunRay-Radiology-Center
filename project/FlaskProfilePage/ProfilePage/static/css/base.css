@@ -234,7 +234,7 @@ header {
     align-items: center;
     position: relative;
     top: 20px;
-    left: 50%;
+    left: 51.5%;
     transform: translateX(-50%);
     z-index: 1000;
     width: 90%;
@@ -243,6 +243,7 @@ header {
 
 .flash-message {
     padding: 15px;
+    margin: auto;
     margin-bottom: 10px;
     border-radius: 5px;
     font-size: 16px;
@@ -261,7 +262,7 @@ header {
     border-radius: 5px;
     font-weight: bold;
     color: #fff;  /* White text */
-    background-color:  #2ecc71;
+    background-color:  lightgreen;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     width: max-content;  /* Adjust width to fit content */
 }
@@ -273,7 +274,7 @@ header {
     border-radius: 5px;
     font-weight: bold;
     color: #fff;  /* White text */
-    background-color: #e74c3c;  /* Red background */
+    background-color: lightcoral;  /* Red background */
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     width: max-content;  /* Adjust width to fit content */
 }

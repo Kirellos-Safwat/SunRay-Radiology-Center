@@ -9,6 +9,7 @@ import pathlib
 from google_auth_oauthlib.flow import Flow
 
 
+
 app = Flask(__name__)
 connection_string =  'postgresql://hospital_owner:qx6si3HTUwNA@ep-orange-lake-a2ssd1gj.eu-central-1.aws.neon.tech/hospital?sslmode=require'
 connection = psycopg2.connect(connection_string)
