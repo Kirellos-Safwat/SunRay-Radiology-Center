@@ -44,10 +44,11 @@
                         <li class="link"><a href="/logout">Log Out</a></li>
                     {% endif %}
                 </ul>
-                {% if data.id %}
+                {% if data.id or data is none %}
                     <a class="btn" href="/BookAppointment">BOOK NOW</a>
                 {% endif %}
             </nav>
+
             {% if template == 'home' %}
             <div class="section__container header__container">
                 <div class="header__content">

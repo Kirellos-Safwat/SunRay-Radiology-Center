@@ -10,7 +10,7 @@ from flask import render_template, redirect, url_for, flash, session, request, g
 from ProfilePage.models import appointments, Patient
 from ProfilePage.forms import LoginForm, RadiologistEditProfileForm, PatientEditProfileForm, AppointmentForm, PatientRegisterForm, ReportForm, \
     RadiologistRegisterForm, ForgetForm, \
-    ResetPasswordForm
+    ResetPasswordForm, contactForm
 from flask import render_template, redirect, url_for, flash, session, request, json, jsonify
 from werkzeug.utils import secure_filename
 import os, psycopg2.extras, random
@@ -275,9 +275,12 @@ def users_page():
     # devices data1x
     cursor.execute('SELECT * FROM radiology_equipment')
     devices = cursor.fetchall()
+    # complaints
+    cursor.execute('SELECT * FROM contactus')
+    complaints = cursor.fetchall()
 
     cursor.close()
-    return render_template('users.html', patients=patients, doctors=doctors, devices=devices, data=g.data, template='users')
+    return render_template('users.html', patients=patients, doctors=doctors, devices=devices, complaints=complaints, data=g.data, template='users')
 
 
 
@@ -426,6 +429,7 @@ def patient_registration_page():
 
         flash('Registration successful. Please log in.', category='success')
         return redirect('/patient-login_page')
+
     return render_template('patient_registration.html', form=form, data=None, template='patient_register')
 
 
@@ -583,30 +587,31 @@ def patient_edit_profile():
 
 @app.route('/contactUs', methods=['GET', 'POST'])
 def contact_page():
-    if request.method == 'POST':
-        flash('We have received your message. Thank you for contacting us', category='success')
-        return redirect('/home')
-    '''
-        form = contactForm()
-        if request.method == 'POST':
-        name = request.form.get('Name')
-        email = request.form.get('Email')
-        message = request.form.get('Message')
+    form = contactForm()
+    if request.method == 'POST' and form.validate_on_submit():
 
-        msg = Message(
-            subject=f"Mail from {name}",  body=f"Name: {name}\nEmail: {email}\n\n\n{message}", sender="rawanwalid978", recipients="rawanwalid978@gmial.com"
-        )
-        mail.send(msg)
+        fname = form.First_Name.data
+        lname = form.Last_Name.data
+        email = form.Email.data
+        message = form.Message.data
 
+        # msg = Message(
+        #     subject=f"Mail from {name}",  body=f"Name: {name}\nEmail: {email}\n\n\n{message}", sender="rawanwalid978", recipients="rawanwalid978@gmial.com"
+        # )
+        # mail.send(msg)
+
+        # connection = psycopg2.connect(connection_string)
         cursor = g.connection.cursor()
         cursor.execute(
-            "INSERT INTO Patient (Message) VALUES (%s)",
-            (message)
+            "INSERT INTO contactus (c_fname,c_lname,c_email,c_message) VALUES (%s,%s,%s,%s)", (fname, lname, email, message)
         )
         g.connection.commit()
         cursor.close()
-    '''
-    return render_template('contact.html', data= g.data)
+        g.connection.close()
+        flash('We have received your message. Thank you for contacting us', category='success')
+        return redirect('/home')
+
+    return render_template('contact.html',form=form, data=g.data)
 
 
 def send_reset_email(patient):

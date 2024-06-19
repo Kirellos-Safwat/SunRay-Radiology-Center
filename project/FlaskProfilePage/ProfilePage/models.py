@@ -98,3 +98,11 @@ class report(db.Model):
         # Foreign Key To Link Users (refer to primary key of the user)
         poster_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     '''
+
+
+class Contactus(db.Model):
+    c_id = db.Column(db.Integer, primary_key=True)
+    c_fname = db.Column(db.String(100), nullable=False)
+    c_lname = db.Column(db.String(100), nullable=False)
+    c_email = db.Column(db.String(100), unique=True, nullable=False)
+    c_message = db.Column(db.String(500), nullable=False)
