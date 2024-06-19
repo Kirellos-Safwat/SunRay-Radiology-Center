@@ -13,29 +13,24 @@
                     </br> </br>
                 <div class="left-side">
                     <div class="profile">
-                        <div class="profile-img">
+
                             
                             
                         {% if data.d_profile_picture is none %}
+                            <div class="circular-frame">
                             <img src="{{ url_for('static', filename='images/image.png') }}" class="image"/>
+                            </div>
                         {% else %}
+                            <div class="circular-frame">
                             <img src="{{ url_for('static', filename=data.d_profile_picture) }}" class="image"/>
+                            </div>
                         {% endif %}
-                        <!-- <div class="file btn btn-lg btn-primary">
-                            Change Photo
-                            <input type="file" name="file"/>
-                        </div> -->
+
                         <div class="profile-work">
-                            <!-- <p id="p1">Social</p>
-                            <a href={{data.facebook}}><i class="fab fa-facebook"></i> Facebook</a><br/>
-                            <a href={{data.linkedin}} target="_blank"><i class="fab fa-linkedin"></i> LinkedIn</a><br/>
-                            <a href={{data.instagram}} target="_blank"> <i class="fab fa-instagram"></i> Instagram</a><br/>
-                            <a href={{data.twitter}} target="_blank"><i class="fab fa-twitter"></i> Twitter</a> -->
                             <p> </p>
                             </br>
                             <a class="edit-profile-btn" href="/radiologist_edit_profile">Edit Profile</a>
                         </div>
-                    </div>
                 </div>
                     </br> </br>
                     <div class="user-data">
@@ -44,11 +39,7 @@
                                 {{ data.d_name }}
                             </h5>
                             <h6>
-                                {% if data.is_admin == true %}
-                                    admin
-                                {% else %}
-                                    Doctor
-                                {% endif %}
+                                Radiologist
                             </h6>
 
                         </div>

@@ -12,12 +12,17 @@
                     </br> </br>
                 <div class="left-side">
                     <div class="profile">
-                        <div class="profile-img">
+
                             {% if data.profile_picture is none %}
-                                <img src="{{ url_for('static', filename='images/image.png') }}" class="image" />
-                            {% else %}
-                                <img src="{{ url_for('static', filename=data.profile_picture) }}" class="image" />
-                            {% endif %}
+                            <div class="circular-frame">
+                            <img src="{{ url_for('static', filename='images/image.png') }}" class="image"/>
+                            </div>
+                        {% else %}
+                            <div class="circular-frame">
+                            <img src="{{ url_for('static', filename=data.profile_picture) }}" class="image"/>
+                            </div>
+                        {% endif %}
+
                             <!-- <div class="file btn btn-lg btn-primary">
                                 Change Photo
                                 <input type="file" name="file"/>
@@ -32,7 +37,6 @@
                                 </br>
                                 <a class="edit-profile-btn" href="/patient-edit_profile">Edit Profile</a>
                             </div>
-                        </div>
                     </div>
                     </br> </br>
                     <div class="user-data">

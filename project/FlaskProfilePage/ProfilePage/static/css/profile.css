@@ -46,7 +46,7 @@
     background: #fafafa;
     border-radius: 5px;
     margin-top: 58px;
-    padding: 20px 60px 30px 40px;
+    padding: 20px 20px 20px 20px;
     box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
     height: 400px;
 }
@@ -90,7 +90,7 @@
     background-color: #fb923c;
     color: white;
     position: absolute;
-    top: 620px;
+    top: 665px;
     border-radius: 5px;
     border-color: white;
     padding: 10px 18px;
@@ -103,7 +103,7 @@
     height: 40px;
     align-items: center;
     justify-content: center;
-    margin-left: 70px;
+    margin-left: 100px;
     font-weight: bold;
 }
 
@@ -362,38 +362,22 @@
     box-shadow: 0 0 3px 3px #fb923c;
 }
 
+.circular-frame {
+    width: 200px; /* Adjust the width and height as needed */
+    height: 200px;
+    margin: auto;
+    position: relative;
+    top: 40px;
+    overflow: hidden;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 5px solid lightseagreen; /* Optional: add a border around the circle */
+}
 
-/*
-@media (max-width: 950px) {
-  .container{
-    width: 90%;
-    padding: 30px 40px 40px 35px ;
-  }
-  .container .content .right-side{
-   width: 75%;
-   margin-left: 55px;
+.circular-frame img {
+    width: 200px;
+    height: 200px;
+    display: block;
 }
-}
-@media (max-width: 820px) {
-  .container{
-    margin: 40px 0;
-    height: 100%;
-  }
-  .container .content{
-    flex-direction: column-reverse;
-  }
- .container .content .left-side{
-   width: 100%;
-   flex-direction: row;
-   margin-top: 40px;
-   justify-content: center;
-   flex-wrap: wrap;
- }
- .container .content .left-side::before{
-   display: none;
- }
- .container .content .right-side{
-   width: 100%;
-   margin-left: 0;
- }
-}*/

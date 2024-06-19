@@ -8,14 +8,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+function scrollonclick(h) {
+    const scrollPosition = document.body.scrollHeight * h;
+    window.scrollTo({
+    top: scrollPosition,
+    behavior: 'smooth'
+});
+        }
+    </script>
 </head>
 <body>
     <div class="tabs-container">
         <ul class="tabs-menu">
-            <li class="tabs-menu-item active" data-tab="tab-statistics"><p>Statistics</p></li>
-            <li class="tabs-menu-item" data-tab="tab-appointments"><p>Appointments</p></li>
-            <li class="tabs-menu-item" data-tab="tab-demographics"><p>Demographics</p></li>
-            <li class="tabs-menu-item" data-tab="tab-contributions"><p>Contributions</p></li>
+            <li class="tabs-menu-item active" data-tab="tab-statistics" onclick="scrollonclick(0.17)"><p>Statistics</p></li>
+            <li class="tabs-menu-item" data-tab="tab-appointments" onclick="scrollonclick(0.15)"><p>Appointments</p></li>
+            <li class="tabs-menu-item" data-tab="tab-demographics" onclick="scrollonclick(0.15)"><p>Demographics</p></li>
+            <li class="tabs-menu-item" data-tab="tab-contributions" onclick="scrollonclick(0.15)"><p>Contributions</p></li>
         </ul>
 <br><br><br><br>
         <div id="tab-statistics" class="tab active">

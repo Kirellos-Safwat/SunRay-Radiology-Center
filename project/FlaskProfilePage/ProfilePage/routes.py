@@ -9,7 +9,7 @@ from ProfilePage.models import Patient
 from flask import render_template, redirect, url_for, flash, session, request, g
 from ProfilePage.models import appointments, Patient
 from ProfilePage.forms import LoginForm, RadiologistEditProfileForm, PatientEditProfileForm, AppointmentForm, PatientRegisterForm, ReportForm, \
-    RadiologistRegisterForm, ForgetForm, \
+    ForgetForm, \
     ResetPasswordForm, contactForm
 from flask import render_template, redirect, url_for, flash, session, request, json, jsonify
 from werkzeug.utils import secure_filename
@@ -310,7 +310,7 @@ def radiologist_login():
             session['user_data'] = dict(user)
             data = session['user_data']
             if os.name == 'nt' and data['d_profile_picture'] is not None:
-                data['profile_picture'] = data['d_profile_picture'].replace("\\", "/")
+                data['d_profile_picture'] = data['d_profile_picture'].replace("\\", "/")
             cursor.close()  # Close the cursor once
             return redirect('/radiologist-profile')
         else:
@@ -487,9 +487,9 @@ def patient_profile_page():
     #     data['scans'] = data['scans'].replace("\\", "/")
     cursor = g.connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
     # Fetch reports for the current user's ID
-    cursor.execute(""" SELECT report.*, patient.fname, patient.lname
-                   FROM report Join patient ON report.p_id = patient.id
-                   WHERE id = %s """, (g.data['id'],))
+    cursor.execute(""" SELECT report.*, radiologist.d_name
+                   FROM report Join radiologist ON report.d_id = radiologist.d_id
+                   WHERE p_id = %s """, (g.data['id'],))
     reports = cursor.fetchall()
     cursor.close()
     if g.data is None:
@@ -653,7 +653,7 @@ def reset_token(token):
     # Verify token and retrieve patient
     patient = Patient.verify_reset_token(token)
     if patient is None:
-        flash('That is an invalid or expired token', category='warning')
+        flash('That is an invalid or expired token', category='error')
         return redirect(url_for('reset_request'))
 
     if request.method == 'POST' and form.validate_on_submit():
@@ -760,9 +760,13 @@ def callback():
 
 @app.route('/predict', methods=['GET', 'POST'])
 def predict():
+    if g.data is None or 'd_id' not in g.data:
+        return redirect('/radiologist-login')
     if request.method == 'POST':
         image_file = request.files['imagefile']
-        image_path = r"C:\Users\Egypt_Laptop\Desktop\database final project\his-finalproject-database_sbe_spring24_team6\project\FlaskProfilePage\ProfilePage\images" + image_file.filename
+        filename = secure_filename(image_file.filename)
+        image_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        print(image_path)
         image_file.save(image_path)
         img = image.load_img(image_path)
         img_array = image.img_to_array(img)
@@ -783,6 +787,8 @@ def predict():
 @app.route("/dashboard")
 def dashboard():
     # most crowded day
+    if g.data is None or 'admin_id' not in g.data:
+        return redirect('/login')
     def appointments_per_day():
         cursor = g.connection.cursor()
         cursor.execute("SELECT date FROM appointments")
@@ -917,7 +923,6 @@ def dashboard():
     # upcoming maintenances
     def upcoming_maintenances():
         cursor = g.connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
-        print(datetime.today().strftime('%d/%m/%Y'))
         cursor.execute(f'''
         SELECT device_id, device_name, maintenance_date
         FROM radiology_equipment
@@ -926,7 +931,6 @@ def dashboard():
         ''')
         upcoming_maintenances = cursor.fetchall()
         return upcoming_maintenances
-    print(upcoming_maintenances())
     return render_template('dashboard.html', days=appointments_per_day(), data= g.data,
         most_crowded_day=max(appointments_per_day(), key=appointments_per_day().get), demographics=demographics(),
         most_served_age_group=most_served_age_group(), doctors_data=doctors_data(),

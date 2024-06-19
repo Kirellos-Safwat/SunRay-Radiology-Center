@@ -20,7 +20,6 @@ class radiology_equipment(db.Model, UserMixin):
     out_of_order = db.Column(db.Boolean(), default=False)
 
 
-
 class appointments(db.Model, UserMixin):
     a_id = db.Column(db.Integer(), primary_key=True)
     p_id = db.Column(db.Integer(), db.ForeignKey('patient.P_ID'), nullable=True)
@@ -73,6 +72,7 @@ class radiologist(db.Model):
 
     def __repr__(self):
         return f'Patient {self.p_name}'
+
 
 class report(db.Model):
     r_id = db.Column(db.Integer, primary_key=True)
