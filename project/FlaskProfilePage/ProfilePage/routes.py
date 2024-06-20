@@ -972,7 +972,16 @@ def dashboard():
         ''')
         upcoming_maintenances = cursor.fetchall()
         return upcoming_maintenances
+    def out_of_service():
+        cursor = g.connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
+        cursor.execute(f'''
+        SELECT device_id, device_name
+        FROM radiology_equipment
+        WHERE out_of_order;
+        ''')
+        out_of_service = cursor.fetchall()
+        return out_of_service
     return render_template('dashboard.html', days=appointments_per_day(), data= g.data,
         most_crowded_day=max(appointments_per_day(), key=appointments_per_day().get), demographics=demographics(),
         most_served_age_group=most_served_age_group(), doctors_data=doctors_data(),
-        total_patients_docotrs_equipments=total_patients_docotrs_equipments(), total_revenues_last_month_last_year=total_revenues_last_month_last_year(), upcoming_maintenances=upcoming_maintenances(), template='dashboard')
+        total_patients_docotrs_equipments=total_patients_docotrs_equipments(), total_revenues_last_month_last_year=total_revenues_last_month_last_year(), upcoming_maintenances=upcoming_maintenances(), out_of_service=out_of_service(), template='dashboard')
