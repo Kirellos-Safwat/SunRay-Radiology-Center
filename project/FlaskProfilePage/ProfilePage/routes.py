@@ -1,18 +1,14 @@
 import psycopg2.extras
 from datetime import datetime
-from google.oauth2 import id_token
-from sqlalchemy.testing.plugin.plugin_base import post
-from ProfilePage import app, db, connection_string, mail, bcrypt, flow, GOOGLE_CLIENT_ID
+from ProfilePage import app, db, connection_string, mail, flow, GOOGLE_CLIENT_ID
 from flask_login import current_user
 from flask_mail import Message
 from ProfilePage.models import Patient
-from flask import render_template, redirect, url_for, flash, session, request, g
-from ProfilePage.models import appointments, Patient
 from ProfilePage.forms import LoginForm, RadiologistEditProfileForm, PatientEditProfileForm, AppointmentForm, \
     PatientRegisterForm, ReportForm, \
     ForgetForm, \
     ResetPasswordForm, contactForm
-from flask import render_template, redirect, url_for, flash, session, request, json, jsonify
+from flask import render_template, redirect, url_for, flash, session, request,g
 from werkzeug.utils import secure_filename
 import os, psycopg2.extras, random
 import requests
@@ -20,30 +16,25 @@ from google.oauth2 import id_token
 from pip._vendor import cachecontrol
 import google.auth.transport.requests
 import tensorflow as tf
-
-
-from tensorflow import keras
-from keras.models import load_model
-# from PIL import Image
 from keras.src.optimizers import Adamax
 from tensorflow.keras.preprocessing import image
-from keras.preprocessing.image import load_img, img_to_array
 
-model = tf.keras.models.load_model(
-    r"C:\Users\Anas Mohamed\Desktop\DB_project\his-finalproject-database_sbe_spring24_team6\project\FlaskProfilePage\ProfilePage\brain_tumor_v2.h5",
-    compile=False)
-model.compile(Adamax(learning_rate=0.001), loss='categorical_crossentropy', metrics=['accuracy'])
-
-pneumonia_model = tf.keras.models.load_model(
-    r'C:\Users\Anas Mohamed\Desktop\DB_project\his-finalproject-database_sbe_spring24_team6\project\FlaskProfilePage\ProfilePage\pneumonia_detection_v2.h5',
-    compile=False)
-pneumonia_model.compile(Adamax(learning_rate = 0.0001) , loss = 'categorical_crossentropy', metrics = ['accuracy'])
+# model = tf.keras.models.load_model(
+#     r"C:\Users\Anas Mohamed\Desktop\DB_project\his-finalproject-database_sbe_spring24_team6\project\FlaskProfilePage\ProfilePage\brain_tumor_v2.h5",
+#     compile=False)
+# model.compile(Adamax(learning_rate=0.001), loss='categorical_crossentropy', metrics=['accuracy'])
+#
+# pneumonia_model = tf.keras.models.load_model(
+#     r'C:\Users\Anas Mohamed\Desktop\DB_project\his-finalproject-database_sbe_spring24_team6\project\FlaskProfilePage\ProfilePage\pneumonia_detection_v2.h5',
+#     compile=False)
+# pneumonia_model.compile(Adamax(learning_rate = 0.0001) , loss = 'categorical_crossentropy', metrics = ['accuracy'])
 
 
 @app.before_request
 def load_user_data():
     g.data = session.get('user_data')  # Use Flask's global `g` object
     g.connection = psycopg2.connect(connection_string)
+
 
 
 @app.route('/')  # that is the root url of the website
@@ -83,20 +74,43 @@ def edit_data():
                 DELETE FROM radiologist 
                 WHERE d_id = %s;
             """
+        if table == 'device':
+            update_query = """
+                DELETE FROM radiology_equipment 
+                WHERE device_id = %s;
+            """
+        if table == 'complaint':
+            update_query = """
+                DELETE FROM contactus 
+                WHERE c_id = %s;
+            """
         cursor.execute(update_query, (str(delete_id),))
+    #  adding new doctor / device
+    elif 'new' in data and data['new']:
+        if table == 'doctor':
+            new_data = {
+                'd_name': data['d_name'],
+                'd_phone': data['d_phone'],
+                'd_email': data['d_email']
+            }
+            add_query = """
+                INSERT INTO radiologist(d_name, d_email, d_phone)
+                VALUES(%(d_name)s, %(d_email)s, %(d_phone)s)
+            """
+        if table == 'device':
+            print('test1')
+            new_data = {
+                'device_name': data['device_name'] if 'device_name' in data else 'null',
+                'commission_date': data['commission_date'] if 'commission_date' in data else 'null',
+                'maintenance_date': data['maintenance_date'] if 'maintenance_date' in data else 'null',
+                'out_of_order': data['out_of_order'] if 'out_of_order' in data else 'False',
+            }
+            add_query = """
+                INSERT INTO radiology_equipment(device_name, commission_date, maintenance_date, out_of_order)
+                VALUES(%(device_name)s, %(commission_date)s, %(maintenance_date)s, %(out_of_order)s)
+            """
+        cursor.execute(add_query, new_data)
     # handle editing
-    elif 'new' in data:
-        doctor_data = {
-            'd_name': data['d_name'],
-            'd_phone': data['d_phone'],
-            'd_email': data['d_email']
-        }
-        add_query = """
-            INSERT INTO radiologist(d_name, d_email, d_phone)
-            VALUES(%(d_name)s, %(d_email)s, %(d_phone)s)
-        """
-        cursor.execute(add_query, doctor_data)
-    # adding new doctor
     elif 'id' in data or 'd_id' in data:
         update_data = data
         if table == 'patient':
@@ -116,6 +130,15 @@ def edit_data():
                 for key, value in update_data.items()
                 if key != 'id' and key != 'table')}
                 WHERE d_id = {update_data['id']};
+            """
+        if table == 'device':
+            update_query = f"""
+                UPDATE radiology_equipment SET 
+                {', '.join(
+                f"{key} = '{value}'"
+                for key, value in update_data.items()
+                if key != 'id' and key != 'table')}
+                WHERE device_id = {update_data['id']};
             """
         cursor.execute(update_query, update_data)
     cursor.close()
@@ -222,6 +245,8 @@ def report_page():
             profile_photo.save(profile_photo_path)
             relative_photo_path = os.path.join('uploads', filename)
 
+
+
             p_name = form.patients.data
 
             cursor.execute("SELECT id FROM patient WHERE concat(fname,' ',lname) = %s", (p_name,))
@@ -233,8 +258,7 @@ def report_page():
 
             cursor.execute(
                 "INSERT INTO report (p_id, d_id, device_id, r_time, r_scan, r_study_area, radiation_dose, r_findings, r_result, billing) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
-                (p_id, d_id, device_id, r_time, relative_photo_path, r_study_area, radiation_dose, r_findings, r_result,
-                 billing)
+                (p_id, d_id, device_id, r_time, relative_photo_path, r_study_area, radiation_dose, r_findings, r_result, billing)
             )
             g.connection.commit()
             g.connection.close()
@@ -290,8 +314,8 @@ def users_page():
 
     cursor.close()
     g.connection.close()
-    return render_template('users.html', patients=patients, doctors=doctors, devices=devices, complaints=complaints,
-                           data=g.data, template='users')
+    return render_template('users.html', patients=patients, doctors=doctors, devices=devices, complaints=complaints, data=g.data, template='database')
+
 
 
 @app.route('/logout')
@@ -326,8 +350,7 @@ def radiologist_login():
         else:
             flash('Incorrect Email or password. Please try again.', category='error')
 
-    return render_template('radiologist-login.html', form=LoginForm(), data=data if 'data' in locals() else None,
-                           template='radiologist_login')
+    return render_template('radiologist-login.html', form=LoginForm(), data=data if 'data' in locals() else None, template='radiologist_login')
 
 
 @app.route('/radiologist-profile')
@@ -358,8 +381,7 @@ def radiologist_profile_page():
 
     cursor.close()
     g.connection.close()
-    return render_template('radiologist-profile.html', data=g.data, appointments=appointments,
-                           template='radiologist_profile', reports=reports)
+    return render_template('radiologist-profile.html', data=g.data, appointments=appointments , template = 'radiologist_profile',reports=reports)
 
 
 @app.route('/radiologist_edit_profile', methods=['GET', 'POST'])
@@ -407,7 +429,7 @@ def radiologist_edit_profile():
         flash('Your profile has been updated successfully! Please login again', category='success')
         return redirect('/radiologist-login')  # Redirect to log in to refresh
 
-    return render_template('radiologist_edit_profile.html', data=g.data, form=form, template='radiologist_edit_profile')
+    return render_template('radiologist_edit_profile.html', data=g.data, form=form, template = 'radiologist_edit_profile')
 
 
 #######################################################################
@@ -431,7 +453,7 @@ def patient_registration_page():
             relative_photo_path = None
 
         # connection = psycopg2.connect(connection_string)
-        cursor = g.connection.cursor()
+        cursor = g.connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
         cursor.execute(
             "INSERT INTO Patient (fname, lname, email, phone, password, profile_picture) VALUES (%s, %s, %s, %s, %s, %s)",
             (fname, lname, email, phone, password, relative_photo_path)
@@ -457,7 +479,7 @@ def patient_login_page():
         )
         user = cursor.fetchone()
         cursor.close()  # Close the cursor once
-        g.connection.close()
+        g.connection.close()        
         if user:
             session['user_data'] = dict(user)
             data = session['user_data']
@@ -470,8 +492,7 @@ def patient_login_page():
         else:
             flash('Incorrect Email or password. Please try again.', category='error')
 
-    return render_template('patient-login.html', form=LoginForm(), data=data if 'data' in locals() else None,
-                           template='patient_login')
+    return render_template('patient-login.html', form=LoginForm(), data=data if 'data' in locals() else None, template = 'patient_login')
 
 
 @app.route('/patient-profile')
@@ -507,8 +528,7 @@ def patient_profile_page():
     reports = cursor.fetchall()
     cursor.close()
     g.connection.close()
-    return render_template('patient-profile.html', data=g.data, scan_Files=scan_Files, appointments=appointments,
-                           reports=reports)
+    return render_template('patient-profile.html', data=g.data, scan_Files=scan_Files, appointments=appointments, reports=reports)
 
 
 @app.route('/upload_scan', methods=['GET', 'POST'])
@@ -614,7 +634,7 @@ def contact_page():
         # mail.send(msg)
 
         # connection = psycopg2.connect(connection_string)
-        cursor = g.connection.cursor()
+        cursor = g.connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
         cursor.execute(
             "INSERT INTO contactus (c_fname,c_lname,c_email,c_message) VALUES (%s,%s,%s,%s)",
             (fname, lname, email, message)
@@ -742,7 +762,7 @@ def callback():
         if not user:
             # Create new user with Google information
             # connection = psycopg2.connect(connection_string)
-            cursor = g.connection.cursor()
+            cursor = g.connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
             cursor.execute(
                 "INSERT INTO Patient (fname, lname, email) VALUES (%s, %s, %s) RETURNING id",
                 (first_name, last_name, email)
@@ -832,7 +852,7 @@ def dashboard():
         return redirect('/login')
 
     def appointments_per_day():
-        cursor = g.connection.cursor()
+        cursor = g.connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
         cursor.execute("SELECT date FROM appointments")
         dates = cursor.fetchall()
         cursor.close()
@@ -973,11 +993,16 @@ def dashboard():
         ''')
         upcoming_maintenances = cursor.fetchall()
         return upcoming_maintenances
-
-    g.connection.close()
-    return render_template('dashboard.html', days=appointments_per_day(), data=g.data,
-                           most_crowded_day=max(appointments_per_day(), key=appointments_per_day().get),
-                           demographics=demographics(),
-                           most_served_age_group=most_served_age_group(), doctors_data=doctors_data(),
-                           total_patients_docotrs_equipments=total_patients_docotrs_equipments(),
-                           total_revenues_last_month_last_year=total_revenues_last_month_last_year())
+    def out_of_service():
+        cursor = g.connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
+        cursor.execute(f'''
+        SELECT device_id, device_name
+        FROM radiology_equipment
+        WHERE out_of_order;
+        ''')
+        out_of_service = cursor.fetchall()
+        return out_of_service
+    return render_template('dashboard.html', days=appointments_per_day(), data= g.data,
+        most_crowded_day=max(appointments_per_day(), key=appointments_per_day().get), demographics=demographics(),
+        most_served_age_group=most_served_age_group(), doctors_data=doctors_data(),
+        total_patients_docotrs_equipments=total_patients_docotrs_equipments(), total_revenues_last_month_last_year=total_revenues_last_month_last_year(), upcoming_maintenances=upcoming_maintenances(), out_of_service=out_of_service(), template='dashboard')

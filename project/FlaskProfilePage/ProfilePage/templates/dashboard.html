@@ -25,8 +25,10 @@ function scrollonclick(h) {
             <li class="tabs-menu-item" data-tab="tab-appointments" onclick="scrollonclick(0.15)"><p>Appointments</p></li>
             <li class="tabs-menu-item" data-tab="tab-demographics" onclick="scrollonclick(0.15)"><p>Demographics</p></li>
             <li class="tabs-menu-item" data-tab="tab-contributions" onclick="scrollonclick(0.15)"><p>Contributions</p></li>
+            <li class="tabs-menu-item" data-tab="tab-maintenances" onclick="scrollonclick(0.15)"><p>Upcoming Maintenances</p></li>
+            <li class="tabs-menu-item" data-tab="tab-out_of_service" onclick="scrollonclick(0.15)"><p>Out Of Service Devices</li>
         </ul>
-<br><br><br><br>
+        <br><br><br><br>
         <div id="tab-statistics" class="tab active">
             <div class="card-container">
                 <div class="card">
@@ -75,8 +77,7 @@ function scrollonclick(h) {
         </div>
 
         <div id="tab-contributions" class="tab">
-            <div>
-                <table >
+                 <table class="table custom-table">
                     <thead>
                         <tr>
                             <th scope="col">ID</th>
@@ -89,14 +90,54 @@ function scrollonclick(h) {
                         {% for doctor in doctors_data %}
                         <tr data-id="{{ doctor.d_id }}" data-table="doctor">
                             <td>{{ doctor.d_id }}</td>
-                            <td data-field="d_name">{{ doctor.d_name }}</td>
-                            <td data-field="d_email">{{ doctor.toal_billing }}</td>
-                            <td data-field="d_phone">{{ doctor.appointments }}</td>
+                            <td>{{ doctor.d_name }}</td>
+                            <td>{{ doctor.toal_billing }}</td>
+                            <td>{{ doctor.appointments }}</td>
                         </tr>
                         {% endfor %}
                     </tbody>
                 </table>
-            </div>
+        </div>
+        <div id="tab-maintenances" class="tab">
+               <table class="table custom-table">
+                    <thead>
+                        <tr>
+                            <th scope="col">ID</th>
+                            <th scope="col">Device Name</th>
+                            <th scope="col">Maintenance Date</th>
+                        </tr>
+                    </thead>
+                    <tbody id="devices">
+                        {% for device in upcoming_maintenances %}
+                        <tr data-id="{{ device.device_id }}" data-table="doctor">
+                            <td>{{ device.device_id }}</td>
+                            <td>{{ device.device_name }}</td>
+                            <td>{{ device.maintenance_date }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+        </div>
+        <div id="tab-out_of_service" class="tab">
+
+                <table class="table custom-table">
+                    <thead>
+                        <tr>
+                            <th scope="col">ID</th>
+                            <th scope="col">Device Name</th>
+                            <th scope="col"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="devices">
+                        {% for device in out_of_service %}
+                        <tr data-id="{{ device.device_id }}" data-table="doctor">
+                            <td>{{ device.device_id }}</td>
+                            <td>{{ device.device_name }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
         </div>
     </div>
 
@@ -147,8 +188,9 @@ function scrollonclick(h) {
                 },
                 options: {
                     animation: {
-                        duration: 2000, // Animation duration in milliseconds
-                        easing: 'easeOutBounce' // Animation easing effect
+                        delay: (context) => context.datasetIndex * 300,
+                        duration: 1000,
+                        easing: 'easeOutCirc'
                     },
                     scales: {
                         y: {
@@ -188,8 +230,9 @@ function scrollonclick(h) {
                 },
                 options: {
                     animation: {
-                        duration: 2000, // Animation duration in milliseconds
-                        easing: 'easeOutBounce' // Animation easing effect
+                        delay: (context) => context.datasetIndex * 300,
+                        duration: 1000,
+                        easing: 'easeInOutBack'
                     },
                     scales: {
                         y: {
