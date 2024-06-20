@@ -173,17 +173,17 @@ function scrollonclick() {
                             <th scope="col">message</th>
                         </tr>
                     </thead>
-                    <tbody id="complaintsTable">
+                    <tbody id="complaints">
                         {% for complaint in complaints %}
-                        <tr data-id="{{ complaint.device_id }}" data-table="complaint">
+                        <tr data-id="{{ complaint.c_id }}" data-table="complaint">
                             <td>{{ complaint.c_id }}</td>
-                            <td class="editable" data-field="c_fname">{{ complaint.c_fname }}</td>
-                            <td class="editable" data-field="c_lname">{{ complaint.c_lname }}</td>
-                            <td class="editable" data-field="c_email">{{ complaint.c_email }}</td>
-                            <td class="editable" data-field="c_message">{{ complaint.c_message }}</td>
+                            <td data-field="c_fname">{{ complaint.c_fname }}</td>
+                            <td data-field="c_lname">{{ complaint.c_lname }}</td>
+                            <td data-field="c_email">{{ complaint.c_email }}</td>
+                            <td data-field="c_message">{{ complaint.c_message }}</td>
                             <td>
                                 <button class="icon-button2 save-btn" style="display: none;"><img class="logo" src="static/photos/savegreen.png"></button>
-                                <button class="icon-button delete-btn" data-id="{{ complaint.complaint_id }}" data-table="complaint" style="position: relative; left: 10px;"><img class="logo" src="static/photos/trashred.png" alt="Delete"></button>
+                                <button class="icon-button delete-btn" data-id="{{ complaint.c_id }}" data-table="complaint" style="position: relative; left: 10px;"><img class="logo" src="static/photos/trashred.png" alt="Delete"></button>
                             </td>
                         </tr>
                         {% endfor %}

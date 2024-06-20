@@ -62,6 +62,7 @@ def home_page():
 @app.route('/edit_data', methods=['POST'])
 def edit_data():
     data = request.get_json()
+    print(data)
     table = data.get('table')
     cursor = g.connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
     # handle deleting
@@ -77,8 +78,18 @@ def edit_data():
                 DELETE FROM radiologist 
                 WHERE d_id = %s;
             """
+        if table == 'device':
+            update_query = """
+                DELETE FROM radiology_equipment 
+                WHERE device_id = %s;
+            """
+        if table == 'complaint':
+            update_query = """
+                DELETE FROM contactus 
+                WHERE c_id = %s;
+            """
         cursor.execute(update_query, (str(delete_id),))
-    # handle editing
+    #  adding new doctor
     elif 'new' in data:
         doctor_data = {
             'd_name': data['d_name'],
@@ -90,7 +101,7 @@ def edit_data():
             VALUES(%(d_name)s, %(d_email)s, %(d_phone)s)
         """
         cursor.execute(add_query, doctor_data)
-    # adding new doctor
+    # handle editing
     elif 'id' in data or 'd_id' in data:
         update_data = data
         if table == 'patient':
@@ -110,6 +121,15 @@ def edit_data():
                 for key, value in update_data.items()
                 if key != 'id' and key != 'table')}
                 WHERE d_id = {update_data['id']};
+            """
+        if table == 'device':
+            update_query = f"""
+                UPDATE radiology_equipment SET 
+                {', '.join(
+                f"{key} = '{value}'"
+                for key, value in update_data.items()
+                if key != 'id' and key != 'table')}
+                WHERE device_id = {update_data['id']};
             """
         cursor.execute(update_query, update_data)
     cursor.close()
