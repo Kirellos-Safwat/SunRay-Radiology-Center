@@ -55,6 +55,7 @@ def home_page():
             ''')
     special_doctors = cursor.fetchall()
     cursor.close()
+    g.connection.close()
     return render_template('home.html', data=g.data, template='home', special_doctors=special_doctors)
 
 
@@ -113,6 +114,7 @@ def edit_data():
         cursor.execute(update_query, update_data)
     cursor.close()
     g.connection.commit()
+    g.connection.close()
     return redirect(url_for('users_page'))
 
 
@@ -230,6 +232,7 @@ def report_page():
                 (p_id, d_id, device_id, r_time, relative_photo_path, r_study_area, radiation_dose, r_findings, r_result, billing)
             )
             g.connection.commit()
+            g.connection.close()
             cursor.close()
 
             flash('The report was submitted successfully', category='success')
@@ -248,11 +251,12 @@ def login_admin():
             (email, password)
         )
         user = cursor.fetchone()
+        cursor.close()  # Close the cursor once
+        g.connection.close()
         data = None
         if user:
             session['user_data'] = dict(user)
             data = session['user_data']
-            cursor.close()  # Close the cursor once
             return redirect('/users')
         else:
             flash('Incorrect Email or password. Please try again.', category='error')
@@ -280,6 +284,7 @@ def users_page():
     complaints = cursor.fetchall()
 
     cursor.close()
+    g.connection.close()
     return render_template('users.html', patients=patients, doctors=doctors, devices=devices, complaints=complaints, data=g.data, template='users')
 
 
@@ -305,13 +310,13 @@ def radiologist_login():
             (d_email, d_password)
         )
         user = cursor.fetchone()
-        data = None
+        cursor.close()  # Close the cursor once
+        g.connection.close()
         if user:
             session['user_data'] = dict(user)
             data = session['user_data']
             if os.name == 'nt' and data['d_profile_picture'] is not None:
                 data['d_profile_picture'] = data['d_profile_picture'].replace("\\", "/")
-            cursor.close()  # Close the cursor once
             return redirect('/radiologist-profile')
         else:
             flash('Incorrect Email or password. Please try again.', category='error')
@@ -345,8 +350,8 @@ def radiologist_profile_page():
             if report['r_scan'] is not None:
                 report['r_scan'] = report['r_scan'].replace("\\", "/")
 
-    print(reports)
     cursor.close()
+    g.connection.close()
     return render_template('radiologist-profile.html', data=g.data, appointments=appointments , template = 'radiologist_profile',reports=reports)
 
 
@@ -391,7 +396,7 @@ def radiologist_edit_profile():
         cursor.execute(update_query, updated_data)
         g.connection.commit()
         cursor.close()
-
+        g.connection.close()
         flash('Your profile has been updated successfully! Please login again', category='success')
         return redirect('/radiologist-login')  # Redirect to log in to refresh
 
@@ -426,7 +431,7 @@ def patient_registration_page():
         )
         g.connection.commit()
         cursor.close()
-
+        g.connection.close()
         flash('Registration successful. Please log in.', category='success')
         return redirect('/patient-login_page')
 
@@ -444,7 +449,8 @@ def patient_login_page():
             (email, password)
         )
         user = cursor.fetchone()
-        data = None
+        cursor.close()  # Close the cursor once
+        g.connection.close()        
         if user:
             session['user_data'] = dict(user)
             data = session['user_data']
@@ -452,7 +458,7 @@ def patient_login_page():
                 data['scans'] = data['scans'].replace("\\", "/")
             if os.name == 'nt' and data['profile_picture'] is not None:
                 data['profile_picture'] = data['profile_picture'].replace("\\", "/")
-            cursor.close()  # Close the cursor once
+
             return redirect('/patient-profile')
         else:
             flash('Incorrect Email or password. Please try again.', category='error')
@@ -492,8 +498,7 @@ def patient_profile_page():
                    WHERE p_id = %s """, (g.data['id'],))
     reports = cursor.fetchall()
     cursor.close()
-    if g.data is None:
-        return redirect('/patient-login')
+    g.connection.close()
     return render_template('patient-profile.html', data=g.data, scan_Files=scan_Files, appointments=appointments, reports=reports)
 
 
@@ -530,9 +535,9 @@ def patient_upload_scan():
         "UPDATE patient SET scans = %s WHERE id = %s",
         (relative_scan_folder, g.data['id'])
     )  # insert to the specific patient
-    g.connection.commit()
     cursor.close()
-
+    g.connection.commit()
+    g.connection.close()
     return render_template('upload_scan.html', data=g.data, scan_files=scan_files)
 
 
@@ -576,9 +581,9 @@ def patient_edit_profile():
         updated_data['id'] = g.data['id']
 
         cursor.execute(update_query, updated_data)
-        g.connection.commit()
         cursor.close()
-
+        g.connection.commit()
+        g.connection.close()
         flash('Your profile has been updated successfully! Please login again', category='success')
         return redirect('/patient-login_page')  # Redirect to log in to refresh
 
@@ -605,8 +610,8 @@ def contact_page():
         cursor.execute(
             "INSERT INTO contactus (c_fname,c_lname,c_email,c_message) VALUES (%s,%s,%s,%s)", (fname, lname, email, message)
         )
-        g.connection.commit()
         cursor.close()
+        g.connection.commit()
         g.connection.close()
         flash('We have received your message. Thank you for contacting us', category='success')
         return redirect('/home')
@@ -620,10 +625,10 @@ def send_reset_email(patient):
                   sender='noreply@demo.com',
                   recipients=[patient.email])
     msg.body = f'''To reset your password, visit the following link:
-{url_for('reset_token', token=token, _external=True)}
+    {url_for('reset_token', token=token, _external=True)}
 
-If you did not make this request then simply ignore this email and no changes will be made.
-'''
+    If you did not make this request then simply ignore this email and no changes will be made.
+    '''
     mail.send(msg)
 
 
@@ -671,8 +676,9 @@ def reset_token(token):
         updated_data['id'] = patient.id
 
         cursor.execute(update_query, updated_data)
-        connection.commit()
         cursor.close()
+        connection.commit()
+        g.connection.close()
         flash('Your password has been updated successfully! You are now able to log in', category='success')
         return redirect('/patient-login_page')  # Redirect to log in
 
@@ -736,6 +742,7 @@ def callback():
             new_user = cursor.fetchone()
             g.connection.commit()
             cursor.close()
+            g.connection.close()
             user_data = {
                 "id": new_user[0],
                 "email": email,
@@ -931,6 +938,7 @@ def dashboard():
         ''')
         upcoming_maintenances = cursor.fetchall()
         return upcoming_maintenances
+    g.connection.close()
     return render_template('dashboard.html', days=appointments_per_day(), data= g.data,
         most_crowded_day=max(appointments_per_day(), key=appointments_per_day().get), demographics=demographics(),
         most_served_age_group=most_served_age_group(), doctors_data=doctors_data(),
