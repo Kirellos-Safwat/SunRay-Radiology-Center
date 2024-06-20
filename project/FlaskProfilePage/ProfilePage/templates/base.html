@@ -30,8 +30,9 @@
                     {% endif %}
                     {% if data.admin_id is none or data.admin_id is undefined %}
                         <li class="link"><a href="/contactUs">Contact Us</a></li>
-                    {% else %}
+                    {% elif template != 'dashboard' %}
                         <li class="link"><a href="/dashboard">Dashboard</a></li>
+                    {% elif template != 'database' %}
                         <li class="link"><a href="/users">DataBase</a></li>
                     {% endif %}
                     {% if template == 'patient_login' %}

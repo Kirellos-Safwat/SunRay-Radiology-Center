@@ -118,3 +118,45 @@ td{
     font-size: 24px;
 }
 
+/* upcoming maintenances table  */
+#tab-maintenances table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 18px;
+    text-align: left;
+}
+
+#tab-maintenances th, #tab-maintenances td {
+    padding: 12px;
+    border-bottom: 1px solid #ddd;
+}
+
+#tab-maintenances th {
+    background-color: #f2f2f2;
+    color: #333;
+}
+
+#tab-maintenances tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+#tab-maintenances tr:hover {
+    background-color: #f1f1f1;
+}
+
+#tab-maintenances tr[data-id]:hover {
+    cursor: pointer;
+    background-color: #e0e0e0;
+}
+
+#tab-maintenances th, #tab-maintenances td {
+    text-align: center;
+}
+
+#tab-maintenances h3 {
+    margin-bottom: 20px;
+    color: #333;
+    font-size: 24px;
+}
+
