@@ -49,6 +49,11 @@ function scrollonclick() {
                     <img src="static/photos/heart.png" class="tab-icon" alt="Device Icon">Commissioned Devices
                 </a>
             </li>
+            <li class="nav-item">
+                <a class="nav-link" id="complaints-tab" data-toggle="tab" href="#complaints" role="tab" aria-controls="complaints" aria-selected="false">
+                    <img src="static/photos/complaints.png" class="tab-icon" alt="Device Icon">Complaints
+                </a>
+            </li>
         </ul>
         <div class="tab-content" id="myTabContent">
             <div class="tab-pane fade show active" id="patients" role="tabpanel" aria-labelledby="patients-tab">
@@ -164,6 +169,12 @@ function scrollonclick() {
                         {% endfor %}
                     </tbody>
                 </table>
+            </div>
+            <div class="tab-pane fade" id="complaints" role="tabpanel" aria-labelledby="complaints-tab">
+                <br>
+                <h3>Complaints</h3>
+                
+                <br>
                 <table class="table custom-table">
                     <thead>
                         <tr>
