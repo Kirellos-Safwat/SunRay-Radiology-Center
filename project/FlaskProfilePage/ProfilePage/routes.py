@@ -89,18 +89,31 @@ def edit_data():
                 WHERE c_id = %s;
             """
         cursor.execute(update_query, (str(delete_id),))
-    #  adding new doctor
-    elif 'new' in data:
-        doctor_data = {
-            'd_name': data['d_name'],
-            'd_phone': data['d_phone'],
-            'd_email': data['d_email']
-        }
-        add_query = """
-            INSERT INTO radiologist(d_name, d_email, d_phone)
-            VALUES(%(d_name)s, %(d_email)s, %(d_phone)s)
-        """
-        cursor.execute(add_query, doctor_data)
+    #  adding new doctor / device
+    elif 'new' in data and data['new']:
+        if table == 'doctor':
+            new_data = {
+                'd_name': data['d_name'],
+                'd_phone': data['d_phone'],
+                'd_email': data['d_email']
+            }
+            add_query = """
+                INSERT INTO radiologist(d_name, d_email, d_phone)
+                VALUES(%(d_name)s, %(d_email)s, %(d_phone)s)
+            """
+        if table == 'device':
+            print('test1')
+            new_data = {
+                'device_name': data['device_name'] if 'device_name' in data else 'null',
+                'commission_date': data['commission_date'] if 'commission_date' in data else 'null',
+                'maintenance_date': data['maintenance_date'] if 'maintenance_date' in data else 'null',
+                'out_of_order': data['out_of_order'] if 'out_of_order' in data else 'False',
+            }
+            add_query = """
+                INSERT INTO radiology_equipment(device_name, commission_date, maintenance_date, out_of_order)
+                VALUES(%(device_name)s, %(commission_date)s, %(maintenance_date)s, %(out_of_order)s)
+            """
+        cursor.execute(add_query, new_data)
     # handle editing
     elif 'id' in data or 'd_id' in data:
         update_data = data
@@ -444,7 +457,7 @@ def patient_registration_page():
             relative_photo_path = None
 
         # connection = psycopg2.connect(connection_string)
-        cursor = g.connection.cursor()
+        cursor = g.connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
         cursor.execute(
             "INSERT INTO Patient (fname, lname, email, phone, password, profile_picture) VALUES (%s, %s, %s, %s, %s, %s)",
             (fname, lname, email, phone, password, relative_photo_path)
@@ -626,7 +639,7 @@ def contact_page():
         # mail.send(msg)
 
         # connection = psycopg2.connect(connection_string)
-        cursor = g.connection.cursor()
+        cursor = g.connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
         cursor.execute(
             "INSERT INTO contactus (c_fname,c_lname,c_email,c_message) VALUES (%s,%s,%s,%s)", (fname, lname, email, message)
         )
@@ -753,7 +766,7 @@ def callback():
         if not user:
             # Create new user with Google information
             # connection = psycopg2.connect(connection_string)
-            cursor = g.connection.cursor()
+            cursor = g.connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
             cursor.execute(
                 "INSERT INTO Patient (fname, lname, email) VALUES (%s, %s, %s) RETURNING id",
                 (first_name, last_name, email)
@@ -817,7 +830,7 @@ def dashboard():
     if g.data is None or 'admin_id' not in g.data:
         return redirect('/login')
     def appointments_per_day():
-        cursor = g.connection.cursor()
+        cursor = g.connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
         cursor.execute("SELECT date FROM appointments")
         dates = cursor.fetchall()
         cursor.close()
@@ -958,6 +971,7 @@ def dashboard():
         ''')
         upcoming_maintenances = cursor.fetchall()
         return upcoming_maintenances
+    print(upcoming_maintenances())
     g.connection.close()
     return render_template('dashboard.html', days=appointments_per_day(), data= g.data,
         most_crowded_day=max(appointments_per_day(), key=appointments_per_day().get), demographics=demographics(),

@@ -15,8 +15,8 @@ connection = psycopg2.connect(connection_string)
 app.config['SQLALCHEMY_DATABASE_URI'] = connection_string
 app.config['SECRET_KEY'] = '4266af1ee8b1c32ecc9b2d97'
 
-UPLOAD_FOLDER = os.path.join(os.getcwd(),"ProfilePage", "static", "uploads")
-#UPLOAD_FOLDER = os.path.join(os.getcwd(), "project","FlaskProfilePage","ProfilePage", "static", "uploads")
+# UPLOAD_FOLDER = os.path.join(os.getcwd(),"ProfilePage", "static", "uploads")
+UPLOAD_FOLDER = os.path.join(os.getcwd(), "project","FlaskProfilePage","ProfilePage", "static", "uploads")
 # print(os.getcwd())
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)

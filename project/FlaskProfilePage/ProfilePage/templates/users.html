@@ -137,6 +137,7 @@ function scrollonclick() {
                     <input type="text" id="deviceSearch" class="form-control" placeholder="Search by ID, Name, Commission Date, Maintenance Date, or Out Of Order status" style="width: 1045px;">
                 </div>
                 <br>
+                <button class="btn btn-primary mt-3" id="addDeviceBtn" onclick="scrollonclick()">Add a new Device</button>
                 <table class="table custom-table">
                     <thead>
                         <tr>
@@ -147,17 +148,17 @@ function scrollonclick() {
                             <th scope="col">Out of Order</th>
                         </tr>
                     </thead>
-                    <tbody id="devicesTable">
+                    <tbody id="devices">
                         {% for device in devices %}
                         <tr data-id="{{ device.device_id }}" data-table="device">
                             <td>{{ device.device_id }}</td>
                             <td class="editable" data-field="device_name">{{ device.device_name }}</td>
-                            <td class="editable" data-field="commission_Date">{{ device.commission_date }}</td>
-                            <td class="editable" data-field="maintenance_Date">{{ device.maintenance_date }}</td>
+                            <td class="editable" data-field="commission_date">{{ device.commission_date }}</td>
+                            <td class="editable" data-field="maintenance_date">{{ device.maintenance_date }}</td>
                             <td class="editable" data-field="out_of_order">{{ device.out_of_order }}</td>
                             <td>
                                 <button class="icon-button2 save-btn" style="display: none;"><img class="logo" src="static/photos/savegreen.png"></button>
-                                <button class="icon-button delete-btn" data-id="{{ device.device_id }}" data-table="device" style="position: relative; left: 10px;"><img class="logo" src="static/photos/trashred.png" alt="Delete"></button>
+                                <button class="icon-button delete-btn" data-id="{{ device.device_id }}" data-table="device" style="position: relative; left: 10px;"><img class="logo" src="static/photos/trashred.png"></button>
                             </td>
                         </tr>
                         {% endfor %}
@@ -183,7 +184,7 @@ function scrollonclick() {
                             <td data-field="c_message">{{ complaint.c_message }}</td>
                             <td>
                                 <button class="icon-button2 save-btn" style="display: none;"><img class="logo" src="static/photos/savegreen.png"></button>
-                                <button class="icon-button delete-btn" data-id="{{ complaint.c_id }}" data-table="complaint" style="position: relative; left: 10px;"><img class="logo" src="static/photos/trashred.png" alt="Delete"></button>
+                                <button class="icon-button delete-btn" data-id="{{ complaint.c_id }}" data-table="complaint" style="position: relative; left: 10px;"><img class="logo" src="static/photos/trashred.png"></button>
                             </td>
                         </tr>
                         {% endfor %}
@@ -303,6 +304,24 @@ $(document).ready(function() {
 
         $('#doctors tbody').append(newRowHtml);
     });
+    // Add new device row
+    $('#addDeviceBtn').click(function() {
+        let newRowHtml = `
+            <tr class="new-row" data-table="device">
+                <td data-field="device_id"></td>
+                <td class="editable" data-field="device_name"></td>
+                <td class="editable" data-field="commission_date"></td>
+                <td class="editable" data-field="maintenance_date"></td>
+                <td class="editable" data-field="out_of_order"></td>
+                <td>
+                    <button class="icon-button2 save-btn" style="display: none;"><img class="logo" src="static/photos/savegreen.png"></button>
+                    <button class="icon-button delete-btn" style="position: relative; left: 10px;"><img class="logo" src="static/photos/trashred.png"></button>
+                </td>
+            </tr>
+        `;
+
+        $('#devices tbody').append(newRowHtml);
+    });
 
     // Search functionality for patients table
     $('#patientSearch').on('keyup', function() {
@@ -323,7 +342,7 @@ $(document).ready(function() {
     // Search functionality for devices table
     $('#deviceSearch').on('keyup', function() {
         let value = $(this).val().toLowerCase();
-        $('#devicesTable tr').filter(function() {
+        $('#devices tr').filter(function() {
             $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
         });
     });
