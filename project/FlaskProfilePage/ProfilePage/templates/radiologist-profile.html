@@ -5,7 +5,7 @@
 {% block content %}
 
 <body>
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/profile.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/rad-profile.css') }}">
 <div class="container-profile">
             <form method="post">
                 </br>
@@ -205,13 +205,24 @@
                                 <a class="create-report-btn" href="/SubmitReport">Create A Report</a>
                             </div>
             </div>
+
                     </div>
+  <div class="scans">
+                        </br>
+
+<h2 style="text-align: center">AI Assistance For</h2>
+                            <a class="icon-button" href="/braintumourpredict"><img class="logo" src="static/photos/brain.png"></a>
+
+                            <a class="icon-button2" href="/pneumoniaPredict"><img class="logo" src="static/photos/lungs.png"></a>
+      <div class="brain">Brain Tumor</div>
+      <div class="lung">Pneumonia</div>
+                    </div>
+                </div>
+                    </br> </br>
                     </br> </br>
                 </div>
-                </div>
-                <a href='/predict' class="button">brain tumor prediction</a>
+<!--                <a href='/predict' class="button">brain tumor prediction</a>-->
                 </form>
-    </br>
     </div>
 </body>
 {% endblock %}

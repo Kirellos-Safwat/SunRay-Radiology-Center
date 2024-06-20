@@ -30,8 +30,10 @@
                     {% endif %}
                     {% if data.admin_id is none or data.admin_id is undefined %}
                         <li class="link"><a href="/contactUs">Contact Us</a></li>
-                    {% else %}
+                    {% elif template != 'dashboard' %}
                         <li class="link"><a href="/dashboard">Dashboard</a></li>
+                    {% elif template != 'database' %}
+                        <li class="link"><a href="/users">DataBase</a></li>
                     {% endif %}
                     {% if template == 'patient_login' %}
                         <li class="link"><a href="/patient-register">Register</a></li>
@@ -41,9 +43,8 @@
                         <li class="link"><a href="/patient-login_page">Log In</a></li>
                         <li class="link"><a href="/patient-register">Register</a></li>
                     {% elif data.id %}
-                        <li class="link"><a href="/patient-profile">Profile</a></li>    
+                        <li class="link"><a href="/patient-profile">Profile</a></li>
                     {% elif data.d_id %}
-                        <li class="link"><a href="/predict">Brain Tumor Prediction</a></li>
                         {% if template != 'radiologist_profile' %}
                         <li class="link"><a href="/radiologist-profile">Profile</a></li>
                         {% endif %}

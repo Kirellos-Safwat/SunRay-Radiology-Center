@@ -8,7 +8,8 @@ from flask_mail import Message
 from ProfilePage.models import Patient
 from flask import render_template, redirect, url_for, flash, session, request, g
 from ProfilePage.models import appointments, Patient
-from ProfilePage.forms import LoginForm, RadiologistEditProfileForm, PatientEditProfileForm, AppointmentForm, PatientRegisterForm, ReportForm, \
+from ProfilePage.forms import LoginForm, RadiologistEditProfileForm, PatientEditProfileForm, AppointmentForm, \
+    PatientRegisterForm, ReportForm, \
     ForgetForm, \
     ResetPasswordForm, contactForm
 from flask import render_template, redirect, url_for, flash, session, request, json, jsonify
@@ -19,25 +20,30 @@ from google.oauth2 import id_token
 from pip._vendor import cachecontrol
 import google.auth.transport.requests
 import tensorflow as tf
-# from tensorflow import keras
-# from keras.models import load_model
-# # from PIL import Image
-# from keras.src.optimizers import Adamax
-# from tensorflow.keras.preprocessing import image
-# from keras.preprocessing.image import load_img, img_to_array
-#
-# model = tf.keras.models.load_model(
-#     r"C:\Users\Egypt_Laptop\Desktop\database final project\his-finalproject-database_sbe_spring24_team6\project\FlaskProfilePage\ProfilePage\brain_tumor_v2.h5",
-#     compile=False)
-# model.compile(Adamax(learning_rate=0.001), loss='categorical_crossentropy', metrics=['accuracy'])
 
+
+from tensorflow import keras
+from keras.models import load_model
+# from PIL import Image
+from keras.src.optimizers import Adamax
+from tensorflow.keras.preprocessing import image
+from keras.preprocessing.image import load_img, img_to_array
+
+model = tf.keras.models.load_model(
+    r"C:\Users\Anas Mohamed\Desktop\DB_project\his-finalproject-database_sbe_spring24_team6\project\FlaskProfilePage\ProfilePage\brain_tumor_v2.h5",
+    compile=False)
+model.compile(Adamax(learning_rate=0.001), loss='categorical_crossentropy', metrics=['accuracy'])
+
+pneumonia_model = tf.keras.models.load_model(
+    r'C:\Users\Anas Mohamed\Desktop\DB_project\his-finalproject-database_sbe_spring24_team6\project\FlaskProfilePage\ProfilePage\pneumonia_detection_v2.h5',
+    compile=False)
+pneumonia_model.compile(Adamax(learning_rate = 0.0001) , loss = 'categorical_crossentropy', metrics = ['accuracy'])
 
 
 @app.before_request
 def load_user_data():
     g.data = session.get('user_data')  # Use Flask's global `g` object
     g.connection = psycopg2.connect(connection_string)
-
 
 
 @app.route('/')  # that is the root url of the website
@@ -216,8 +222,6 @@ def report_page():
             profile_photo.save(profile_photo_path)
             relative_photo_path = os.path.join('uploads', filename)
 
-
-
             p_name = form.patients.data
 
             cursor.execute("SELECT id FROM patient WHERE concat(fname,' ',lname) = %s", (p_name,))
@@ -229,7 +233,8 @@ def report_page():
 
             cursor.execute(
                 "INSERT INTO report (p_id, d_id, device_id, r_time, r_scan, r_study_area, radiation_dose, r_findings, r_result, billing) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
-                (p_id, d_id, device_id, r_time, relative_photo_path, r_study_area, radiation_dose, r_findings, r_result, billing)
+                (p_id, d_id, device_id, r_time, relative_photo_path, r_study_area, radiation_dose, r_findings, r_result,
+                 billing)
             )
             g.connection.commit()
             g.connection.close()
@@ -285,8 +290,8 @@ def users_page():
 
     cursor.close()
     g.connection.close()
-    return render_template('users.html', patients=patients, doctors=doctors, devices=devices, complaints=complaints, data=g.data, template='users')
-
+    return render_template('users.html', patients=patients, doctors=doctors, devices=devices, complaints=complaints,
+                           data=g.data, template='users')
 
 
 @app.route('/logout')
@@ -321,7 +326,8 @@ def radiologist_login():
         else:
             flash('Incorrect Email or password. Please try again.', category='error')
 
-    return render_template('radiologist-login.html', form=LoginForm(), data=data if 'data' in locals() else None, template='radiologist_login')
+    return render_template('radiologist-login.html', form=LoginForm(), data=data if 'data' in locals() else None,
+                           template='radiologist_login')
 
 
 @app.route('/radiologist-profile')
@@ -352,7 +358,8 @@ def radiologist_profile_page():
 
     cursor.close()
     g.connection.close()
-    return render_template('radiologist-profile.html', data=g.data, appointments=appointments , template = 'radiologist_profile',reports=reports)
+    return render_template('radiologist-profile.html', data=g.data, appointments=appointments,
+                           template='radiologist_profile', reports=reports)
 
 
 @app.route('/radiologist_edit_profile', methods=['GET', 'POST'])
@@ -400,7 +407,7 @@ def radiologist_edit_profile():
         flash('Your profile has been updated successfully! Please login again', category='success')
         return redirect('/radiologist-login')  # Redirect to log in to refresh
 
-    return render_template('radiologist_edit_profile.html', data=g.data, form=form, template = 'radiologist_edit_profile')
+    return render_template('radiologist_edit_profile.html', data=g.data, form=form, template='radiologist_edit_profile')
 
 
 #######################################################################
@@ -450,7 +457,7 @@ def patient_login_page():
         )
         user = cursor.fetchone()
         cursor.close()  # Close the cursor once
-        g.connection.close()        
+        g.connection.close()
         if user:
             session['user_data'] = dict(user)
             data = session['user_data']
@@ -463,7 +470,8 @@ def patient_login_page():
         else:
             flash('Incorrect Email or password. Please try again.', category='error')
 
-    return render_template('patient-login.html', form=LoginForm(), data=data if 'data' in locals() else None, template = 'patient_login')
+    return render_template('patient-login.html', form=LoginForm(), data=data if 'data' in locals() else None,
+                           template='patient_login')
 
 
 @app.route('/patient-profile')
@@ -499,7 +507,8 @@ def patient_profile_page():
     reports = cursor.fetchall()
     cursor.close()
     g.connection.close()
-    return render_template('patient-profile.html', data=g.data, scan_Files=scan_Files, appointments=appointments, reports=reports)
+    return render_template('patient-profile.html', data=g.data, scan_Files=scan_Files, appointments=appointments,
+                           reports=reports)
 
 
 @app.route('/upload_scan', methods=['GET', 'POST'])
@@ -594,7 +603,6 @@ def patient_edit_profile():
 def contact_page():
     form = contactForm()
     if request.method == 'POST' and form.validate_on_submit():
-
         fname = form.First_Name.data
         lname = form.Last_Name.data
         email = form.Email.data
@@ -608,7 +616,8 @@ def contact_page():
         # connection = psycopg2.connect(connection_string)
         cursor = g.connection.cursor()
         cursor.execute(
-            "INSERT INTO contactus (c_fname,c_lname,c_email,c_message) VALUES (%s,%s,%s,%s)", (fname, lname, email, message)
+            "INSERT INTO contactus (c_fname,c_lname,c_email,c_message) VALUES (%s,%s,%s,%s)",
+            (fname, lname, email, message)
         )
         cursor.close()
         g.connection.commit()
@@ -616,7 +625,7 @@ def contact_page():
         flash('We have received your message. Thank you for contacting us', category='success')
         return redirect('/home')
 
-    return render_template('contact.html',form=form, data=g.data)
+    return render_template('contact.html', form=form, data=g.data)
 
 
 def send_reset_email(patient):
@@ -764,8 +773,7 @@ def callback():
     return redirect("/home")
 
 
-
-@app.route('/predict', methods=['GET', 'POST'])
+@app.route('/braintumourpredict', methods=['GET', 'POST'])
 def predict():
     if g.data is None or 'd_id' not in g.data:
         return redirect('/radiologist-login')
@@ -782,13 +790,39 @@ def predict():
         img_array = tf.expand_dims(img_array, axis=0)
         # Make prediction
         prediction = model.predict(img_array)
-        class_labels = ['glioma', 'meningioma', 'notumor', 'pituitary']
+        class_labels = ['Existence of Glioma', 'Existence of Meningioma', 'No Tumor Detected', 'Existence of Pituitary tumor']
         # Return prediction result
         score = tf.nn.softmax(prediction[0])
         result = class_labels[tf.argmax(score)]
-        return render_template("result.html", result=result)
+        return render_template("brain_predict.html", result=result, data=g.data)
     else:
-        return render_template('index.html')
+        return render_template('brain_predict.html', data=g.data)
+
+
+@app.route('/pneumoniaPredict', methods=['GET', 'POST'])
+def p_predict():
+    if g.data is None or 'd_id' not in g.data:
+        return redirect('/radiologist-login')
+    if request.method == 'POST':
+        image_file = request.files['imagefile']
+        filename = secure_filename(image_file.filename)
+        image_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        print(image_path)
+        image_file.save(image_path)
+        img = image.load_img(image_path)
+        img_array = image.img_to_array(img)
+        img_array = tf.image.resize(img_array, [224, 224])
+        img_array = tf.keras.applications.efficientnet.preprocess_input(img_array)
+        img_array = tf.expand_dims(img_array, axis=0)
+        # Make prediction
+        prediction = pneumonia_model.predict(img_array)
+        class_labels = ['NORMAL SAMPLE', 'EXISTENCE OF PNEUMONIA IN THE SAMPLE']
+        # Return prediction result
+        score = tf.nn.softmax(prediction[0])
+        result = class_labels[tf.argmax(score)]
+        return render_template("pneumonia_predict.html", result=result,data=g.data)
+    else:
+        return render_template('pneumonia_predict.html',data=g.data)
 
 
 @app.route("/dashboard")
@@ -796,6 +830,7 @@ def dashboard():
     # most crowded day
     if g.data is None or 'admin_id' not in g.data:
         return redirect('/login')
+
     def appointments_per_day():
         cursor = g.connection.cursor()
         cursor.execute("SELECT date FROM appointments")
@@ -910,7 +945,7 @@ def dashboard():
         current_month = datetime.today().month
         year = datetime.today().year
         last_month = current_month - 1 if current_month > 1 else 12
-        last_month = str('0'+str(last_month)) if last_month < 10 else str(last_month)
+        last_month = str('0' + str(last_month)) if last_month < 10 else str(last_month)
         last_month_year = str(year) if current_month > 1 else str(year - 1)
         cursor.execute(f'''
         SELECT SUM(billing) 
@@ -938,8 +973,11 @@ def dashboard():
         ''')
         upcoming_maintenances = cursor.fetchall()
         return upcoming_maintenances
+
     g.connection.close()
-    return render_template('dashboard.html', days=appointments_per_day(), data= g.data,
-        most_crowded_day=max(appointments_per_day(), key=appointments_per_day().get), demographics=demographics(),
-        most_served_age_group=most_served_age_group(), doctors_data=doctors_data(),
-        total_patients_docotrs_equipments=total_patients_docotrs_equipments(), total_revenues_last_month_last_year=total_revenues_last_month_last_year())
+    return render_template('dashboard.html', days=appointments_per_day(), data=g.data,
+                           most_crowded_day=max(appointments_per_day(), key=appointments_per_day().get),
+                           demographics=demographics(),
+                           most_served_age_group=most_served_age_group(), doctors_data=doctors_data(),
+                           total_patients_docotrs_equipments=total_patients_docotrs_equipments(),
+                           total_revenues_last_month_last_year=total_revenues_last_month_last_year())

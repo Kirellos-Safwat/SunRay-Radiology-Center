@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% block title %}
+    Ai Assistance
+{% endblock %}
+{% block content %}
+<html>
+    <head>
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/appointment.css') }}">
+    </head>
+
+    <body>
+ <div class="PredictBox1 "> <br>
+            <div class="content">
+            <h2 align="center">Image Classifier</h2>
+
+
+                <form class="p-3 text-center" action='/braintumourpredict', method="post" enctype="multipart/form-data">
+<div class="form-group">
+               <input class="form-control" type="file" name="imagefile" >
+            <input class="btn btn-primary mt-3 brain" type="submit" value="Predict Brain Tumor" >
+                    </div>
+            </form>
+                </div>
+        </div>
+   <div class="flash-container">
+            <div>
+         {% if result %}
+                     <div class="flash-info">Scan indicates: {{result}}</div>
+          {% endif %}
+            </div>
+       </div>
+    </body>
+</html>
+{% endblock %}
