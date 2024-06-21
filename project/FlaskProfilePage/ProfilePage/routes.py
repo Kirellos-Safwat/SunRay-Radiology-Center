@@ -1,36 +1,33 @@
 import psycopg2.extras
 from datetime import datetime
-from google.oauth2 import id_token
-from sqlalchemy.testing.plugin.plugin_base import post
-from ProfilePage import app, db, connection_string, mail, bcrypt, flow, GOOGLE_CLIENT_ID
+from ProfilePage import app, db, connection_string, mail, flow, GOOGLE_CLIENT_ID
 from flask_login import current_user
 from flask_mail import Message
 from ProfilePage.models import Patient
-from flask import render_template, redirect, url_for, flash, session, request, g
-from ProfilePage.models import appointments, Patient
-from ProfilePage.forms import LoginForm, RadiologistEditProfileForm, PatientEditProfileForm, AppointmentForm, PatientRegisterForm, ReportForm, \
+from ProfilePage.forms import LoginForm, RadiologistEditProfileForm, PatientEditProfileForm, AppointmentForm, \
+    PatientRegisterForm, ReportForm, \
     ForgetForm, \
     ResetPasswordForm, contactForm
-from flask import render_template, redirect, url_for, flash, session, request, json, jsonify
+from flask import render_template, redirect, url_for, flash, session, request,g
 from werkzeug.utils import secure_filename
 import os, psycopg2.extras, random
 import requests
 from google.oauth2 import id_token
 from pip._vendor import cachecontrol
 import google.auth.transport.requests
-import tensorflow as tf
-# from tensorflow import keras
-# from keras.models import load_model
-# # from PIL import Image
+# import tensorflow as tf
 # from keras.src.optimizers import Adamax
 # from tensorflow.keras.preprocessing import image
-# from keras.preprocessing.image import load_img, img_to_array
-#
+
 # model = tf.keras.models.load_model(
-#     r"C:\Users\Egypt_Laptop\Desktop\database final project\his-finalproject-database_sbe_spring24_team6\project\FlaskProfilePage\ProfilePage\brain_tumor_v2.h5",
+#     r"C:\Users\Anas Mohamed\Desktop\DB_project\his-finalproject-database_sbe_spring24_team6\project\FlaskProfilePage\ProfilePage\brain_tumor_v2.h5",
 #     compile=False)
 # model.compile(Adamax(learning_rate=0.001), loss='categorical_crossentropy', metrics=['accuracy'])
-
+#
+# pneumonia_model = tf.keras.models.load_model(
+#     r'C:\Users\Anas Mohamed\Desktop\DB_project\his-finalproject-database_sbe_spring24_team6\project\FlaskProfilePage\ProfilePage\pneumonia_detection_v2.h5',
+#     compile=False)
+# pneumonia_model.compile(Adamax(learning_rate = 0.0001) , loss = 'categorical_crossentropy', metrics = ['accuracy'])
 
 
 @app.before_request
@@ -62,7 +59,6 @@ def home_page():
 @app.route('/edit_data', methods=['POST'])
 def edit_data():
     data = request.get_json()
-    print(data)
     table = data.get('table')
     cursor = g.connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
     # handle deleting
@@ -627,7 +623,6 @@ def patient_edit_profile():
 def contact_page():
     form = contactForm()
     if request.method == 'POST' and form.validate_on_submit():
-
         fname = form.First_Name.data
         lname = form.Last_Name.data
         email = form.Email.data
@@ -641,7 +636,8 @@ def contact_page():
         # connection = psycopg2.connect(connection_string)
         cursor = g.connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
         cursor.execute(
-            "INSERT INTO contactus (c_fname,c_lname,c_email,c_message) VALUES (%s,%s,%s,%s)", (fname, lname, email, message)
+            "INSERT INTO contactus (c_fname,c_lname,c_email,c_message) VALUES (%s,%s,%s,%s)",
+            (fname, lname, email, message)
         )
         cursor.close()
         g.connection.commit()
@@ -649,7 +645,7 @@ def contact_page():
         flash('We have received your message. Thank you for contacting us', category='success')
         return redirect('/home')
 
-    return render_template('contact.html',form=form, data=g.data)
+    return render_template('contact.html', form=form, data=g.data)
 
 
 def send_reset_email(patient):
@@ -797,8 +793,7 @@ def callback():
     return redirect("/home")
 
 
-
-@app.route('/predict', methods=['GET', 'POST'])
+@app.route('/braintumourpredict', methods=['GET', 'POST'])
 def predict():
     if g.data is None or 'd_id' not in g.data:
         return redirect('/radiologist-login')
@@ -815,13 +810,39 @@ def predict():
         img_array = tf.expand_dims(img_array, axis=0)
         # Make prediction
         prediction = model.predict(img_array)
-        class_labels = ['glioma', 'meningioma', 'notumor', 'pituitary']
+        class_labels = ['Existence of Glioma', 'Existence of Meningioma', 'No Tumor Detected', 'Existence of Pituitary tumor']
         # Return prediction result
         score = tf.nn.softmax(prediction[0])
         result = class_labels[tf.argmax(score)]
-        return render_template("result.html", result=result)
+        return render_template("brain_predict.html", result=result, data=g.data)
     else:
-        return render_template('index.html')
+        return render_template('brain_predict.html', data=g.data)
+
+
+@app.route('/pneumoniaPredict', methods=['GET', 'POST'])
+def p_predict():
+    if g.data is None or 'd_id' not in g.data:
+        return redirect('/radiologist-login')
+    if request.method == 'POST':
+        image_file = request.files['imagefile']
+        filename = secure_filename(image_file.filename)
+        image_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        print(image_path)
+        image_file.save(image_path)
+        img = image.load_img(image_path)
+        img_array = image.img_to_array(img)
+        img_array = tf.image.resize(img_array, [224, 224])
+        img_array = tf.keras.applications.efficientnet.preprocess_input(img_array)
+        img_array = tf.expand_dims(img_array, axis=0)
+        # Make prediction
+        prediction = pneumonia_model.predict(img_array)
+        class_labels = ['NORMAL SAMPLE', 'EXISTENCE OF PNEUMONIA IN THE SAMPLE']
+        # Return prediction result
+        score = tf.nn.softmax(prediction[0])
+        result = class_labels[tf.argmax(score)]
+        return render_template("pneumonia_predict.html", result=result,data=g.data)
+    else:
+        return render_template('pneumonia_predict.html',data=g.data)
 
 
 @app.route("/dashboard")
@@ -944,7 +965,7 @@ def dashboard():
         current_month = datetime.today().month
         year = datetime.today().year
         last_month = current_month - 1 if current_month > 1 else 12
-        last_month = str('0'+str(last_month)) if last_month < 10 else str(last_month)
+        last_month = str('0' + str(last_month)) if last_month < 10 else str(last_month)
         last_month_year = str(year) if current_month > 1 else str(year - 1)
         cursor.execute(f'''
         SELECT SUM(billing) 
@@ -981,7 +1002,7 @@ def dashboard():
         ''')
         out_of_service = cursor.fetchall()
         return out_of_service
-    
+
     def revenue_data():
         cursor = g.connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
         year = datetime.today().year
@@ -1003,7 +1024,7 @@ def dashboard():
         GROUP BY month
         ORDER BY month;
         ''')
-        revenues = cursor.fetchall() 
+        revenues = cursor.fetchall()
         cursor.close()
         months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
         revenues_per_month = dict()
@@ -1011,9 +1032,8 @@ def dashboard():
             revenues_per_month[months[i[0]-1]] = i[1]
         total_year_revenues = sum(revenues_per_month.values())
         return (revenues_per_month, year, total_year_revenues)
-    
+
     return render_template('dashboard.html', days=appointments_per_day(), data= g.data,
         most_crowded_day=max(appointments_per_day(), key=appointments_per_day().get), demographics=demographics(),
         most_served_age_group=most_served_age_group(), doctors_data=doctors_data(),
-        total_patients_docotrs_equipments=total_patients_docotrs_equipments(), total_revenues_last_month_last_year=total_revenues_last_month_last_year(), 
-        upcoming_maintenances=upcoming_maintenances(), out_of_service=out_of_service(), revenue_data=revenue_data(), template='dashboard')
+        total_patients_docotrs_equipments=total_patients_docotrs_equipments(), total_revenues_last_month_last_year=total_revenues_last_month_last_year(), upcoming_maintenances=upcoming_maintenances(), out_of_service=out_of_service(), template='dashboard')

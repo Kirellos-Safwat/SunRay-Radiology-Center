@@ -8,7 +8,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
     <script>
 function scrollonclick(h) {
     const scrollPosition = document.body.scrollHeight * h;
@@ -19,25 +18,17 @@ function scrollonclick(h) {
         }
     </script>
 
-    <style>
-        #revenuePieChart {
-            max-width: 750px;
-            max-height: 750px;
-            width: 100%;
-            height: 100%;
-        }
-    </style>
 </head>
 <body>
     <div class="tabs-container">
         <ul class="tabs-menu">
             <li class="tabs-menu-item active" data-tab="tab-statistics" onclick="scrollonclick(0.17)"><p>Statistics</p></li>
-            <li class="tabs-menu-item" data-tab="tab-revenue" onclick="scrollonclick(0.15)"><p>Annual Revenue</p></li>
+            <li class="tabs-menu-item" data-tab="tab-revenue" onclick="scrollonclick(0.09)"><p>Annual Revenue</p></li>
             <li class="tabs-menu-item" data-tab="tab-appointments" onclick="scrollonclick(0.15)"><p>Appointments</p></li>
             <li class="tabs-menu-item" data-tab="tab-demographics" onclick="scrollonclick(0.15)"><p>Demographics</p></li>
-            <li class="tabs-menu-item" data-tab="tab-contributions"><p>Contributions</p></li>
-            <li class="tabs-menu-item" data-tab="tab-maintenances"><p>Upcoming Maintenances</p></li>
-            <li class="tabs-menu-item" data-tab="tab-out_of_service"><p>Out Of Service Devices</li>
+            <li class="tabs-menu-item" data-tab="tab-contributions" onclick="scrollonclick(0.15)"><p>Contributions</p></li>
+            <li class="tabs-menu-item" data-tab="tab-maintenances" onclick="scrollonclick(0.15)"><p>Upcoming Maintenances</p></li>
+            <li class="tabs-menu-item" data-tab="tab-out_of_service" onclick="scrollonclick(0.15)"><p>Out Of Service Devices</li>
         </ul>
         <br><br><br><br>
         <div id="tab-statistics" class="tab active">
@@ -73,14 +64,15 @@ function scrollonclick(h) {
             </div>
         </div>
         <div id="tab-revenue" class="tab">
-            <h2>Total revenues in {{ revenue_data[1] }} are <span id="formattedRevenue"></span></h2>
+            <div style="position: relative;top: 472px;margin:auto;width: 100%;text-align: center">
+            <h2>Total revenue in {{ revenue_data[1] }} is <span id="formattedRevenue"></span></h2></div>
             <canvas id="revenuePieChart"></canvas>
         </div>
-        
+
         <script>
             const originalRevenue = parseInt("{{ revenue_data[2] }}");
             const formattedRevenue = originalRevenue.toLocaleString('en', { useGrouping: true });
-        
+
             document.getElementById('formattedRevenue').textContent = formattedRevenue;
         </script>
         <div id="tab-appointments" class="tab">
@@ -99,8 +91,7 @@ function scrollonclick(h) {
         </div>
 
         <div id="tab-contributions" class="tab">
-            <div>
-                <table >
+                 <table class="table custom-table">
                     <thead>
                         <tr>
                             <th scope="col">ID</th>
@@ -120,11 +111,9 @@ function scrollonclick(h) {
                         {% endfor %}
                     </tbody>
                 </table>
-            </div>
         </div>
         <div id="tab-maintenances" class="tab">
-            <div>
-                <table >
+               <table class="table custom-table">
                     <thead>
                         <tr>
                             <th scope="col">ID</th>
@@ -142,11 +131,10 @@ function scrollonclick(h) {
                         {% endfor %}
                     </tbody>
                 </table>
-            </div>
         </div>
         <div id="tab-out_of_service" class="tab">
-            <div>
-                <table >
+
+                <table class="table custom-table">
                     <thead>
                         <tr>
                             <th scope="col">ID</th>
@@ -163,7 +151,7 @@ function scrollonclick(h) {
                         {% endfor %}
                     </tbody>
                 </table>
-            </div>
+
         </div>
     </div>
 
@@ -290,73 +278,70 @@ function scrollonclick(h) {
 
                 updateCounter();
             });
-            
 
-            const revenueData = {{ revenue_data[0] | tojson }};
-            const months = Object.keys(revenueData);
-            const percentages = Object.values(revenueData);
 
-            const ctx3 = document.getElementById('revenuePieChart').getContext('2d');
-            const revenuePieChart = new Chart(ctx3, {
-                type: 'pie',
-                data: {
-                    labels: months,
-                    datasets: [{
-                        data: percentages,
-                        backgroundColor: [
-                            'rgba(255, 99, 132, 0.2)',
-                            'rgba(54, 162, 235, 0.2)',
-                            'rgba(255, 206, 86, 0.2)',
-                            'rgba(75, 192, 192, 0.2)',
-                            'rgba(153, 102, 255, 0.2)',
-                            'rgba(255, 159, 64, 0.2)',
-                            'rgba(199, 199, 199, 0.2)',
-                            'rgba(83, 102, 255, 0.2)',
-                            'rgba(140, 159, 64, 0.2)',
-                            'rgba(200, 199, 199, 0.2)',
-                            'rgba(100, 192, 192, 0.2)',
-                            'rgba(200, 159, 64, 0.2)',
-                        ],
-                        borderColor: [
-                            'rgba(255, 99, 132, 1)',
-                            'rgba(54, 162, 235, 1)',
-                            'rgba(255, 206, 86, 1)',
-                            'rgba(75, 192, 192, 1)',
-                            'rgba(153, 102, 255, 1)',
-                            'rgba(255, 159, 64, 1)',
-                            'rgba(199, 199, 199, 1)',
-                            'rgba(83, 102, 255, 1)',
-                            'rgba(140, 159, 64, 1)',
-                            'rgba(200, 199, 199, 1)',
-                            'rgba(100, 192, 192, 1)',
-                            'rgba(200, 159, 64, 1)',
-                        ],
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    plugins: {
-                        datalabels: {
-                        formatter: (value, ctx) => {
-                            return ctx.chart.data.labels[ctx.dataIndex];
+
+
+                const revenueData = {{ revenue_data[0] | tojson }};
+                const months = Object.keys(revenueData);
+                const percentages = Object.values(revenueData);
+
+                const ctx3 = document.getElementById('revenuePieChart').getContext('2d');
+
+                const createGradient = (ctx, color1, color2) => {
+                    const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+                    gradient.addColorStop(0, color1);
+                    gradient.addColorStop(1, color2);
+                    return gradient;
+                };
+
+                const revenuePieChart = new Chart(ctx3, {
+                    type: 'doughnut',
+                    data: {
+                        labels: months,
+                        datasets: [{
+                            data: percentages,
+                            backgroundColor: [
+                                createGradient(ctx3, 'rgba(255, 99, 132, 0.5)', 'rgba(255, 99, 132, 0.9)'),
+                                createGradient(ctx3, 'rgba(54, 162, 235, 0.5)', 'rgba(54, 162, 235, 0.9)'),
+                                createGradient(ctx3, 'rgba(255, 206, 86, 0.5)', 'rgba(255, 206, 86, 0.9)'),
+                                createGradient(ctx3, 'rgba(75, 192, 192, 0.5)', 'rgba(75, 192, 192, 0.9)'),
+                                createGradient(ctx3, 'rgba(153, 102, 255,0.5)', 'rgba(153, 102, 255,0.9)'),
+                                createGradient(ctx3, 'rgba(255, 159, 64, 0.5)', 'rgba(255, 159, 64, 0.9)'),
+                                createGradient(ctx3, 'rgba(199, 199, 199,0.5)', 'rgba(199, 199, 199,0.9)'),
+                                createGradient(ctx3, 'rgba(83, 102, 255, 0.5)', 'rgba(83, 102, 255, 0.9)'),
+                                createGradient(ctx3, 'rgba(140, 159, 64, 0.5)', 'rgba(140, 159, 64, 0.9)'),
+                                createGradient(ctx3, 'rgba(200, 199, 199,0.5)', 'rgba(200, 199, 199,0.9)'),
+                                createGradient(ctx3, 'rgba(100, 192, 192,0.5)', 'rgba(100, 192, 192,0.9)'),
+                                createGradient(ctx3, 'rgba(200, 159, 64, 0.5)', 'rgba(200, 159, 64, 0.9)')
+                            ],
+                            borderColor: [
+                                'white',
+                            ],
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        plugins: {
+                            datalabels: {
+                                formatter: (value, ctx) => {
+                                    return ctx.chart.data.labels[ctx.dataIndex];
+                                },
+                                color: '#000',
+                                font: {
+                                    size: 0,
+                                }
+                            }
                         },
-                        color: '#000',
-                        font: {
-                            // weight: 'bold',
-                            size: 12,
-                        },
-                        // align: 'end',
-                        // anchor: 'end'
-                    }
-                },
-                animation: {
-                    duration: 1000, // Animation duration in milliseconds
-                    easing: 'easeInOutBack' // Animation easing effect
-                }
-            }
-            ,plugins: [ChartDataLabels]
+                        animation: {
+                            duration: 1000, // Animation duration in milliseconds
+                            easing: 'easeInOutBack', // Animation easing effect
+                            animateRotate: true
+                        }
+                    },
+                    plugins: [ChartDataLabels]
+                });
             });
-        });
     </script>
 </body>
 {% endblock %}
