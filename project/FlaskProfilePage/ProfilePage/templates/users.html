@@ -51,7 +51,7 @@ function scrollonclick() {
             </li>
             <li class="nav-item">
                 <a class="nav-link" id="complaints-tab" data-toggle="tab" href="#complaints" role="tab" aria-controls="complaints" aria-selected="false">
-                    <img src="static/photos/complaints.png" class="tab-icon2" alt="Device Icon">Complaints
+                    <img src="static/photos/complaints.png" class="tab-icon" alt="Device Icon">Complaints
                 </a>
             </li>
         </ul>
@@ -186,7 +186,7 @@ function scrollonclick() {
                     <p><strong>Email:</strong> {{ complaint.c_email }}</p>
                     <p><strong>Complaint:</strong> {{ complaint.c_message }}</p>
                 </div>
-                <button class="icon-button delete-btn" data-id="{{ complaint.c_id }}" data-table="complaint" style="width: fit-content"><img class="logo" src="static/photos/check.png" style="margin-right: 30px; width: 50px;"></button>
+                <button class="icon-button3 delete-btn" data-id="{{ complaint.c_id }}" data-table="complaint" style="width: 30px;height: 30px"><img class="logo" src="static/photos/check.png" style="margin-right: 30px; width: 50px;"></button>
             </li>
             {% endfor %}
         </ul>

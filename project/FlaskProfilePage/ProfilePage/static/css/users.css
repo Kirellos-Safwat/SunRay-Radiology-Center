@@ -49,6 +49,18 @@ td:last-child {
         width: auto; /* Maintain aspect ratio */
     }
 
+.icon-button3 {
+    border: none;
+    background: none;
+    padding: 0;
+    cursor: pointer;
+    position: relative;
+    margin: auto;
+    left: -41px;
+}
+
+
+
 .tab-icon {
     display: inline-block;
     width: 30px;
