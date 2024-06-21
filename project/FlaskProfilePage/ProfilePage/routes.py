@@ -363,12 +363,19 @@ def radiologist_profile_page():
         return redirect('/radiologist-login')
     cursor = g.connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
     # Fetch appointments for the current user's ID
+    today = str(datetime.today().strftime('%Y-%m-%d'))
     cursor.execute("""
-            SELECT appointments.*, patient.fname, patient.lname
+            SELECT 
+            CASE
+            WHEN appointments.date < %(today)s THEN 'missed'
+            WHEN appointments.date = %(today)s THEN 'today'
+            ELSE 'upcoming' END AS state
+            , appointments.*, patient.fname, patient.lname
             FROM appointments
             JOIN patient ON appointments.p_id = Patient.id
-            WHERE appointments.d_id = %s
-        """, (g.data['d_id'],))
+            WHERE appointments.d_id = %(d_id)s
+            ORDER BY state
+        """, {'d_id':g.data['d_id'], 'today': today})
     appointments = cursor.fetchall()
     cursor.close()
 
@@ -504,12 +511,19 @@ def patient_profile_page():
         return redirect('/patient-login_page')
     cursor = g.connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
     # Fetch appointments for the current user's ID
+    today = str(datetime.today().strftime('%Y-%m-%d'))
     cursor.execute("""
-        SELECT appointments.*, radiologist.d_name
+        SELECT 
+        CASE
+        WHEN appointments.date < %(today)s THEN 'missed'
+        WHEN appointments.date = %(today)s THEN 'today'
+        ELSE 'upcoming' END AS state
+        , appointments.*, radiologist.d_name
         FROM appointments
         JOIN radiologist ON appointments.D_ID = radiologist.d_id
-        WHERE P_ID = %s
-    """, (g.data['id'],))
+        WHERE P_ID = %(id)s
+        ORDER BY state
+    """, {'id':g.data['id'], 'today': today})
     appointments = cursor.fetchall()
     cursor.close()
 
