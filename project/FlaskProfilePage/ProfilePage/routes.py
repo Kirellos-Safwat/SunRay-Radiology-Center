@@ -15,9 +15,9 @@ import requests
 from google.oauth2 import id_token
 from pip._vendor import cachecontrol
 import google.auth.transport.requests
-import tensorflow as tf
-from keras.src.optimizers import Adamax
-from tensorflow.keras.preprocessing import image
+# import tensorflow as tf
+# from keras.src.optimizers import Adamax
+# from tensorflow.keras.preprocessing import image
 
 # model = tf.keras.models.load_model(
 #     r"C:\Users\Anas Mohamed\Desktop\DB_project\his-finalproject-database_sbe_spring24_team6\project\FlaskProfilePage\ProfilePage\brain_tumor_v2.h5",
@@ -965,7 +965,7 @@ def dashboard():
         current_month = datetime.today().month
         year = datetime.today().year
         last_month = current_month - 1 if current_month > 1 else 12
-        last_month = str('0' + str(last_month)) if last_month < 10 else str(last_month)
+        last_month = str('0'+str(last_month)) if last_month < 10 else str(last_month)
         last_month_year = str(year) if current_month > 1 else str(year - 1)
         cursor.execute(f'''
         SELECT SUM(billing) 
@@ -1002,7 +1002,39 @@ def dashboard():
         ''')
         out_of_service = cursor.fetchall()
         return out_of_service
+
+    def revenue_data():
+        cursor = g.connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
+        year = datetime.today().year
+        cursor.execute(f'''
+        SELECT CASE 
+        WHEN r_time LIKE  '{str(year)}-01%' THEN 1
+        WHEN r_time LIKE  '{str(year)}-02%' THEN 2
+        WHEN r_time LIKE  '{str(year)}-03%' THEN 3
+        WHEN r_time LIKE  '{str(year)}-04%' THEN 4
+        WHEN r_time LIKE  '{str(year)}-05%' THEN 5
+        WHEN r_time LIKE  '{str(year)}-06%' THEN 6
+        WHEN r_time LIKE  '{str(year)}-07%' THEN 7
+        WHEN r_time LIKE  '{str(year)}-08%' THEN 8
+        WHEN r_time LIKE  '{str(year)}-09%' THEN 9
+        WHEN r_time LIKE  '{str(year)}-10%' THEN 10
+        WHEN r_time LIKE  '{str(year)}-11%' THEN 11
+        ELSE 12 END AS month, SUM(billing) AS revenues
+        FROM report
+        GROUP BY month
+        ORDER BY month;
+        ''')
+        revenues = cursor.fetchall()
+        cursor.close()
+        months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+        revenues_per_month = dict()
+        for i in revenues:
+            revenues_per_month[months[i[0]-1]] = i[1]
+        total_year_revenues = sum(revenues_per_month.values())
+        return (revenues_per_month, year, total_year_revenues)
+
     return render_template('dashboard.html', days=appointments_per_day(), data= g.data,
         most_crowded_day=max(appointments_per_day(), key=appointments_per_day().get), demographics=demographics(),
         most_served_age_group=most_served_age_group(), doctors_data=doctors_data(),
-        total_patients_docotrs_equipments=total_patients_docotrs_equipments(), total_revenues_last_month_last_year=total_revenues_last_month_last_year(), upcoming_maintenances=upcoming_maintenances(), out_of_service=out_of_service(), template='dashboard')
+        total_patients_docotrs_equipments=total_patients_docotrs_equipments(), total_revenues_last_month_last_year=total_revenues_last_month_last_year(),
+        upcoming_maintenances=upcoming_maintenances(), out_of_service=out_of_service(), revenue_data=revenue_data(), template='dashboard')

@@ -84,3 +84,4 @@ padding: 10px;
     text-align: center;
     height: 52px;
 }
+#revenuePieChart {position: relative!important;width: 520px!important;height: auto!important;margin: auto!important;left: 257px;top: 125px!important;transform: translate(-50%, -50%)!important;}
