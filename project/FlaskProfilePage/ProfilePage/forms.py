@@ -12,9 +12,10 @@ class LoginForm(FlaskForm):
 
 
 class PatientEditProfileForm(FlaskForm):
+            
     First_Name = StringField(label='First Name:', validators=[Length(min=2, max=50), DataRequired()])
     Last_Name = StringField(label='Last Name:', validators=[Length(min=2, max=30), DataRequired()])
-    Email = StringField(label='Email:', validators=[Email(), DataRequired()])
+    # Email = StringField(label='Email:', validators=[Email(), DataRequired()])
     Phone_Number = StringField(label='Phone Number:', validators=[Length(min=11, max=13), DataRequired()])
     profile_photo = FileField('Profile Photo', validators=[FileAllowed(['jpg', 'png'])])
     Gender = StringField(label='Gender:', validators=[DataRequired()])
@@ -25,7 +26,7 @@ class PatientEditProfileForm(FlaskForm):
 
 class RadiologistEditProfileForm(FlaskForm):
     Name = StringField(label='Name:', validators=[Length(min=2, max=50), DataRequired()])
-    Email = StringField(label='Email:', validators=[Email(), DataRequired()])
+    # Email = StringField(label='Email:', validators=[Email(), DataRequired()])
     Phone_Number = StringField(label='Phone Number:', validators=[Length(min=11, max=13), DataRequired()])
     profile_photo = FileField('Profile Photo', validators=[FileAllowed(['jpg', 'png'])])
     Gender = StringField(label='Gender:', validators=[DataRequired()])

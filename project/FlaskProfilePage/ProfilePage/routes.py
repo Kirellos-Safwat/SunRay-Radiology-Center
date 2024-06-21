@@ -1,4 +1,3 @@
-import psycopg2.extras
 from datetime import datetime
 from ProfilePage import app, db, connection_string, mail, flow, GOOGLE_CLIENT_ID
 from flask_login import current_user
@@ -53,7 +52,12 @@ def home_page():
     special_doctors = cursor.fetchall()
     cursor.close()
     g.connection.close()
-    return render_template('home.html', data=g.data, template='home', special_doctors=special_doctors)
+    if os.name == 'nt':
+        photo = dict()
+        photo['doctor1'] = special_doctors[0][2].replace("\\", "/") if special_doctors[0][2] else special_doctors[0][2]
+        photo['doctor2'] = special_doctors[1][2].replace("\\", "/") if special_doctors[1][2] else special_doctors[1][2]
+        photo['doctor3'] = special_doctors[2][2].replace("\\", "/") if special_doctors[2][2] else special_doctors[2][2]
+    return render_template('home.html', data=g.data, template='home', special_doctors=special_doctors, photo=photo)
 
 
 @app.route('/edit_data', methods=['POST'])
@@ -165,7 +169,7 @@ def appointment_page():
     def get_devices():
         # connection = psycopg2.connect(connection_string)
         curs = g.connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
-        curs.execute("SELECT device_name,device_id FROM radiology_equipment")
+        curs.execute("SELECT device_name,device_id FROM radiology_equipment WHERE NOT out_of_order")
         devices = curs.fetchall()
         curs.execute("ROLLBACK")
         g.connection.commit()
@@ -320,8 +324,8 @@ def users_page():
 
 @app.route('/logout')
 def logout():
-    session.pop('user_data')
     try:
+        session.pop('user_data')
         session.pop('update')
     except:
         pass
@@ -392,7 +396,7 @@ def radiologist_edit_profile():
     if request.method == 'POST' and form.validate_on_submit():
         updated_data = {
             'd_name': form.Name.data,
-            'd_email': form.Email.data,
+            # 'd_email': form.Email.data,
             'd_phone': form.Phone_Number.data,
             'd_gender': form.Gender.data,
             'd_age': form.Age.data,
@@ -415,8 +419,7 @@ def radiologist_edit_profile():
         cursor = g.connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
         update_query = """
             UPDATE radiologist
-            SET d_name = %(d_name)s, d_email = %(d_email)s,
-                d_phone = %(d_phone)s, d_gender = %(d_gender)s, d_age = %(d_age)s, d_address = %(d_address)s,
+            SET d_name = %(d_name)s, d_phone = %(d_phone)s, d_gender = %(d_gender)s, d_age = %(d_age)s, d_address = %(d_address)s,
                 d_profile_picture = %(d_profile_picture)s
             WHERE d_id = %(d_id)s;
         """
@@ -528,7 +531,7 @@ def patient_profile_page():
     reports = cursor.fetchall()
     cursor.close()
     g.connection.close()
-    return render_template('patient-profile.html', data=g.data, scan_Files=scan_Files, appointments=appointments, reports=reports)
+    return render_template('patient-profile.html', data=g.data, scan_Files=scan_Files, appointments=appointments, reports=reports, template='patient_profile')
 
 
 @app.route('/upload_scan', methods=['GET', 'POST'])
@@ -579,7 +582,7 @@ def patient_edit_profile():
         updated_data = {
             'fname': form.First_Name.data,
             'lname': form.Last_Name.data,
-            'email': form.Email.data,
+            # 'email': form.Email.data,
             'phone': form.Phone_Number.data,
             'gender': form.Gender.data,
             'age': form.Age.data,
@@ -602,8 +605,7 @@ def patient_edit_profile():
         cursor = g.connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
         update_query = """
             UPDATE patient
-            SET fname = %(fname)s, lname = %(lname)s, email = %(email)s,
-                phone = %(phone)s, gender = %(gender)s, age = %(age)s, address = %(address)s,
+            SET fname = %(fname)s, lname = %(lname)s, phone = %(phone)s, gender = %(gender)s, age = %(age)s, address = %(address)s,
                 profile_picture = %(profile_picture)s
             WHERE id = %(id)s;
         """
@@ -965,7 +967,7 @@ def dashboard():
         current_month = datetime.today().month
         year = datetime.today().year
         last_month = current_month - 1 if current_month > 1 else 12
-        last_month = str('0' + str(last_month)) if last_month < 10 else str(last_month)
+        last_month = str('0'+str(last_month)) if last_month < 10 else str(last_month)
         last_month_year = str(year) if current_month > 1 else str(year - 1)
         cursor.execute(f'''
         SELECT SUM(billing) 
@@ -1036,4 +1038,5 @@ def dashboard():
     return render_template('dashboard.html', days=appointments_per_day(), data= g.data,
         most_crowded_day=max(appointments_per_day(), key=appointments_per_day().get), demographics=demographics(),
         most_served_age_group=most_served_age_group(), doctors_data=doctors_data(),
-        total_patients_docotrs_equipments=total_patients_docotrs_equipments(), total_revenues_last_month_last_year=total_revenues_last_month_last_year(), upcoming_maintenances=upcoming_maintenances(), out_of_service=out_of_service(), template='dashboard')
+        total_patients_docotrs_equipments=total_patients_docotrs_equipments(), total_revenues_last_month_last_year=total_revenues_last_month_last_year(),
+        upcoming_maintenances=upcoming_maintenances(), out_of_service=out_of_service(), revenue_data=revenue_data(), template='dashboard')

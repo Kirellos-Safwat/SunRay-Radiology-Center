@@ -1,5 +1,7 @@
 {% extends 'base.html' %}
-
+{% block title %}
+    Dashboard
+{% endblock %}
 {% block content %}
 <head>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css"/>
@@ -8,6 +10,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
     <script>
 function scrollonclick(h) {
     const scrollPosition = document.body.scrollHeight * h;
@@ -26,9 +29,9 @@ function scrollonclick(h) {
             <li class="tabs-menu-item" data-tab="tab-revenue" onclick="scrollonclick(0.09)"><p>Annual Revenue</p></li>
             <li class="tabs-menu-item" data-tab="tab-appointments" onclick="scrollonclick(0.15)"><p>Appointments</p></li>
             <li class="tabs-menu-item" data-tab="tab-demographics" onclick="scrollonclick(0.15)"><p>Demographics</p></li>
-            <li class="tabs-menu-item" data-tab="tab-contributions" onclick="scrollonclick(0.15)"><p>Contributions</p></li>
-            <li class="tabs-menu-item" data-tab="tab-maintenances" onclick="scrollonclick(0.15)"><p>Upcoming Maintenances</p></li>
-            <li class="tabs-menu-item" data-tab="tab-out_of_service" onclick="scrollonclick(0.15)"><p>Out Of Service Devices</li>
+            <li class="tabs-menu-item" data-tab="tab-contributions" onclick="scrollonclick(0.14)"><p>Contributions</p></li>
+            <li class="tabs-menu-item" data-tab="tab-maintenances" onclick="scrollonclick(0.1)"><p>Upcoming Maintenances</p></li>
+            <li class="tabs-menu-item" data-tab="tab-out_of_service" onclick="scrollonclick(0.1)"><p>Out Of Service Devices</li>
         </ul>
         <br><br><br><br>
         <div id="tab-statistics" class="tab active">
@@ -266,7 +269,7 @@ function scrollonclick(h) {
 
                     if (current < target) {
                         counter.innerText = Math.ceil(current + increment);
-                        setTimeout(updateCounter, 20); // Adjust the delay to control speed
+                        setTimeout(updateCounter, 5); // Adjust the delay to control speed
                     } else {
                         if (counter.classList.contains('dollar-sign')) {
                             counter.innerText = target + ' $';
