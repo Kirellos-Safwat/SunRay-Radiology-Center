@@ -143,8 +143,11 @@ function scrollonclick() {
                 </div>
                 <br>
                 <button class="btn btn-primary mt-3" id="addDeviceBtn" onclick="scrollonclick()">Add a new Device</button>
+
                 <table class="table custom-table">
+                    <br>
                     <thead>
+                    <br>
                         <tr>
                             <th scope="col">ID</th>
                             <th scope="col">Name</th>
@@ -170,38 +173,24 @@ function scrollonclick() {
                     </tbody>
                 </table>
             </div>
-            <div class="tab-pane fade" id="complaints" role="tabpanel" aria-labelledby="complaints-tab">
-                <br>
-                <h3>Complaints</h3>
-                
-                <br>
-                <table class="table custom-table">
-                    <thead>
-                        <tr>
-                            <th scope="col">ID</th>
-                            <th scope="col">First Name</th>
-                            <th scope="col">Last Name</th>
-                            <th scope="col">Email</th>
-                            <th scope="col">message</th>
-                        </tr>
-                    </thead>
-                    <tbody id="complaints">
-                        {% for complaint in complaints %}
-                        <tr data-id="{{ complaint.c_id }}" data-table="complaint">
-                            <td>{{ complaint.c_id }}</td>
-                            <td data-field="c_fname">{{ complaint.c_fname }}</td>
-                            <td data-field="c_lname">{{ complaint.c_lname }}</td>
-                            <td data-field="c_email">{{ complaint.c_email }}</td>
-                            <td data-field="c_message">{{ complaint.c_message }}</td>
-                            <td>
-                                <button class="icon-button2 save-btn" style="display: none;"><img class="logo" src="static/photos/savegreen.png"></button>
-                                <button class="icon-button delete-btn" data-id="{{ complaint.c_id }}" data-table="complaint" style="position: relative; left: 10px;"><img class="logo" src="static/photos/trashred.png"></button>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+    <div class="tab-pane fade" id="complaints" role="tabpanel" aria-labelledby="complaints-tab">
+        <br>
+        <h3>Complaints</h3>
+        <br>
+        <ul class="list-unstyled">
+            {% for complaint in complaints %}
+            <li class="row">
+                <div class="complaint-info">
+                    <p><strong>Complaint ID:</strong> {{ complaint.c_id }}</p>
+                    <p><strong>Name:</strong> {{ complaint.c_fname }} {{ complaint.c_lname }}</p>
+                    <p><strong>Email:</strong> {{ complaint.c_email }}</p>
+                    <p><strong>Complaint:</strong> {{ complaint.c_message }}</p>
+                </div>
+                <button class="icon-button3 delete-btn" data-id="{{ complaint.c_id }}" data-table="complaint" style="width: 30px;height: 30px"><img class="logo" src="static/photos/check.png" style="margin-right: 30px; width: 50px;"></button>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
         </div>
     </div>
     <!-- Bootstrap core JS and dependencies -->

@@ -43,9 +43,8 @@
                         <li class="link"><a href="/patient-login_page">Log In</a></li>
                         <li class="link"><a href="/patient-register">Register</a></li>
                     {% elif data.id %}
-                        <li class="link"><a href="/patient-profile">Profile</a></li>    
+                        <li class="link"><a href="/patient-profile">Profile</a></li>
                     {% elif data.d_id %}
-                        <li class="link"><a href="/predict">Brain Tumor Prediction</a></li>
                         {% if template != 'radiologist_profile' %}
                         <li class="link"><a href="/radiologist-profile">Profile</a></li>
                         {% endif %}

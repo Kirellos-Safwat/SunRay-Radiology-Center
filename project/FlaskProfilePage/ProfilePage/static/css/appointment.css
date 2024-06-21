@@ -8,6 +8,70 @@
     border-radius: 5px;
      font-size: 16px;
 }
+.PredictBox{
+    width: 350px;
+    height: 242px;
+    background: rgb(18, 172, 142);
+    color: white;
+    margin: auto;
+    margin-top: 7%;
+    border-radius: 5px;
+     font-size: 16px;
+}
+.PredictBox input{
+    width: 83%;
+    position: relative;
+    top: 32px;
+    margin: auto;
+    font-size: 18px;
+}
+.PredictBox input[type="submit"]{
+    border: none;
+    outline: none;
+    text-align: center;
+    height: 53px;
+    width: fit-content;
+    border-radius: 5px;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+    position: relative;
+
+    left: 54px;
+    top: 57px;
+}
+.PredictBox1{
+    width: 350px;
+    height: 242px;
+    background: rgb(18, 172, 142);
+    color: white;
+    margin: auto;
+    margin-top: 7%;
+    border-radius: 5px;
+     font-size: 16px;
+}
+.PredictBox1 input{
+    width: 83%;
+    position: relative;
+    top: 32px;
+    margin: auto;
+    font-size: 18px;
+}
+.PredictBox1 input[type="submit"]{
+    border: none;
+    outline: none;
+    text-align: center;
+    height: 53px;
+    width: fit-content;
+    border-radius: 5px;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+    position: relative;
+    left: 50px;
+    top: 57px;
+}
+
 .ReportBox{
     width: 715px;
     height: 550px;
@@ -105,6 +169,8 @@
     cursor: pointer;
     margin-left: 10%;
 }
+
+
 .flash-message-success {
     background-color: #dff0d8;
     border-color: #d6e9c6;

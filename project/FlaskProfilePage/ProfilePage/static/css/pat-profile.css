@@ -5,13 +5,16 @@
   box-sizing: border-box;
   font-family: "Poppins" , sans-serif;
 }
-.container-profile{
-    padding: 20px 60px 30px 40px;
+.container-profile {
+    padding: 30px;
     box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
-    margin-top: 10%;
-    margin-left: 13%;
-    height: auto;
-    width: 990px;
+    margin: auto;
+    margin-top: 7%;
+    width: 967px;
+
+     /* Required for resize property */
+     /* Allows resizing only vertically */
+    height: 1073px;
     background: var(--primary-color);
     border-radius: 5px;
     display: flex;
@@ -23,6 +26,9 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  width: fit-content;
+  position: relative;
+  top: -58px;
 }
 
 .container-profile .content .left-side{
@@ -89,8 +95,7 @@
 .content .left-side .edit-profile-btn {
     background-color: #fb923c;
     color: white;
-    position: absolute;
-    top: 665px;
+    position: relative;
     border-radius: 5px;
     border-color: white;
     padding: 10px 18px;
@@ -98,12 +103,12 @@
     display: flex;
     font-size: 20px;
     cursor: pointer;
-    margin-top: 20px;
+    margin: auto;
+    margin-top: 70px;
     width: 150px;
     height: 40px;
     align-items: center;
     justify-content: center;
-    margin-left: 100px;
     font-weight: bold;
 }
 
@@ -116,8 +121,7 @@
 .content .right-side .tabs {
     display: flex;
     flex-wrap: wrap;
-    max-width: 600px;
-    margin: auto;
+    max-width: 500px;
     padding: 25px;
 }
 
@@ -170,12 +174,10 @@
     border-radius: 0 5px 5px 5px;
     padding: 20px 60px 30px 40px;
     box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
-    padding-top: 20px;
     height: 400px;
     margin-left: 0px;
     order: 1;
     border-top: 1px solid gray;
-    display: inline-block;
     display: none;
 }
 
@@ -257,9 +259,11 @@
     box-shadow: 0 0 3px 3px #fb923c;
 }
 
-.container-profile .content .right-side{
-  width: 75%;
-  margin-left: 35px;
+.container-profile .content .right-side {
+    position: relative;
+    width: 75%;
+    margin-left: 33px;
+    top: 44px;
 }
 
 .content .left-side .user-data{

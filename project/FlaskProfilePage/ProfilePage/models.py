@@ -82,7 +82,7 @@ class report(db.Model):
     r_time = db.Column(db.String(length=15), nullable=False)
     r_scan = db.Column(db.String(200))
     r_study_area = db.Column(db.String(100))
-    radiation_dose=db.Column(db.String(100))
+    radiation_dose = db.Column(db.String(100))
     r_findings = db.Column(db.String(100))
     r_result = db.Column(db.String(100))
     billing = db.Column(db.Integer)

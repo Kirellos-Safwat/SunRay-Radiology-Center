@@ -1,7 +1,7 @@
 
 .custom-table td:nth-child(n+1):not(:last-child)  {
  border: 1px solid white; /* Orange border */
-    background: lightseagreen; /* Darker green gradient */
+    background: linear-gradient(to right, rgba(18, 172, 142, 0.9), rgba(18, 172, 142, 0.7)); /* Darker green gradient */
     color: black; /* Orange text color */
      font-size: 1.2rem;
     text-align: center;
@@ -49,9 +49,27 @@ td:last-child {
         width: auto; /* Maintain aspect ratio */
     }
 
+.icon-button3 {
+    border: none;
+    background: none;
+    padding: 0;
+    cursor: pointer;
+    position: relative;
+    margin: auto;
+    left: -41px;
+}
+
+
+
 .tab-icon {
     display: inline-block;
     width: 30px;
+    margin-right: 10px;
+}
+
+.tab-icon2 {
+    display: inline-block;
+    width: 37px;
     margin-right: 10px;
 }
 
@@ -73,3 +91,23 @@ td:last-child {
         padding-left: 50px;
     }
 
+.row{
+    margin: 15px;
+    background: #f2f2f2;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 100%;
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+    border-radius: 5px;
+    margin-left: 10px;
+    /*margin-bottom: 30px;*/
+}
+
+.complaint-info {
+    flex: 1;
+}
+
+.complaint-info p {
+    margin: 0;
+}
