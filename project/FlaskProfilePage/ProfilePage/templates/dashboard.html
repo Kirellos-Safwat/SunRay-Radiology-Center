@@ -185,8 +185,8 @@ function scrollonclick(h) {
 
             // Data for Most Crowded Day Chart passed from Flask
             const appointmentsData = {{ days | tojson }};
-            const labels = Object.keys(appointmentsData);
-            const data = Object.values(appointmentsData);
+            const labels = appointmentsData.days
+            const data = appointmentsData.appointments
 
             const ctx1 = document.getElementById('appointmentsChart').getContext('2d');
             const appointmentsChart = new Chart(ctx1, {
@@ -284,8 +284,8 @@ function scrollonclick(h) {
 
 
                 const revenueData = {{ revenue_data[0] | tojson }};
-                const months = Object.keys(revenueData);
-                const percentages = Object.values(revenueData);
+                const months = revenueData.months
+                const percentages = revenueData.revenue
 
                 const ctx3 = document.getElementById('revenuePieChart').getContext('2d');
 

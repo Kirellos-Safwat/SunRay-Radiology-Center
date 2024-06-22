@@ -262,10 +262,13 @@ def report_page():
 
             profile_photo = form.r_scan.data
 
-            filename = secure_filename(profile_photo.filename)
-            profile_photo_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-            profile_photo.save(profile_photo_path)
-            relative_photo_path = os.path.join('uploads', filename)
+            if profile_photo:
+                filename = secure_filename(profile_photo.filename)
+                profile_photo_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                profile_photo.save(profile_photo_path)
+                relative_photo_path = os.path.join('uploads', filename)
+            else:
+                relative_photo_path = None
 
 
 
@@ -893,13 +896,9 @@ def dashboard():
         for date in dates:
             days.append(datetime.strptime(date[0], "%Y-%m-%d").strftime("%A"))
         appointments_per_day = {
-            'Monday': days.count('Monday'),
-            'Tuesday': days.count('Tuesday'),
-            'Wednesday': days.count('Wednesday'),
-            'Thursday': days.count('Thursday'),
-            'Friday': days.count('Friday'),
-            'Saturday': days.count('Saturday'),
-            'Sunday': days.count('Sunday')
+            'days': ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+            'appointments': [days.count('Monday'), days.count('Tuesday'), days.count('Wednesday'), 
+            days.count('Thursday'), days.count('Friday'), days.count('Saturday'), days.count('Sunday')]
         }
         return appointments_per_day
 
@@ -1064,10 +1063,28 @@ def dashboard():
         for i in revenues:
             revenues_per_month[months[i[0]-1]] = i[1]
         total_year_revenues = sum(revenues_per_month.values())
+        revenue = [revenues_per_month['January'] if 'January' in revenues_per_month else 0,
+        revenues_per_month['February'] if 'February' in revenues_per_month else 0,
+        revenues_per_month['March'] if 'March' in revenues_per_month else 0,
+        revenues_per_month['April'] if 'April' in revenues_per_month else 0,
+        revenues_per_month['May'] if 'May' in revenues_per_month else 0,
+        revenues_per_month['June'] if 'June' in revenues_per_month else 0,
+        revenues_per_month['July'] if 'July' in revenues_per_month else 0,
+        revenues_per_month['August'] if 'August' in revenues_per_month else 0,
+        revenues_per_month['September'] if 'September' in revenues_per_month else 0,
+        revenues_per_month['October'] if 'October' in revenues_per_month else 0,
+        revenues_per_month['November'] if 'November' in revenues_per_month else 0,
+        revenues_per_month['December'] if 'December' in revenues_per_month else 0]
+        print(revenue)
+        revenues_per_month = {
+            'months': months,
+            'revenue': revenue
+        }
         return (revenues_per_month, year, total_year_revenues)
-
-    return render_template('dashboard.html', days=appointments_per_day(), data= g.data,
-        most_crowded_day=max(appointments_per_day(), key=appointments_per_day().get), demographics=demographics(),
+    
+    a_p_d = appointments_per_day()
+    return render_template('dashboard.html', days=a_p_d, data= g.data,
+        most_crowded_day=a_p_d['days'][a_p_d['appointments'].index(max(a_p_d['appointments']))], demographics=demographics(),
         most_served_age_group=most_served_age_group(), doctors_data=doctors_data(),
         total_patients_docotrs_equipments=total_patients_docotrs_equipments(), total_revenues_last_month_last_year=total_revenues_last_month_last_year(),
         upcoming_maintenances=upcoming_maintenances(), out_of_service=out_of_service(), revenue_data=revenue_data(), template='dashboard')
