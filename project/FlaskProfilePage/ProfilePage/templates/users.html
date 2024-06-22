@@ -173,24 +173,24 @@ function scrollonclick() {
                     </tbody>
                 </table>
             </div>
-    <div class="tab-pane fade" id="complaints" role="tabpanel" aria-labelledby="complaints-tab">
-        <br>
-        <h3>Complaints</h3>
-        <br>
-        <ul class="list-unstyled">
-            {% for complaint in complaints %}
-            <li class="row">
-                <div class="complaint-info">
-                    <p><strong>Complaint ID:</strong> {{ complaint.c_id }}</p>
-                    <p><strong>Name:</strong> {{ complaint.c_fname }} {{ complaint.c_lname }}</p>
-                    <p><strong>Email:</strong> {{ complaint.c_email }}</p>
-                    <p><strong>Complaint:</strong> {{ complaint.c_message }}</p>
-                </div>
-                <button class="icon-button3 delete-btn" data-id="{{ complaint.c_id }}" data-table="complaint" style="width: 30px;height: 30px"><img class="logo" src="static/photos/check.png" style="margin-right: 30px; width: 50px;"></button>
-            </li>
-            {% endfor %}
-        </ul>
-    </div>
+            <div class="tab-pane fade" id="complaints" role="tabpanel" aria-labelledby="complaints-tab">
+                <br>
+                <h3>Complaints</h3>
+                <br>
+                <ul class="list-unstyled">
+                    {% for complaint in complaints %}
+                    <li class="row" data-id="{{ complaint.c_id }}">
+                        <div class="complaint-info">
+                            <p><strong>Complaint ID:</strong> {{ complaint.c_id }}</p>
+                            <p><strong>Name:</strong> {{ complaint.c_fname }} {{ complaint.c_lname }}</p>
+                            <p><strong>Email:</strong> {{ complaint.c_email }}</p>
+                            <p><strong>Complaint:</strong> {{ complaint.c_message }}</p>
+                        </div>
+                        <button class="icon-button3 delete-btn" data-id="{{ complaint.c_id }}" data-table="complaint" style="width: 30px;height: 30px"><img class="logo" src="static/photos/check.png" style="margin-right: 30px; width: 50px;"></button>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
         </div>
     </div>
     <!-- Bootstrap core JS and dependencies -->
@@ -281,6 +281,7 @@ $(document).ready(function() {
                 alert('Data deleted successfully!');
                 // Remove the row from the table
                 $(`tr[data-id=${id}]`).remove();
+                $(`li[data-id=${id}]`).remove();
             },
             error: function(error) {
                 alert('Error deleting data.');

@@ -211,6 +211,13 @@
     /*margin-bottom: 30px;*/
 }
 
+.content .right-side .tab .row .cancel-btn {
+    width: 30px; 
+    height: 30px;
+    border: none;
+    background-color: transparent;
+}
+
 /* Background colors based on appointment state */
 #today {
     background-color: #ffffe0; /* Light blue */
@@ -226,6 +233,29 @@
     background-color: #ffe4e1; /* Light coral */
     border-left: 5px solid red; /* Light coral border */
 }
+
+/* styles.css */
+.content .right-side .tab .cancel-btn {
+    /* Other button styles */
+    position: relative; /* Ensure relative positioning for the pseudo-element */
+}
+
+.content .right-side .tab .cancel-btn::after {
+    content: "Cancel"; /* Text to display on hover */
+    position: relative;
+    background-color: white; /* Background color for the text */
+    color: red; /* Text color */
+    font-weight: bold;
+    padding: 5px 10px;
+    border-radius: 5px;
+    opacity: 0; /* Initially hidden */
+    transition: opacity 0.3s ease; /* Smooth transition */
+}
+
+.content .right-side .tab .cancel-btn:hover::after {
+    opacity: 1; /* Show the text on hover */
+}
+
 
 .content .right-side .book-appointment-btn {
     background-color: #fb923c;

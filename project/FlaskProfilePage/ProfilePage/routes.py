@@ -7,7 +7,7 @@ from ProfilePage.forms import LoginForm, RadiologistEditProfileForm, PatientEdit
     PatientRegisterForm, ReportForm, \
     ForgetForm, \
     ResetPasswordForm, contactForm
-from flask import render_template, redirect, url_for, flash, session, request,g
+from flask import render_template, redirect, url_for, flash, session, request,g, jsonify
 from werkzeug.utils import secure_filename
 import os, psycopg2.extras, random
 import requests
@@ -151,6 +151,23 @@ def edit_data():
     return redirect(url_for('users_page'))
 
 
+@app.route('/cancel_appointment', methods=['POST'])
+def cancel_appointment():
+    cursor = g.connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
+    data = request.get_json()
+    if 'cancel_id' in data:
+        print(data)
+        cancel_id = data['cancel_id']
+        update_query = """
+                DELETE FROM appointments 
+                WHERE a_id = %s;
+            """
+        cursor.execute(update_query, (str(cancel_id),))
+    cursor.close()
+    g.connection.commit()
+    g.connection.close()
+    return redirect(url_for('patient_profile_page'))
+
 @app.route('/BookAppointment', methods=['GET', 'POST'])
 def appointment_page():
     form = AppointmentForm()
@@ -202,7 +219,7 @@ def appointment_page():
             g.connection.commit()
             cursor.close()
             flash('Your appointment has been booked successfully!', category='success')
-            return redirect(url_for('patient_profile_page'))
+            return redirect('/patient-profile')
     return render_template('appointment.html', form=form, data=g.data)
 
 
@@ -299,8 +316,7 @@ def login_admin():
 
 @app.route('/users')
 def users_page():
-    data = session.get('user_data')
-    if data is None or 'admin_id' not in data:
+    if g.data is None or 'admin_id' not in g.data:
         return redirect('/login')
     cursor = g.connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
     # patients data
@@ -374,7 +390,7 @@ def radiologist_profile_page():
             FROM appointments
             JOIN patient ON appointments.p_id = Patient.id
             WHERE appointments.d_id = %(d_id)s
-            ORDER BY state
+            ORDER BY state, appointments.date
         """, {'d_id':g.data['d_id'], 'today': today})
     appointments = cursor.fetchall()
     cursor.close()
@@ -522,7 +538,7 @@ def patient_profile_page():
         FROM appointments
         JOIN radiologist ON appointments.D_ID = radiologist.d_id
         WHERE P_ID = %(id)s
-        ORDER BY state
+        ORDER BY state, appointments.date
     """, {'id':g.data['id'], 'today': today})
     appointments = cursor.fetchall()
     cursor.close()
