@@ -1,7 +1,5 @@
 {% extends 'base.html' %}
-{% block title %}
-    Dashboard
-{% endblock %}
+    Dashboard Page
 {% block content %}
 <head>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css"/>
@@ -55,14 +53,14 @@ function scrollonclick(h) {
                     <br>
                     <h1 class="counter" data-target="{{total_patients_docotrs_equipments[2][0]}}">0</h1><h1>Devices</h1>
                     <br>
-                    <img src="{{ url_for('static', filename='photos/devices2.png') }}" alt="Equipment" style="width: 80px;height: auto">
+                    <img src="https://cdn-icons-png.flaticon.com/128/14435/14435651.png" alt="Equipment" style="width: 50px;height: auto">
                 </div>
                 <div class="card">
                     <br>
                     <br>
                     <h1 class="counter dollar-sign" data-target="{{total_revenues_last_month_last_year[0][0]}}">0</h1><h1>Last month revenue</h1>
                     <br>
-                    <img src="{{ url_for('static', filename='photos/money.png') }}" alt="Last month revenue" style="width: 80px;height: auto">
+                    <img src="https://cdn-icons-png.flaticon.com/128/1140/1140214.png" alt="Last month revenue" style="width: 50px;height: auto">
                 </div>
             </div>
         </div>
@@ -269,7 +267,7 @@ function scrollonclick(h) {
 
                     if (current < target) {
                         counter.innerText = Math.ceil(current + increment);
-                        setTimeout(updateCounter, 5); // Adjust the delay to control speed
+                        setTimeout(updateCounter, 15); // Adjust the delay to control speed
                     } else {
                         if (counter.classList.contains('dollar-sign')) {
                             counter.innerText = target + ' $';

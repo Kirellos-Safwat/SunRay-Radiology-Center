@@ -5,6 +5,7 @@
     color: white;
     margin: auto;
     margin-top: 10%;
+    margin-bottom: 10%;
     border-radius: 5px;
 }
 
@@ -63,12 +64,10 @@
 
 #signUp{
     margin-left: 25%;
-    margin-bottom: 20%;
 }
 
 #forgetPassword{
     margin-left: 36px;
-    font-weight: 600px;
 }
 
 .form-signin label{
@@ -182,10 +181,33 @@
 
 @media (max-width: 820px) {
   .loginBox{
-    margin: 40px 0;
+    margin: 40px 15px;
+    margin-top: 30%;
+    margin-bottom: 30%;
     height: 100%;
   }
   .loginBox .content{
     flex-direction: column-reverse;
+  }
+
+  #signUp{
+    margin-left: 14%;
+    margin-bottom: -60%;
+  }
+
+  .form-signin input[type="submit"]{
+    text-align: center;
+    font-weight: bold;
+    width: 230px;
+    margin-left: -2%;
+    margin-bottom: -100%;
+  }
+  .form-signin .g-sign-in-button, .logo-wrapper, .text-container {
+    text-align: center;
+    font-weight: bold;
+    width: 230px;
+    margin-left: -1%;
+    margin-bottom: 30%;
+    margin-top: 0%;
   }
 }

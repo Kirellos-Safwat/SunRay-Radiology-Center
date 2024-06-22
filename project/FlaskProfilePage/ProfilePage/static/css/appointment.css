@@ -5,42 +5,12 @@
     color: white;
     margin: auto;
     margin-top: 10%;
+    margin-bottom: 10%;
     border-radius: 5px;
-     font-size: 16px;
+    font-size: 16px;
 }
-.PredictBox{
-    width: 350px;
-    height: 242px;
-    background: rgb(18, 172, 142);
-    color: white;
-    margin: auto;
-    margin-top: 7%;
-    border-radius: 5px;
-     font-size: 16px;
-}
-.PredictBox input{
-    width: 83%;
-    position: relative;
-    top: 32px;
-    margin: auto;
-    font-size: 18px;
-}
-.PredictBox input[type="submit"]{
-    border: none;
-    outline: none;
-    text-align: center;
-    height: 53px;
-    width: fit-content;
-    border-radius: 5px;
-    color: white;
-    font-size: 20px;
-    cursor: pointer;
-    position: relative;
 
-    left: 54px;
-    top: 57px;
-}
-.PredictBox1{
+/*.PredictBox1{
     width: 350px;
     height: 242px;
     background: rgb(18, 172, 142);
@@ -81,7 +51,7 @@
     margin-top: 10%;
     border-radius: 5px;
     font-size: 16px;
-}
+}*/
 
 .AppointmentBox h1{
     text-align: center;
@@ -98,6 +68,15 @@
     margin: auto;
 }
 
+/*.report-select{
+      width: 83%;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #fb923c;
+    border-radius: 5px;
+    box-sizing: border-box;
+
+}*/
 
 
 .form-group {
@@ -167,9 +146,9 @@
     color: white;
     font-size: 20px;
     cursor: pointer;
-    margin-left: 10%;
+    margin-left: 9%;
+    font-weight: bold;
 }
-
 
 .flash-message-success {
     background-color: #dff0d8;
@@ -196,10 +175,16 @@
 
 @media (max-width: 820px) {
   .AppointmentBox{
-    margin: 40px 0;
+    margin: 40px 15px;
     height: 100%;
   }
   .AppointmentBox .content{
     flex-direction: column-reverse;
+  }
+  .AppointmentBox input[type="submit"]{
+    text-align: center;
+    font-weight: bold;
+    width: 230px;
+    margin-left: -2%;
   }
 }
