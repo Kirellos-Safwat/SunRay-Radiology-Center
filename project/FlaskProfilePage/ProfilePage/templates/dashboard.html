@@ -1,5 +1,7 @@
 {% extends 'base.html' %}
-
+{% block title %}
+    Dashboard
+{% endblock %}
 {% block content %}
 <head>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css"/>
@@ -267,7 +269,7 @@ function scrollonclick(h) {
 
                     if (current < target) {
                         counter.innerText = Math.ceil(current + increment);
-                        setTimeout(updateCounter, 20); // Adjust the delay to control speed
+                        setTimeout(updateCounter, 5); // Adjust the delay to control speed
                     } else {
                         if (counter.classList.contains('dollar-sign')) {
                             counter.innerText = target + ' $';
@@ -312,7 +314,7 @@ function scrollonclick(h) {
                                 createGradient(ctx3, 'rgba(199, 199, 199,0.5)', 'rgba(199, 199, 199,0.9)'),
                                 createGradient(ctx3, 'rgba(83, 102, 255, 0.5)', 'rgba(83, 102, 255, 0.9)'),
                                 createGradient(ctx3, 'rgba(140, 159, 64, 0.5)', 'rgba(140, 159, 64, 0.9)'),
-                                createGradient(ctx3, 'rgba(200, 199, 199,0.5)', 'rgba(200, 199, 199,0.9)'),
+                                createGradient(ctx3, 'rgba(250, 139, 169,0.5)', 'rgba(250, 139, 169,0.9)'),
                                 createGradient(ctx3, 'rgba(100, 192, 192,0.5)', 'rgba(100, 192, 192,0.9)'),
                                 createGradient(ctx3, 'rgba(200, 159, 64, 0.5)', 'rgba(200, 159, 64, 0.9)')
                             ],

@@ -179,7 +179,11 @@
             <div class="doctors__grid">
                 <div class="doctors__card">
                     <div class="doctors__card__image">
-                        <img src="static/photos/doctor-1-photo.jpg" alt="doctor" />
+                        {% if photo.doctor1 is none  or photo.doctor1 is undefined %}
+                        <img src="{{ url_for('static', filename='images/image.png') }}" alt="doctor" />
+                        {% else %}
+                        <img src="{{ url_for('static', filename=photo.doctor1) }}" alt="doctor" />
+                        {% endif %}
                         <div class="doctors__socials">
                             <span><i class="ri-instagram-line"></i></span>
                             <span><i class="ri-facebook-fill"></i></span>
@@ -192,7 +196,11 @@
                 </div>
                 <div class="doctors__card">
                     <div class="doctors__card__image">
-                        <img src="static/photos/doctor-2-photo.jpg" alt="doctor" />
+                        {% if photo.doctor2 is none or photo.doctor2 is undefined %}
+                        <img src="{{ url_for('static', filename='images/image.png') }}" alt="doctor" />
+                        {% else %}
+                        <img src="{{ url_for('static', filename=photo.doctor2) }}" alt="doctor" />
+                        {% endif %}
                         <div class="doctors__socials">
                             <span><i class="ri-instagram-line"></i></span>
                             <span><i class="ri-facebook-fill"></i></span>
@@ -205,7 +213,11 @@
                 </div>
                 <div class="doctors__card">
                     <div class="doctors__card__image">
-                        <img src="static/photos/doctor-3-photo.jpg" alt="doctor" />
+                        {% if photo.doctor3 is none or photo.doctor3 is undefined %}
+                        <img src="{{ url_for('static', filename='images/image.png') }}" alt="doctor" />
+                        {% else %}
+                        <img src="{{ url_for('static', filename=photo.doctor3) }}" alt="doctor" />
+                        {% endif %}
                         <div class="doctors__socials">
                             <span><i class="ri-instagram-line"></i></span>
                             <span><i class="ri-facebook-fill"></i></span>

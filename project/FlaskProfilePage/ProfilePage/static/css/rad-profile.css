@@ -208,6 +208,22 @@
     /*margin-bottom: 30px;*/
 }
 
+/* Background colors based on appointment state */
+#today {
+    background-color: #ffffe0; /* Light blue */
+    border-left: 5px solid yellow; /* Light blue border */
+}
+
+#upcoming {
+    background-color: #f0fff0; /* Light green */
+    border-left: 5px solid green; /* Light green border */
+}
+
+#missed {
+    background-color: #ffe4e1; /* Light coral */
+    border-left: 5px solid red; /* Light coral border */
+}
+
 .content .right-side .book-appointment-btn {
     background-color: #fb923c;
     color: white;

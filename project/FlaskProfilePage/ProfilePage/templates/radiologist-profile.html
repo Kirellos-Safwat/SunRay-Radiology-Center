@@ -61,14 +61,7 @@
                                         <p>{{ data.d_name }}</p>
                                     </div>
                                 </div>
-<!--                                <div class="row">-->
-<!--                                    <div class="col-md-6">-->
-<!--                                        <label>Last Name :</label>-->
-<!--                                    </div>-->
-<!--                                    <div class="col-md-6">-->
-<!--                                        <p>{{ data.lname }}</p>-->
-<!--                                    </div>-->
-<!--                                </div>-->
+
                                 <div class="row">
                                     <div class="col-md-6">
                                         <label>Email :</label>
@@ -126,12 +119,13 @@
                         {% if appointments %}
                         <ul>
                             {% for appointment in appointments %}
-                            <div class ="row">
+                            <div class ="row" id="{{ appointment.state }}">
                                 <li>
 
-                                    <p><strong>Appointment ID:</strong> {{ appointment.a_id }}</p>
-                                    <p><strong>Date:</strong> {{ appointment.date }}</p>
-                                    <p><strong>Patient:</strong> {{ appointment.fname +" "+ appointment.lname }}</p>
+                                    <p style="margin-left: 10px;"><strong>Appointment ID:</strong> {{ appointment.a_id }}</p>
+                                    <p style="margin-left: 10px;"><strong>Date:</strong> {{ appointment.date }}</p>
+                                    <p style="margin-left: 10px;"><strong>Patient:</strong> {{ appointment.fname +" "+ appointment.lname }}</p>
+                                    <p style="margin-left: 10px;"><strong>State:</strong> {{ appointment.state }}</p>
                                     <!-- Add more fields as needed -->
                                 </li>
                             </div>
