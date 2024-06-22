@@ -12,7 +12,7 @@ class LoginForm(FlaskForm):
 
 
 class PatientEditProfileForm(FlaskForm):
-            
+
     First_Name = StringField(label='First Name:', validators=[Length(min=2, max=50), DataRequired()])
     Last_Name = StringField(label='Last Name:', validators=[Length(min=2, max=30), DataRequired()])
     # Email = StringField(label='Email:', validators=[Email(), DataRequired()])

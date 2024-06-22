@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% block title %}
-    Contact Us
+    Contact Page
 {% endblock %}
 {% block content %}
     <head>
@@ -42,19 +42,19 @@
               <form class="form" method="POST" enctype="multipart/form-data" >
                   {{ form.hidden_tag() }}
                   <div class="mb-3">
-                    <label for="First_Name" class="form-label">First Name:</label>
+                    <!--<label for="First_Name" class="form-label">First Name:</label>-->
                     {{ form.First_Name(class="form", placeholder="First Name") }}
                   </div>
                   <div class="mb-3">
-                    <label for="Last_Name" class="form-label con">Last Name:</label>
+                    <!--<label for="Last_Name" class="form-label con">Last Name:</label>-->
                     {{ form.Last_Name(class="form", placeholder="Last Name") }}
                   </div>
                   <div class="mb-3">
-                    <label for="Email" class="form-label contactlabel">Email:</label>
+                    <!--<label for="Email" class="form-label contactlabel">Email:</label>-->
                     {{ form.Email(class="form", placeholder="Email") }}
                   </div>
                   <div class="mb-3">
-                    <label for="Message" class="form-label contactlabel2 ">Message:</label>
+                    <!--<label for="Message" class="form-label contactlabel2 ">Message:</label>-->
                     {{ form.Message(class="form", placeholder="Message") }}
                   </div>
                   <button type="submit">Send Now</button>

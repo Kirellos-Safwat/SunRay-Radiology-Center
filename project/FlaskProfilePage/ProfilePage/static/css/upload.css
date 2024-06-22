@@ -10,7 +10,7 @@
     font-size: 18px;
     margin: auto;
     margin-top:10%;
-    /*margin-top: 10%;*/
+    margin-bottom: 10%;
     /*margin-left: 21%;*/
     text-align: center;
     background: rgb(18, 172, 142);
@@ -24,22 +24,22 @@
     height: 350px;
     background: #12ac8e;
     color: #fafafa;
-    margin-left: 6.5%;
+    margin: auto;
     border-radius: 5px;
 }
 
 .uploadBox h1{
     font-size: 30px;
     text-align: center;
-    margin-top: -60px;
-    margin-left: 2%;
+    margin: auto;
+    margin-top: -10px;
     margin-bottom: 3%;
     color: #fafafa;
 }
 .uploadBox p{
     font-size: 25px;
     text-align: center;
-    margin-left: 2%;
+    margin: auto;
     margin-bottom: 3%;
     color: #fafafa;
 }
@@ -108,9 +108,8 @@
     width: 800px;
     background: #fafafa;
     color: #fafafa;
-    margin-top: 5%;
-    margin-left: 6.5%;
-    margin-right: 5%;
+    margin: auto;
+    margin-bottom: 5%;
     border-radius: 10px;
     display: flex;
     flex-direction: row;
@@ -138,5 +137,71 @@
     padding: 10px;
     cursor: pointer;
     border: 1px solid #fb923c;
+}
+
+@media (max-width: 950px) {
+  .container{
+    display: flex;
+    width: 90%;
+    padding: 30px 40px 40px 35px ;
+  }
+  .uploadBox{
+    width: 200px;
+    padding: 30px 40px 40px 35px ;
+    margin: auto;
+    margin-left: 2%;
+  }
+}
+
+@media (max-width: 820px) {
+  .container{
+    display: flex;
+    margin: 40px 15px;
+    margin-top: 30%;
+    margin-bottom: 30%;
+    height: 100%;
+  }
+
+  .container .content{
+    flex-direction: column-reverse;
+  }
+
+  .uploadBox{
+    width: 200px;
+    padding: 30px 40px 40px 35px;
+    margin-left: 2%;
+    margin-top: -20%;
+  }
+
+  .uploadBox label{
+    font-size: 22px;
+    margin-left: -50%;
+    margin-top: 20%;
+  }
+
+  .uploadBox input[type="file"]{
+    text-align: center;
+    width: 230px;
+    margin-left: 170%;
+    margin-bottom: 30%;
+  }
+
+  .container button{
+    text-align: center;
+    font-weight: bold;
+    margin-left: -2%;
+    margin-bottom: 30%;
+  }
+  .container a{
+    text-align: center;
+    font-weight: bold;
+    margin-left: -2%;
+    margin-bottom: 50%;
+  }
+  .container .scan-photos{
+    width: 200px;
+    margin-top: 80%;
+    margin-bottom: -10%;
+  }
 }
 

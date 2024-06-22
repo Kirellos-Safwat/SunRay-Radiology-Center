@@ -1,3 +1,4 @@
+import psycopg2.extras
 from datetime import datetime
 from ProfilePage import app, db, connection_string, mail, flow, GOOGLE_CLIENT_ID
 from flask_login import current_user
@@ -7,7 +8,7 @@ from ProfilePage.forms import LoginForm, RadiologistEditProfileForm, PatientEdit
     PatientRegisterForm, ReportForm, \
     ForgetForm, \
     ResetPasswordForm, contactForm
-from flask import render_template, redirect, url_for, flash, session, request,g, jsonify
+from flask import render_template, redirect, url_for, flash, session, request,g
 from werkzeug.utils import secure_filename
 import os, psycopg2.extras, random
 import requests
@@ -219,7 +220,7 @@ def appointment_page():
             g.connection.commit()
             cursor.close()
             flash('Your appointment has been booked successfully!', category='success')
-            return redirect('/patient-profile')
+            return redirect(url_for('patient_profile_page'))
     return render_template('appointment.html', form=form, data=g.data)
 
 

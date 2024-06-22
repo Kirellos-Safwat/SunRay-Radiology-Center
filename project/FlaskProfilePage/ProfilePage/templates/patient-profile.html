@@ -83,7 +83,7 @@
                                             <label>Email:</label>
                                         </div>
                                         <div class="col-md-6">
-                                            <p>{{ data.email }}</p>
+                                            <p>{{ ' ' +data.email }}</p>
                                         </div>
                                     </div>
                                     <div class="row">
@@ -145,8 +145,8 @@
                                         <!-- Add more fields as needed -->
                                         {% if appointment.state == 'upcoming' %}
                                         <button class="cancel-btn" data-id="{{ appointment.a_id }}">
-                                            <img class="logo" src="static/photos/cancel_icon.png" style="margin-right: 30px; width: 30px;"></button>                                    
-                                        {% endif %}                                    
+                                            <img class="logo" src="static/photos/cancel_icon.png" style="margin-right: 30px; width: 30px;"></button>
+                                        {% endif %}
                                 </li>
                                 {% endfor %}
                             </ul>

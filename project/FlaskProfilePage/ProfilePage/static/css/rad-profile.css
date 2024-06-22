@@ -47,7 +47,7 @@
 .content .left-side .profile{
     width: 390px;
     background: #fafafa;
-    border-radius: 5px;
+    border-radius: 45px;
     margin-top: 58px;
     padding: 20px 20px 20px 20px;
     box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
@@ -168,7 +168,7 @@
 .content .right-side .tab{
     width: 450px;
     background: #fafafa;
-    border-radius: 0 5px 5px 5px;
+    border-radius: 0 45px 45px 45px;
     padding: 20px 60px 30px 40px;
     box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
     height: 400px;
@@ -281,7 +281,7 @@
 
 .content .left-side .user-data{
     background-color: #fafafa;
-    border-radius: 5px;
+    border-radius: 45px;
     box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
     width: 390px;
     height: auto;
@@ -323,7 +323,7 @@
 
 .content .right-side .scans{
     background-color: #fafafa;
-    border-radius: 5px;
+    border-radius: 45px;
     box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
     width: 450px;
     height: auto;

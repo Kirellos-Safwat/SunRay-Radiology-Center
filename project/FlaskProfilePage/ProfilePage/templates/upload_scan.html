@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% block title %}
-    Forget Password Page
+    Upload Scan Page
 {% endblock %}
 {% block content %}
     <head>
@@ -9,10 +9,9 @@
     <body>
 
         </div>
-        <div class="container">
-            </br>
+        <div class="container"> <br>
+           <div class="content">  <br>
         <div class="uploadBox">
-            <div class="content">  <br> <br> <br>
                 <h1>Upload Scans</h1>
                 <p>Welcome, {{ data.fname }}!</p>
                 <form action="/upload_scan" method="post" enctype="multipart/form-data">
@@ -24,7 +23,6 @@
                     <!-- dont change the a elemnt to button the href doesnt work just change the style to match it -->
                     <a href="/patient-profile" role="button" class="btn">Done</a> 
                 </form>
-            </div>
         </div>
         <div class="scan-photos">
             {%if data.scans %}
@@ -35,8 +33,9 @@
                 <p>No scans uploaded yet.</p>
             {% endif %}
         </div>
-            </br> </br>
+            </br>
         </div>
+            </div>
         <!-- Bootstrap JavaScript -->
         <!--<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>-->
     </body>
