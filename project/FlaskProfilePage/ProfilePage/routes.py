@@ -14,19 +14,19 @@ import requests
 from google.oauth2 import id_token
 from pip._vendor import cachecontrol
 import google.auth.transport.requests
-# import tensorflow as tf
-# from keras.src.optimizers import Adamax
-# from tensorflow.keras.preprocessing import image
+import tensorflow as tf
+from keras.src.optimizers import Adamax
+from tensorflow.keras.preprocessing import image
 
-# model = tf.keras.models.load_model(
-#     r"C:\Users\Anas Mohamed\Desktop\DB_project\his-finalproject-database_sbe_spring24_team6\project\FlaskProfilePage\ProfilePage\brain_tumor_v2.h5",
-#     compile=False)
-# model.compile(Adamax(learning_rate=0.001), loss='categorical_crossentropy', metrics=['accuracy'])
-#
-# pneumonia_model = tf.keras.models.load_model(
-#     r'C:\Users\Anas Mohamed\Desktop\DB_project\his-finalproject-database_sbe_spring24_team6\project\FlaskProfilePage\ProfilePage\pneumonia_detection_v2.h5',
-#     compile=False)
-# pneumonia_model.compile(Adamax(learning_rate = 0.0001) , loss = 'categorical_crossentropy', metrics = ['accuracy'])
+model = tf.keras.models.load_model(
+    r"C:\Users\Anas Mohamed\Desktop\DB_project\his-finalproject-database_sbe_spring24_team6\project\FlaskProfilePage\ProfilePage\brain_tumor_v2.h5",
+    compile=False)
+model.compile(Adamax(learning_rate=0.001), loss='categorical_crossentropy', metrics=['accuracy'])
+
+pneumonia_model = tf.keras.models.load_model(
+    r'C:\Users\Anas Mohamed\Desktop\DB_project\his-finalproject-database_sbe_spring24_team6\project\FlaskProfilePage\ProfilePage\pneumonia_detection_v2.h5',
+    compile=False)
+pneumonia_model.compile(Adamax(learning_rate = 0.0001) , loss = 'categorical_crossentropy', metrics = ['accuracy'])
 
 
 @app.before_request
@@ -151,6 +151,23 @@ def edit_data():
     return redirect(url_for('users_page'))
 
 
+@app.route('/cancel_appointment', methods=['POST'])
+def cancel_appointment():
+    cursor = g.connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
+    data = request.get_json()
+    if 'cancel_id' in data:
+        print(data)
+        cancel_id = data['cancel_id']
+        update_query = """
+                DELETE FROM appointments 
+                WHERE a_id = %s;
+            """
+        cursor.execute(update_query, (str(cancel_id),))
+    cursor.close()
+    g.connection.commit()
+    g.connection.close()
+    return redirect(url_for('patient_profile_page'))
+
 @app.route('/BookAppointment', methods=['GET', 'POST'])
 def appointment_page():
     form = AppointmentForm()
@@ -244,10 +261,13 @@ def report_page():
 
             profile_photo = form.r_scan.data
 
-            filename = secure_filename(profile_photo.filename)
-            profile_photo_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-            profile_photo.save(profile_photo_path)
-            relative_photo_path = os.path.join('uploads', filename)
+            if profile_photo:
+                filename = secure_filename(profile_photo.filename)
+                profile_photo_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                profile_photo.save(profile_photo_path)
+                relative_photo_path = os.path.join('uploads', filename)
+            else:
+                relative_photo_path = None
 
 
 
@@ -299,8 +319,7 @@ def login_admin():
 
 @app.route('/users')
 def users_page():
-    data = session.get('user_data')
-    if data is None or 'admin_id' not in data:
+    if g.data is None or 'admin_id' not in g.data:
         return redirect('/login')
     cursor = g.connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
     # patients data
@@ -374,7 +393,7 @@ def radiologist_profile_page():
             FROM appointments
             JOIN patient ON appointments.p_id = Patient.id
             WHERE appointments.d_id = %(d_id)s
-            ORDER BY state
+            ORDER BY state, appointments.date
         """, {'d_id':g.data['d_id'], 'today': today})
     appointments = cursor.fetchall()
     cursor.close()
@@ -489,7 +508,7 @@ def patient_login_page():
         )
         user = cursor.fetchone()
         cursor.close()  # Close the cursor once
-        g.connection.close()        
+        g.connection.close()
         if user:
             session['user_data'] = dict(user)
             data = session['user_data']
@@ -522,7 +541,7 @@ def patient_profile_page():
         FROM appointments
         JOIN radiologist ON appointments.D_ID = radiologist.d_id
         WHERE P_ID = %(id)s
-        ORDER BY state
+        ORDER BY state, appointments.date
     """, {'id':g.data['id'], 'today': today})
     appointments = cursor.fetchall()
     cursor.close()
@@ -876,13 +895,9 @@ def dashboard():
         for date in dates:
             days.append(datetime.strptime(date[0], "%Y-%m-%d").strftime("%A"))
         appointments_per_day = {
-            'Monday': days.count('Monday'),
-            'Tuesday': days.count('Tuesday'),
-            'Wednesday': days.count('Wednesday'),
-            'Thursday': days.count('Thursday'),
-            'Friday': days.count('Friday'),
-            'Saturday': days.count('Saturday'),
-            'Sunday': days.count('Sunday')
+            'days': ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+            'appointments': [days.count('Monday'), days.count('Tuesday'), days.count('Wednesday'),
+            days.count('Thursday'), days.count('Friday'), days.count('Saturday'), days.count('Sunday')]
         }
         return appointments_per_day
 
@@ -1047,10 +1062,28 @@ def dashboard():
         for i in revenues:
             revenues_per_month[months[i[0]-1]] = i[1]
         total_year_revenues = sum(revenues_per_month.values())
+        revenue = [revenues_per_month['January'] if 'January' in revenues_per_month else 0,
+        revenues_per_month['February'] if 'February' in revenues_per_month else 0,
+        revenues_per_month['March'] if 'March' in revenues_per_month else 0,
+        revenues_per_month['April'] if 'April' in revenues_per_month else 0,
+        revenues_per_month['May'] if 'May' in revenues_per_month else 0,
+        revenues_per_month['June'] if 'June' in revenues_per_month else 0,
+        revenues_per_month['July'] if 'July' in revenues_per_month else 0,
+        revenues_per_month['August'] if 'August' in revenues_per_month else 0,
+        revenues_per_month['September'] if 'September' in revenues_per_month else 0,
+        revenues_per_month['October'] if 'October' in revenues_per_month else 0,
+        revenues_per_month['November'] if 'November' in revenues_per_month else 0,
+        revenues_per_month['December'] if 'December' in revenues_per_month else 0]
+        print(revenue)
+        revenues_per_month = {
+            'months': months,
+            'revenue': revenue
+        }
         return (revenues_per_month, year, total_year_revenues)
 
-    return render_template('dashboard.html', days=appointments_per_day(), data= g.data,
-        most_crowded_day=max(appointments_per_day(), key=appointments_per_day().get), demographics=demographics(),
+    a_p_d = appointments_per_day()
+    return render_template('dashboard.html', days=a_p_d, data= g.data,
+        most_crowded_day=a_p_d['days'][a_p_d['appointments'].index(max(a_p_d['appointments']))], demographics=demographics(),
         most_served_age_group=most_served_age_group(), doctors_data=doctors_data(),
         total_patients_docotrs_equipments=total_patients_docotrs_equipments(), total_revenues_last_month_last_year=total_revenues_last_month_last_year(),
         upcoming_maintenances=upcoming_maintenances(), out_of_service=out_of_service(), revenue_data=revenue_data(), template='dashboard')

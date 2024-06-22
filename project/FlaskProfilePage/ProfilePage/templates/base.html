@@ -5,6 +5,8 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link href="https://cdn.jsdelivr.net/npm/remixicon@3.4.0/fonts/remixicon.css" rel="stylesheet" />
         <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/home.css') }}">
+            <link rel="icon" href="static/photos/LOGO.png" type="image/x-icon">
+
         <title>
               {% block title %}
                 Radiology Center | SunRay
@@ -30,10 +32,13 @@
                     {% endif %}
                     {% if data.admin_id is none or data.admin_id is undefined %}
                         <li class="link"><a href="/contactUs">Contact Us</a></li>
-                    {% elif template != 'dashboard' %}
-                        <li class="link"><a href="/dashboard">Dashboard</a></li>
-                    {% elif template != 'database' %}
-                        <li class="link"><a href="/users">DataBase</a></li>
+                    {% else %}
+                        {% if template != 'dashboard' %}
+                            <li class="link"><a href="/dashboard">Dashboard</a></li>
+                        {% endif %}
+                        {% if template != 'database' %}
+                            <li class="link"><a href="/users">DataBase</a></li>
+                        {% endif %}
                     {% endif %}
                     {% if template == 'patient_login' %}
                         <li class="link"><a href="/patient-register">Register</a></li>

@@ -7,7 +7,6 @@
         <!--<link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">-->
         <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/pat-profile.css') }}">
         <div class="container-profile">
-            <form method="post">
                 <div class="content">
                     </br> </br>
                 <div class="left-side">
@@ -84,7 +83,7 @@
                                             <label>Email:</label>
                                         </div>
                                         <div class="col-md-6">
-                                            <p>{{ ' ' +data.email }}</p>
+                                            <p>{{ data.email }}</p>
                                         </div>
                                     </div>
                                     <div class="row">
@@ -136,16 +135,19 @@
                         {% if appointments %}
                             <ul>
                                 {% for appointment in appointments %}
-                                <div class ="row" id="{{ appointment.state }}">
-                                    <li>
-
+                                <li class ="row" id="{{ appointment.state }}" data-id="{{ appointment.a_id }}">
+                                    <div>
                                         <p style="margin-left: 10px;"><strong>Appointment ID:</strong> {{ appointment.a_id }}</p>
                                         <p style="margin-left: 10px;"><strong>Date:</strong> {{ appointment.date }}</p>
                                         <p style="margin-left: 10px;"><strong>With:</strong> {{ appointment.d_name }}</p>
                                         <p style="margin-left: 10px;"><strong>State:</strong> {{ appointment.state }}</p>
+                                    </div>
                                         <!-- Add more fields as needed -->
-                                    </li>
-                                </div>
+                                        {% if appointment.state == 'upcoming' %}
+                                        <button class="cancel-btn" data-id="{{ appointment.a_id }}">
+                                            <img class="logo" src="static/photos/cancel_icon.png" style="margin-right: 30px; width: 30px;"></button>
+                                        {% endif %}
+                                </li>
                                 {% endfor %}
                             </ul>
                         {% else %}
@@ -177,8 +179,6 @@
                         </style>
                         <div class ="row">
                             <li>
-
-
                                 <p><strong>report ID:</strong> {{ report.r_id }}</p>
                                 <p><strong>Doctor Name:</strong> {{ report.d_name }}</p>
                                 <p><strong>Study Area:</strong> {{ report.r_study_area}}</p>
@@ -239,8 +239,32 @@
                     </br> </br>
                 </div>
                 </br>
-            </form>
             </br>
         </div>
+        <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"></script>
+        <script>
+            $(document).ready(function() {
+                // Handle click event on cancel button
+                $('.cancel-btn').click(function() {
+                    let id = $(this).data('id');
+                    $.ajax({
+                        url: '{{ url_for("cancel_appointment") }}',
+                        type: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify({ cancel_id: id }),
+                        success: function(response) {
+                            alert('Appointment canceled successfully!');
+                            // You can also update the UI here if needed
+                            $(`li[data-id=${id}]`).remove();
+                        },
+                        error: function(error) {
+                            alert('Error cancelling appointment.');
+                            // Handle error scenario
+                        }
+                    });
+                });
+            });
+        </script>
     </body>
 {% endblock %}
