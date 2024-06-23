@@ -1,5 +1,113 @@
-.searchBar input[type="search"] {
-    width: 250px;
-    margin-left : 65%;
-    height: 40px;
+
+.custom-table td:nth-child(n+1):not(:last-child)  {
+ border: 1px solid white; /* Orange border */
+    background: linear-gradient(to right, rgba(18, 172, 142, 0.9), rgba(18, 172, 142, 0.7)); /* Darker green gradient */
+    color: black; /* Orange text color */
+     font-size: 1.2rem;
+    text-align: center;
+}
+td:last-child {
+  background-color: transparent;
+    border:1px solid transparent; ;
+}
+.custom-table th {
+     border: 1px solid white; /* Orange border */
+    background: rgba(245, 123, 24, 0.9);
+    color: black; /* Orange text color */
+     font-size: 1rem;
+    text-align: center;
+}
+
+.custom-table .editable input {
+    background: lightcyan; /* Darker green gradient */
+
+    color: black; /* Orange text color */
+    border: 1px solid white; /* Orange border */
+}
+
+.icon-button {
+        border: none;
+        background: none;
+        padding: 0;
+        cursor: pointer;
+    }
+
+    .icon-button img {
+        width: 30px; /* Adjust the size of the icon */
+        height: auto; /* Maintain aspect ratio */
+    }
+
+.icon-button2 {
+        border: none;
+        background: none;
+        padding: 0;
+        cursor: pointer;
+    }
+
+    .icon-button2 img {
+        height: 35px; /* Adjust the size of the icon */
+        width: auto; /* Maintain aspect ratio */
+    }
+
+.icon-button3 {
+    border: none;
+    background: none;
+    padding: 0;
+    cursor: pointer;
+    position: relative;
+    margin: auto;
+    left: -41px;
+}
+
+
+
+.tab-icon {
+    display: inline-block;
+    width: 30px;
+    margin-right: 10px;
+}
+
+.tab-icon2 {
+    display: inline-block;
+    width: 37px;
+    margin-right: 10px;
+}
+
+
+
+.search-input {
+        position: relative;
+    }
+    .search-input .search-icon {
+        position: absolute;
+        left: 10px;
+        top: 55%;
+        transform: translateY(-50%);
+        width: 16px;
+        height: 16px;
+        pointer-events: none;
+    }
+    .search-input input {
+        padding-left: 50px;
+    }
+
+.row{
+    margin: 15px;
+    background: #f2f2f2;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 100%;
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+    border-radius: 5px;
+    margin-left: 10px;
+    /*margin-bottom: 30px;*/
+}
+
+.complaint-info {
+    flex: 1;
+}
+
+.complaint-info p {
+    margin: 0;
 }

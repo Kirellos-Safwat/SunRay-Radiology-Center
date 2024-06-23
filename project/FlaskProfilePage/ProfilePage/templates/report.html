@@ -4,67 +4,82 @@
 {% endblock %}
 {% block content %}
 <body onload="setMinDate()">
-<link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
-    <h1 class="text-center">Submit Report</h1>
-    {% for message in get_flashed_messages() %}
-        <div class="alert alert-{{ message[0] }}" role="alert">{{ message[1] }}</div>
-    {% endfor %}
-<div class="container" style="max-width: 400px;" >
-        <div class="card">
-            <div class="card-body">
-                <form action="" method='POST' name="ReportForm">
-
-                    {{ form.hidden_tag() }}
-                    <div class="mb-3">
-                    <label for="Patient Name">{{ form.patients.label }}</label>
-                             {{ form.patients }}
-                         </div>
-
-                    <script>
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/report.css') }}">
+   <script>
                                 function setMinDate() {
                                     var today = new Date().toISOString().split('T')[0];
                                     document.getElementById('date').setAttribute('min', today);
                                 }
                                          </script>
 
-                    <div >
-                    {{ form.r_time.label }} {{form.r_time(class='datepicker',id = 'date')}}
+
+
+        <div class="ReportBox">
+            <div class="content"> </br>
+            <h1 align="center">Make Report</h1>
+
+
+<!--
+<div class="container" style="max-width: 400px;" >
+        <div class="card">
+            <div class="card-body">-->
+                <form action="" method='POST' name="ReportForm" enctype="multipart/form-data">
+<div class="container">
+                    <div class="left-side">
+
+                    {{ form.hidden_tag() }}
+                    <div class="form-group">
+                    <label for="Patient Name">{{ form.patients.label(placeholder="Patient Name") }}</label>
+                             {{ form.patients }}
+                         </div>
+
+
+
+
+
+                   <div class="form-group">
+                        <label for="Study Area">{{ form.r_study_area.label}}</label>
+                             {{ form.r_study_area(class="form-control", placeholder="Study Area") }}
+                         </div>
+
+                         <div class="mb-3">
+                            <label for="r_scan" class="form-label">Scan Input</label>
+                            {{ form.r_scan(class="form-control") }}
+                        </div>
+                         <div >
+                    {{ form.r_time.label }} {{form.r_time(class='form-control datepicker')}}
                         </div>
 
-                    <div class="mb-3">
-                    <label for="Patient Name">'Replace this with scan image input in the html'</label>
-                             {{ form.patient }}
-                         </div>
-                    <div class="mb-3">
-                    <label for="Study Area">{{ form.r_study_area.label }}</label>
-                             {{ form.r_study_area }}
-                         </div>
-                     <div class="mb-3">
+
+                    </div>
+                        <div class="right-side">
+                     <div class="form-group">
                     <label for="Examination Type">{{ form.devices.label }}</label>
-                             {{ form.devices }}
+                             {{ form.devices(class="form-control") }}
                         </div>
 
-                     <div class="mb-3">
+                     <div class="form-group">
                     <label for="Radiation dose">{{ form.radiation_dose.label }}</label>
-                             {{ form.radiation_dose }}
+                             {{ form.radiation_dose(class="form-control", placeholder="Radiation Dose") }}
                          </div>
-                     <div class="mb-3">
+
+
+
+                     <div class="form-group">
                     <label for="Findings">{{ form.r_findings.label }}</label>
-                             {{ form.r_findings }}
+                             {{ form.r_findings(class="form-control", placeholder="Findings") }}
                          </div>
-                     <div class="mb-3">
+                     <div class="form-group">
                     <label for="Impressions">{{ form.r_result.label }}</label>
-                             {{ form.r_result }}
+                             {{ form.r_result(class="form-control", placeholder="Impressions") }}
                          </div>
-                    <br>
+    </div>
 
-
-                   <br>
-                    {{ form.submit(class="btn btn-lg btn-block btn-primary") }}
+    </div> <br>
+                    <div align="center" >{{ form.submit(class="btn btn-lg btn-block btn-primary") }}</div>
                 </form>
             </div>
-        </div>
-    </div>
+            </div>
 
     <!-- Bootstrap JavaScript -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>

@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block title %}
+    Ai Assistance
+{% endblock %}
+{% block content %}
+<html>
+    <head>
+        <style>
+
+            .flash-container{
+                margin-top: -120px!important;
+                margin-bottom: 7%!important;
+            }
+        </style>
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/password.css') }}">
+    </head>
+
+    <body>
+ <div class="forgetBox">
+            <div class="content"> <br>
+            <h1 align="center">Image Classifier</h1>
+
+
+                <form class="p-3 text-center" action='/braintumourpredict', method="post" enctype="multipart/form-data">
+<div class="forget-form">
+               <input class="form-control" type="file" name="imagefile" >
+            <input class="btn btn-primary mt-3 brain" type="submit" value="Predict Brain Tumor" >
+                    </div>
+            </form>
+                </div>
+        </div>
+   <div class="flash-container" >
+            <div>
+         {% if result %}
+                     <div class="flash-info">Scan indicates: {{result}}</div>
+          {% endif %}
+            </div>
+       </div>
+    <br>
+    </body>
+</html>
+{% endblock %}

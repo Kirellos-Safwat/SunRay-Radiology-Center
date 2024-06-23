@@ -7,48 +7,24 @@
         <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/home.css') }}">
     </head>
     <body>
-        <header>
-            <nav class="section__container nav__container">
-                <div class="nav__logo">Sun<span>Ray</span></div>
-                <ul class="nav__links">
-                    <li class="link"><a href="/home">Home</a></li>
-                    <li class="link"><a href="#about">About Us</a></li>
-                    <li class="link"><a href="#service">Services</a></li>
-                    <li class="link"><a href="#">Blog</a></li>
-                    <li class="link"><a href="/contactUs">Contact Us</a></li>
-                    <li class="link"><a href="#identity">Log In</a></li>
-                    <li class="link"><a href="#identity">Register</a></li>
-                </ul>
-                <a class="btn" href="/BookAppointment">BOOK NOW</a>
-            </nav>
-            <div class="section__container header__container">
-                <div class="header__content">
-                    <h1>See Clearly, Get Answers Quickly. Exceptional Patient Experience Guaranteed.</h1>
-                    <p>
-                        Our health deserves the best imaging. At our radiology center, we provide a comfortable and
-                        efficient experience with cutting-edge technology and a focus on clear communication. Our team of
-                        expert radiologists and caring technologists is dedicated to both your well-being and providing an
-                        exceptional patient experience.
-                    </p>
-                </div>
-            </div>
-        </header>
+        {% if data is none %}
         <section class="section__container identity__container" id="identity">
             <div class="identity__grid">
                 <div class="identity__card">
                     <span><i class="ri-nurse-line"></i></span>
-                    <h4>Doctor</h4>
-                    <a href="/patient-login_page">Click Here</a>
+                    <h4>Login As Doctor</h4>
+                    <a href="/radiologist-login">Click Here</a>
                 </div>
 
                 <div class="identity__card">
                     <a href="/patient-login_page"></a>
                     <span><i class="ri-hotel-bed-fill"></i></span>
-                    <h4>Patient</h4>
+                    <h4>Login As Patient</h4>
                     <a href="/patient-login_page">Click Here</a>
                 </div>
              </div>
         </section>
+        {% endif %}
         <section class="section__container service__container" id="service">
                 <div class="service__header">
                     <div class="service__header__content">
@@ -63,27 +39,25 @@
                     <div class="service__card">
                         <!-- <img src="D:\Users\Desktop\Hospital Design\photos\mri.png" alt="no image"> -->
                         <!-- <img src="D:\Users\Desktop\Hospital Design\photos\mri.png" alt="Icon description" class="icon"> -->
-                        <span><i class="ri-microscope-line"></i></span>
+                        <span><img class="logo" src="static/photos/mri.png" width="35" height="70" ></span>
                         <h4>MRI</h4>
                         <p>
                             Magnetic resonance imaging (MRI) uses a powerful magnetic field, radio waves and a computer to
                             produce detailed pictures of the body's internal structures that are clearer, more detailed and more
                             likely in some instances to identify and accurately characterize disease than other imaging methods.
                         </p>
-                        <a href="#">Learn More</a>
                     </div>
                     <div class="service__card">
-                        <span><i class="ri-mental-health-line"></i></span>
+                        <span><img class="logo" src="static/photos/ct.png" width="35" height="70" ></span>
                         <h4>CT</h4>
                         <p>
                             CT scanning combines special x-ray equipment with sophisticated computers to produce multiple images
                             or pictures of the inside of the body. These cross-sectional images of the area being studied can
                             then be examined on a computer monitor, printed or transferred to a CD.
                         </p>
-                        <a href="#">Learn More</a>
                     </div>
                     <div class="service__card">
-                        <span><i class="ri-hospital-line"></i></span>
+                        <span><img class="logo" src="static/photos/NucImg.png" width="35" height="70" ></span>
                         <h4>Nuclear Imaging</h4>
                         <p>
                             Nuclear medicine is a branch of medical imaging that uses small amounts of radioactive material to
@@ -91,37 +65,33 @@
                             cancers, heart disease, gastrointestinal, endocrine, neurological disorders
                             and other abnormalities within the body.
                         </p>
-                        <a href="#">Learn More</a>
                     </div>
                     <div class="service__card">
-                        <span><i class="ri-hospital-line"></i></span>
+                        <span><img class="logo" src="static/photos/WomImg.png" width="35" height="70" ></span>
                         <h4>Women's Imaging</h4>
                         <p>
                             This unit is equipped with state of the art Digital mammography unit. In addition, the unit is
                             equipped with a latest Ultrasound machines to cater to the ever present demand for an exclusive
                             women's imaging.
                         </p>
-                        <a href="#">Learn More</a>
                     </div>
                     <div class="service__card">
-                        <span><i class="ri-hospital-line"></i></span>
+                        <span><img class="logo" src="static/photos/US.png" width="35" height="70" ></span>
                         <h4>Ultrasound</h4>
                         <p>
                             Conventional ultrasound displays the images in thin, flat sections of the body. Advancements in
                             ultrasound technology include three-dimensional (3-D) ultrasound that formats the sound wave data
                             into 3-D images. Four-dimensional (4-D) ultrasound is 3-D ultrasound in motion.
                         </p>
-                        <a href="#">Learn More</a>
                     </div>
                     <div class="service__card">
-                        <span><i class="ri-hospital-line"></i></span>
+                        <span><img class="logo" src="static/photos/xray.png" width="35" height="70" ></span>
                         <h4>Conventional X-ray</h4>
                         <p>
                             Imaging with x-rays involves exposing a part of the Body to a small dose of ionizing radiation to
                             produce pictures of the inside of the body. X-rays
                             are the oldest and most frequently used form of medical imaging.
                         </p>
-                        <a href="#">Learn More</a>
                     </div>
                 </div>
         </section>
@@ -201,49 +171,43 @@
                         they bring a wealth of experience and expertise to ensure accurate diagnoses and compassionate care.
                     </p>
                 </div>
-                <div class="doctors__nav">
-                    <span><i class="ri-arrow-left-line"></i></span>
-                    <span><i class="ri-arrow-right-line"></i></span>
-                </div>
+
             </div>
             <div class="doctors__grid">
                 <div class="doctors__card">
                     <div class="doctors__card__image">
-                        <img src="static/photos/doctor-1-photo.jpg" alt="doctor" />
-                        <div class="doctors__socials">
-                            <span><i class="ri-instagram-line"></i></span>
-                            <span><i class="ri-facebook-fill"></i></span>
-                            <span><i class="ri-heart-fill"></i></span>
-                            <span><i class="ri-twitter-fill"></i></span>
-                        </div>
+                        {% if photo.doctor1 is none  or photo.doctor1 is undefined %}
+                        <img src="{{ url_for('static', filename='images/image.png') }}" alt="doctor" />
+                        {% else %}
+                        <img src="{{ url_for('static', filename=photo.doctor1) }}" alt="doctor" />
+                        {% endif %}
+
                     </div>
-                    <h4>Dr. Emily Smith</h4>
+                    <h4>{{ special_doctors[0][1] }}</h4>
                     <p>Radiologist</p>
                 </div>
                 <div class="doctors__card">
                     <div class="doctors__card__image">
-                        <img src="static/photos/doctor-2-photo.jpg" alt="doctor" />
-                        <div class="doctors__socials">
-                            <span><i class="ri-instagram-line"></i></span>
-                            <span><i class="ri-facebook-fill"></i></span>
-                            <span><i class="ri-heart-fill"></i></span>
-                            <span><i class="ri-twitter-fill"></i></span>
-                        </div>
+                        {% if photo.doctor2 is none or photo.doctor2 is undefined %}
+                        <img src="{{ url_for('static', filename='images/image.png') }}" alt="doctor" />
+                        {% else %}
+                        <img src="{{ url_for('static', filename=photo.doctor2) }}" alt="doctor" />
+                        {% endif %}
+
                     </div>
-                    <h4>Dr. James Anderson</h4>
+                    <h4>{{ special_doctors[1][1] }}</h4>
                     <p>Radiologist</p>
                 </div>
                 <div class="doctors__card">
                     <div class="doctors__card__image">
-                        <img src="static/photos/doctor-3-photo.jpg" alt="doctor" />
-                        <div class="doctors__socials">
-                            <span><i class="ri-instagram-line"></i></span>
-                            <span><i class="ri-facebook-fill"></i></span>
-                            <span><i class="ri-heart-fill"></i></span>
-                            <span><i class="ri-twitter-fill"></i></span>
-                        </div>
+                        {% if photo.doctor3 is none or photo.doctor3 is undefined %}
+                        <img src="{{ url_for('static', filename='images/image.png') }}" alt="doctor" />
+                        {% else %}
+                        <img src="{{ url_for('static', filename=photo.doctor3) }}" alt="doctor" />
+                        {% endif %}
+
                     </div>
-                    <h4>Dr. Michael Lee</h4>
+                    <h4>{{ special_doctors[2][1] }}</h4>
                     <p>Radiologist</p>
                 </div>
             </div>

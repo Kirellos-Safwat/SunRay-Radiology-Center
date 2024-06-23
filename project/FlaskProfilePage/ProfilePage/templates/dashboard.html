@@ -1,0 +1,348 @@
+{% extends 'base.html' %}
+    Dashboard Page
+{% block content %}
+<head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css"/>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/dashboard.css') }}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+    <script>
+function scrollonclick(h) {
+    const scrollPosition = document.body.scrollHeight * h;
+    window.scrollTo({
+    top: scrollPosition,
+    behavior: 'smooth'
+});
+        }
+    </script>
+
+</head>
+<body>
+    <div class="tabs-container">
+        <ul class="tabs-menu">
+            <li class="tabs-menu-item active" data-tab="tab-statistics" onclick="scrollonclick(0.17)"><p>Statistics</p></li>
+            <li class="tabs-menu-item" data-tab="tab-revenue" onclick="scrollonclick(0.09)"><p>Annual Revenue</p></li>
+            <li class="tabs-menu-item" data-tab="tab-appointments" onclick="scrollonclick(0.15)"><p>Appointments</p></li>
+            <li class="tabs-menu-item" data-tab="tab-demographics" onclick="scrollonclick(0.15)"><p>Demographics</p></li>
+            <li class="tabs-menu-item" data-tab="tab-contributions" onclick="scrollonclick(0.15)"><p>Contributions</p></li>
+            <li class="tabs-menu-item" data-tab="tab-maintenances" onclick="scrollonclick(0.15)"><p>Upcoming Maintenances</p></li>
+            <li class="tabs-menu-item" data-tab="tab-out_of_service" onclick="scrollonclick(0.15)"><p>Out Of Service Devices</li>
+        </ul>
+        <br><br><br><br>
+        <div id="tab-statistics" class="tab active">
+            <div class="card-container">
+                <div class="card">
+                    <br>
+                    <br>
+                    <h1 class="counter" data-target="{{total_patients_docotrs_equipments[0][0]}}">0</h1><h1>Patients</h1>
+                    <br>
+                    <img src="{{ url_for('static', filename='photos/patient.png') }}" alt="Patient" style="width: 60px;height: 60px">
+                </div>
+                <div class="card">
+                    <br>
+                    <br>
+                    <h1 class="counter" data-target="{{total_patients_docotrs_equipments[1][0]}}">0</h1><h1>Radiologists</h1>
+                    <br>
+                    <img src="{{ url_for('static', filename='photos/doctor.png') }}" alt="Radiologist" style="width: 60px;height: 60px">
+                </div>
+                <div class="card">
+                    <br>
+                    <br>
+                    <h1 class="counter" data-target="{{total_patients_docotrs_equipments[2][0]}}">0</h1><h1>Devices</h1>
+                    <br>
+                    <img src="https://cdn-icons-png.flaticon.com/128/14435/14435651.png" alt="Equipment" style="width: 50px;height: auto">
+                </div>
+                <div class="card">
+                    <br>
+                    <br>
+                    <h1 class="counter dollar-sign" data-target="{{total_revenues_last_month_last_year[0][0]}}">0</h1><h1>Last month revenue</h1>
+                    <br>
+                    <img src="https://cdn-icons-png.flaticon.com/128/1140/1140214.png" alt="Last month revenue" style="width: 50px;height: auto">
+                </div>
+            </div>
+        </div>
+        <div id="tab-revenue" class="tab">
+            <div style="position: relative;top: 472px;margin:auto;width: 100%;text-align: center">
+            <h2>Total revenue in {{ revenue_data[1] }} is <span id="formattedRevenue"></span></h2></div>
+            <canvas id="revenuePieChart"></canvas>
+        </div>
+
+        <script>
+            const originalRevenue = parseInt("{{ revenue_data[2] }}");
+            const formattedRevenue = originalRevenue.toLocaleString('en', { useGrouping: true });
+
+            document.getElementById('formattedRevenue').textContent = formattedRevenue;
+        </script>
+        <div id="tab-appointments" class="tab">
+            <div>
+                <h2>The Most Crowded Day is: {{ most_crowded_day }}</h2>
+                <canvas id="appointmentsChart"></canvas>
+            </div>
+        </div>
+
+        <div id="tab-demographics" class="tab">
+            <div>
+                <h2>Age/Gender Demographics</h2>
+                <p>Most Served Age Group: {{ most_served_age_group[0] }} With {{most_served_age_group[1]}} patient</p>
+                <canvas id="demographicsChart"></canvas>
+            </div>
+        </div>
+
+        <div id="tab-contributions" class="tab">
+                 <table class="table custom-table">
+                    <thead>
+                        <tr>
+                            <th scope="col">ID</th>
+                            <th scope="col">Name</th>
+                            <th scope="col">Total Revenue</th>
+                            <th scope="col">Number Of appointments</th>
+                        </tr>
+                    </thead>
+                    <tbody id="doctors">
+                        {% for doctor in doctors_data %}
+                        <tr data-id="{{ doctor.d_id }}" data-table="doctor">
+                            <td>{{ doctor.d_id }}</td>
+                            <td>{{ doctor.d_name }}</td>
+                            <td>{{ doctor.toal_billing }}</td>
+                            <td>{{ doctor.appointments }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+        </div>
+        <div id="tab-maintenances" class="tab">
+               <table class="table custom-table">
+                    <thead>
+                        <tr>
+                            <th scope="col">ID</th>
+                            <th scope="col">Device Name</th>
+                            <th scope="col">Maintenance Date</th>
+                        </tr>
+                    </thead>
+                    <tbody id="devices">
+                        {% for device in upcoming_maintenances %}
+                        <tr data-id="{{ device.device_id }}" data-table="doctor">
+                            <td>{{ device.device_id }}</td>
+                            <td>{{ device.device_name }}</td>
+                            <td>{{ device.maintenance_date }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+        </div>
+        <div id="tab-out_of_service" class="tab">
+
+                <table class="table custom-table">
+                    <thead>
+                        <tr>
+                            <th scope="col">ID</th>
+                            <th scope="col">Device Name</th>
+                            <th scope="col"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="ooo_devices">
+                        {% for device in out_of_service %}
+                        <tr data-id="{{ device.device_id }}" data-table="doctor">
+                            <td>{{ device.device_id }}</td>
+                            <td>{{ device.device_name }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const tabsMenuItems = document.querySelectorAll('.tabs-menu-item');
+            const tabs = document.querySelectorAll('.tab');
+
+            tabsMenuItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    const selectedTab = this.getAttribute('data-tab');
+
+                    tabs.forEach(tab => {
+                        if (tab.id === selectedTab) {
+                            tab.classList.add('active');
+                        } else {
+                            tab.classList.remove('active');
+                        }
+                    });
+
+                    tabsMenuItems.forEach(item => {
+                        if (item.getAttribute('data-tab') === selectedTab) {
+                            item.classList.add('active');
+                        } else {
+                            item.classList.remove('active');
+                        }
+                    });
+                });
+            });
+
+            // Data for Most Crowded Day Chart passed from Flask
+            const appointmentsData = {{ days | tojson }};
+            const labels = appointmentsData.days
+            const data = appointmentsData.appointments
+
+            const ctx1 = document.getElementById('appointmentsChart').getContext('2d');
+            const appointmentsChart = new Chart(ctx1, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Number of Appointments',
+                        data: data,
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    animation: {
+                        delay: (context) => context.datasetIndex * 300,
+                        duration: 1000,
+                        easing: 'easeOutCirc'
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+
+            // Data for Age/Gender Demographics Chart passed from Flask
+            const demographicsData = {{ demographics | tojson }};
+            const ageGroups = demographicsData.age_groups;
+            const maleData = demographicsData.male;
+            const femaleData = demographicsData.female;
+
+            const ctx2 = document.getElementById('demographicsChart').getContext('2d');
+            const demographicsChart = new Chart(ctx2, {
+                type: 'bar',
+                data: {
+                    labels: ageGroups,
+                    datasets: [
+                        {
+                            label: 'Male',
+                            data: maleData,
+                            backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Female',
+                            data: femaleData,
+                            backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                            borderColor: 'rgba(255, 99, 132, 1)',
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    animation: {
+                        delay: (context) => context.datasetIndex * 300,
+                        duration: 1000,
+                        easing: 'easeInOutBack'
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+
+            // Animated counter logic
+            const counters = document.querySelectorAll('.counter');
+            counters.forEach(counter => {
+                const updateCounter = () => {
+                    const target = +counter.getAttribute('data-target');
+                    const current = +counter.innerText;
+                    const increment = target / 200; // Adjust the divisor to control speed
+
+                    if (current < target) {
+                        counter.innerText = Math.ceil(current + increment);
+                        setTimeout(updateCounter, 15); // Adjust the delay to control speed
+                    } else {
+                        if (counter.classList.contains('dollar-sign')) {
+                            counter.innerText = target + ' $';
+                        } else {
+                            counter.innerText = target;
+                        }
+                    }
+                };
+
+                updateCounter();
+            });
+
+
+
+
+                const revenueData = {{ revenue_data[0] | tojson }};
+                const months = revenueData.months
+                const percentages = revenueData.revenue
+
+                const ctx3 = document.getElementById('revenuePieChart').getContext('2d');
+
+                const createGradient = (ctx, color1, color2) => {
+                    const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+                    gradient.addColorStop(0, color1);
+                    gradient.addColorStop(1, color2);
+                    return gradient;
+                };
+
+                const revenuePieChart = new Chart(ctx3, {
+                    type: 'doughnut',
+                    data: {
+                        labels: months,
+                        datasets: [{
+                            data: percentages,
+                            backgroundColor: [
+                                createGradient(ctx3, 'rgba(255, 99, 132, 0.5)', 'rgba(255, 99, 132, 0.9)'),
+                                createGradient(ctx3, 'rgba(54, 162, 235, 0.5)', 'rgba(54, 162, 235, 0.9)'),
+                                createGradient(ctx3, 'rgba(255, 206, 86, 0.5)', 'rgba(255, 206, 86, 0.9)'),
+                                createGradient(ctx3, 'rgba(75, 192, 192, 0.5)', 'rgba(75, 192, 192, 0.9)'),
+                                createGradient(ctx3, 'rgba(153, 102, 255,0.5)', 'rgba(153, 102, 255,0.9)'),
+                                createGradient(ctx3, 'rgba(255, 159, 64, 0.5)', 'rgba(255, 159, 64, 0.9)'),
+                                createGradient(ctx3, 'rgba(199, 199, 199,0.5)', 'rgba(199, 199, 199,0.9)'),
+                                createGradient(ctx3, 'rgba(83, 102, 255, 0.5)', 'rgba(83, 102, 255, 0.9)'),
+                                createGradient(ctx3, 'rgba(140, 159, 64, 0.5)', 'rgba(140, 159, 64, 0.9)'),
+                                createGradient(ctx3, 'rgba(250, 139, 169,0.5)', 'rgba(250, 139, 169,0.9)'),
+                                createGradient(ctx3, 'rgba(100, 192, 192,0.5)', 'rgba(100, 192, 192,0.9)'),
+                                createGradient(ctx3, 'rgba(200, 159, 64, 0.5)', 'rgba(200, 159, 64, 0.9)')
+                            ],
+                            borderColor: [
+                                'white',
+                            ],
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        plugins: {
+                            datalabels: {
+                                formatter: (value, ctx) => {
+                                    return ctx.chart.data.labels[ctx.dataIndex];
+                                },
+                                color: '#000',
+                                font: {
+                                    size: 0,
+                                }
+                            }
+                        },
+                        animation: {
+                            duration: 1000, // Animation duration in milliseconds
+                            easing: 'easeInOutBack', // Animation easing effect
+                            animateRotate: true
+                        }
+                    },
+                    plugins: [ChartDataLabels]
+                });
+            });
+    </script>
+</body>
+{% endblock %}

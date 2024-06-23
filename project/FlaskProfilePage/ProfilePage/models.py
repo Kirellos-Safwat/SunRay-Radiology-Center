@@ -4,6 +4,7 @@ from ProfilePage import db, login_manager
 from ProfilePage import bcrypt
 from flask_login import UserMixin
 from itsdangerous import URLSafeTimedSerializer as Serializer
+from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 
 
 @login_manager.user_loader
@@ -11,41 +12,12 @@ def load_user(user_id):
     return Patient.query.get(int(user_id))
 
 
-class Credentials(db.Model, UserMixin):
-    id = db.Column(db.Integer(), primary_key=True)
-    fname = db.Column(db.String(length=15), nullable=False)
-    lname = db.Column(db.String(length=15), nullable=False)
-    email = db.Column(db.String(length=30), nullable=False, unique=True)
-    phone = db.Column(db.String(length=13), nullable=False, unique=True)
-    password = db.Column(db.String(length=60), nullable=False)  # Will be changed later to false
-    profile_picture = db.Column(db.String(length=255))
-    is_admin = db.Column(db.Boolean(), default=False)
-    facebook = db.Column(db.String(length=255))
-    twitter = db.Column(db.String(length=255))
-    instagram = db.Column(db.String(length=255))
-    linkedin = db.Column(db.String(length=255))
-
-    @property
-    def password(self):
-        return self.password
-
-    @password.setter
-    def password(self, plain_text_password):
-        self.password_hash = bcrypt.generate_password_hash(plain_text_password).decode('utf-8')
-
-    def check_password_correction(self, attempted_password):
-        return bcrypt.check_password_hash(self.password_hash, attempted_password)
-
-
-def __repr__(self):
-    return f'Credentials {self.fname}'
-
-
 class radiology_equipment(db.Model, UserMixin):
     device_id = db.Column(db.Integer(), primary_key=True)
-    device_name = db.Column(db.String(length=15), nullable=False)
-    Commission_Date = db.Column(db.String(length=15), nullable=False)
-    Maintenance_Date = db.Column(db.String(length=15), nullable=False)
+    device_name = db.Column(db.String(length=150), nullable=False)
+    commission_Date = db.Column(db.String(length=10), nullable=False)
+    maintenance_Date = db.Column(db.String(length=10), nullable=False)
+    out_of_order = db.Column(db.Boolean(), default=False)
 
 
 class appointments(db.Model, UserMixin):
@@ -72,18 +44,18 @@ class Patient(db.Model):
     profile_picture = db.Column(db.String(200))
     scans = db.Column(db.String(200))
 
-    def get_reset_token(self):
-        s = Serializer(current_app.config['SECRET_KEY'])
-        return s.dumps({'Patient_id': self.id}).encode('utf-8')
+    def get_reset_token(self, expires_sec=1800):
+        s = Serializer(current_app.config['SECRET_KEY'], expires_sec)
+        return s.dumps({'user_id': self.id}).decode('utf-8')
 
     @staticmethod
     def verify_reset_token(token):
         s = Serializer(current_app.config['SECRET_KEY'])
         try:
-            Patient_id = s.loads(token)['Patient_id']
+            user_id = s.loads(token)['user_id']
         except:
             return None
-        return Patient.query.get(Patient_id)
+        return Patient.query.get(user_id)
 
 
 class radiologist(db.Model):
@@ -101,6 +73,7 @@ class radiologist(db.Model):
     def __repr__(self):
         return f'Patient {self.p_name}'
 
+
 class report(db.Model):
     r_id = db.Column(db.Integer, primary_key=True)
     p_id = db.Column(db.Integer(), db.ForeignKey('patient.id'), nullable=True)
@@ -109,7 +82,7 @@ class report(db.Model):
     r_time = db.Column(db.String(length=15), nullable=False)
     r_scan = db.Column(db.String(200))
     r_study_area = db.Column(db.String(100))
-    radiation_dose=db.Column(db.String(100))
+    radiation_dose = db.Column(db.String(100))
     r_findings = db.Column(db.String(100))
     r_result = db.Column(db.String(100))
     billing = db.Column(db.Integer)
@@ -125,3 +98,11 @@ class report(db.Model):
         # Foreign Key To Link Users (refer to primary key of the user)
         poster_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     '''
+
+
+class Contactus(db.Model):
+    c_id = db.Column(db.Integer, primary_key=True)
+    c_fname = db.Column(db.String(100), nullable=False)
+    c_lname = db.Column(db.String(100), nullable=False)
+    c_email = db.Column(db.String(100), unique=True, nullable=False)
+    c_message = db.Column(db.String(500), nullable=False)

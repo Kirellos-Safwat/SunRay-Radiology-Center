@@ -5,34 +5,13 @@
 {% block content %}
 <!--xmlns="http://www.w3.org/1999/html"-->
     <head>
-        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/patient-login.css') }}">
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/login.css') }}">
     </head>
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            {% for category,message in messages %}
-                 <div class="alert alert-{{ category }}" style="text-align: center">
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" style="position: absolute; left: 1400px"></button>
-                    {{ message }}
-                 </div>
-            {% endfor %}
-        {% endif %}
-    {% endwith %}
+
     <body>
-        <header>
-            <nav class="section__container nav__container">
-                <div class="nav__logo">Sun<span>Ray</span></div>
-                <ul class="nav__links">
-                    <li class="link"><a href="/home">Home</a></li>
-                    <li class="link"><a href="/home">About Us</a></li>
-                    <li class="link"><a href="/home">Services</a></li>
-                    <li class="link"><a href="#">Blog</a></li>
-                    <li class="link"><a href="/contactUs">Contact Us</a></li>
-                    <li class="link"><a href="/patient-register">Register</a></li>
-                </ul>
-                <a class="btn" href="/BookAppointment">BOOK NOW</a>
-            </nav>
-        </header>
+
         <div class="loginBox">
+            <div class="content">
             <img class="logo" src="https://cdn-icons-png.flaticon.com/128/4228/4228704.png">
             <h1>Log In</h1>
             <form method="POST" class="form-signin">
@@ -41,8 +20,8 @@
                 {{ form.Email(class="form-control",placeholder="Email") }}
                 {{ form.Password.label() }}
                 {{ form.Password(class="form-control",placeholder="Password") }}
-                <a class="pass" href="{{ url_for('reset_request') }}">Forgot Password?</a>
-                {{ form.submit(class="btn btn-lg btn-block btn-success") }}
+                <a href="{{ url_for('reset_request') }}" id="forgetPassword">Forgot Password?</a>
+                {{ form.submit(class="btn btn-lg btn-block btn-success") }} </br> </br>
                 <div class="container">
                   <a href="/googleLogin">
                     <div class="g-sign-in-button">
@@ -58,7 +37,8 @@
                   </a>
                 </div>
             </form>
-            <a class="signUp" href="/patient-register">Don't have an account?</a>
+            <a href="/patient-register" id="signUp">Don't have an account?</a> </br> </br> </br>
         </div>
+            </div>
     </body>
 {% endblock %}

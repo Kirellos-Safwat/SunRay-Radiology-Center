@@ -1,0 +1,122 @@
+.formBox{
+    width: 370px;
+    height: auto;
+    background: rgb(18, 172, 142);
+    color: white;
+    margin: auto;
+    margin-top: 10%;
+    margin-bottom: 10%;
+    border-radius: 10px;
+}
+
+.logo{
+    width: 100px;
+    height:100px;
+    position: relative;
+    top: -70px;
+    left: calc(50% - 50px);
+}
+.formBox h1{
+    text-align: center;
+    margin-top: -60px;
+}
+.formBox a{
+    text-decoration: none;
+    color: white;
+    margin-left: 22.5%;
+    font-size: 15px;
+}
+
+.formBox a:hover{
+    text-decoration: underline;
+}
+
+.formBox label{
+    font-size: 18px;
+    display: block;
+    margin-left: 35px;
+}
+.formBox input{
+    width: 80%;
+    margin: 0 0 20px 35px;
+    height: 40px;
+    border-radius: 5px;
+    border: 1px solid #fb923c;
+}
+
+.formBox input[type="text"],input[type="password"]{
+    background: #fafafa;
+    height: 40px;
+    outline: none;
+    color: black;
+    font-size: 16px;
+    border-radius: 5px;
+    width: 80%;
+    border: 1px solid #fb923c;
+}
+.formBox input[type="submit"]{
+    border: none;
+    outline: none;
+    height: 50px;
+    border-radius: 5px;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+    margin: auto;
+    margin-top: 20px;
+    margin-left: 14.5%;
+    margin-bottom: 5%;
+    width: 260px;
+}
+
+.formBox input[type="submit"]:hover {
+    cursor: pointer;
+    -webkit-box-shadow: 0 0 3px 3px rgba(66, 133, 244, .3);
+    box-shadow: 0 0 3px 3px #e9f7f7;
+}
+
+/* New CSS for image input field */
+.formBox input[type="file"] {
+    width:80%;
+    height: 40px;
+    border-radius: 5px;
+    background: #fafafa;
+    color: black;
+    font-size: 16px;
+    outline: none;
+    padding: 10px;
+    cursor: pointer;
+    border: 1px solid #fb923c;
+}
+
+@media (max-width: 950px) {
+  .formBox{
+    width: 90%;
+    padding: 30px 40px 40px 35px ;
+  }
+}
+
+@media (max-width: 820px) {
+  .formBox{
+    margin: 40px 15px;
+    margin-top: 30%;
+    margin-bottom: 30%;
+    height: 100%;
+  }
+  .formBox .content{
+    flex-direction: column-reverse;
+  }
+
+  #signin{
+    font-size: 13px;
+    margin-left: 14%
+  }
+
+  .formBox input[type="submit"]{
+    text-align: center;
+    font-weight: bold;
+    width: 230px;
+    margin-left: -2%;
+    margin-bottom: -100%;
+  }
+}

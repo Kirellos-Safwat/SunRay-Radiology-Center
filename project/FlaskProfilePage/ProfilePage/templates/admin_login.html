@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block title %}
+    Admin Login Page
+{% endblock %}
+{% block content %}
+    <head>
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/login.css') }}">
+    </head>
+    <body >
+
+        <!--<link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">-->
+        <div class="loginBox">
+            <div class="content">
+            <img class="logo" src="https://cdn-icons-png.flaticon.com/128/998/998350.png">
+            <h1>Log In</h1>
+            <form method="POST" class="form-signin">
+                {{ form.hidden_tag() }}
+                {{ form.Email.label() }}
+                {{ form.Email(class="form-control",placeholder="Email") }}
+                {{ form.Password.label() }}
+                {{ form.Password(class="form-control",placeholder="Password") }}
+                {{ form.submit(class="btn btn-lg btn-block btn-success") }}
+            </form>
+            </div>
+        </div>
+    </body>
+{% endblock %}

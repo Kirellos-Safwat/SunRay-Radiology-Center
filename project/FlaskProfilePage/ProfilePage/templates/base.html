@@ -4,7 +4,9 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link href="https://cdn.jsdelivr.net/npm/remixicon@3.4.0/fonts/remixicon.css" rel="stylesheet" />
-        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/base.css') }}">
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/home.css') }}">
+            <link rel="icon" href="static/photos/LOGO.png" type="image/x-icon">
+
         <title>
               {% block title %}
                 Radiology Center | SunRay
@@ -13,6 +15,83 @@
     </head>
 
     <body>
+
+        <header>
+            <nav class="section__container nav__container">
+                <div class="nav__logo">Sun<span>Ray</span></div>
+                <ul class="nav__links">
+                    <li class="link"><a href="/home">Home</a></li>
+                    {% if template == 'home' and data is none %}
+                        <li class="link"><a href="#service">Services</a></li>
+                        <li class="link"><a href="#about">About Us</a></li>
+                        <li class="link"><a href="#identity">Log In</a></li>
+                        <li class="link"><a href="/patient-register">Register</a></li>
+                    {% elif template == 'home' %}
+                        <li class="link"><a href="#service">Services</a></li>
+                        <li class="link"><a href="#about">About Us</a></li>
+                    {% endif %}
+                    {% if data.admin_id is none or data.admin_id is undefined %}
+                        <li class="link"><a href="/contactUs">Contact Us</a></li>
+                    {% else %}
+                        {% if template != 'dashboard' %}
+                            <li class="link"><a href="/dashboard">Dashboard</a></li>
+                        {% endif %}
+                        {% if template != 'database' %}
+                            <li class="link"><a href="/users">DataBase</a></li>
+                        {% endif %}
+                    {% endif %}
+                    {% if template == 'patient_login' %}
+                        <li class="link"><a href="/patient-register">Register</a></li>
+                    {% elif template == 'patient_register' %}
+                        <li class="link"><a href="/patient-login_page">Log In</a></li>
+                    {% elif template not in ['home', 'radiologist_login'] and data is none %}
+                        <li class="link"><a href="/patient-login_page">Log In</a></li>
+                        <li class="link"><a href="/patient-register">Register</a></li>
+                    {% elif data.id %}
+                        {% if template != 'patient_profile' %}
+                            <li class="link"><a href="/patient-profile">Profile</a></li>
+                        {% endif %}
+                    {% elif data.d_id %}
+                        {% if template != 'radiologist_profile' %}
+                            <li class="link"><a href="/radiologist-profile">Profile</a></li>
+                        {% endif %}
+                    {% endif %}
+                    {% if data is not none %}
+                        <li class="link"><a href="/logout">Log Out</a></li>
+                    {% endif %}
+                </ul>
+                {% if data.id or data is none %}
+                    <a class="btn" href="/BookAppointment">BOOK NOW</a>
+                {% endif %}
+            </nav>
+
+            {% if template == 'home' %}
+            <div class="section__container header__container">
+                <div class="header__content">
+                    <h1>See Clearly, Get Answers Quickly. Exceptional Patient Experience Guaranteed.</h1>
+                    <p>
+                        Our health deserves the best imaging. At our radiology center, we provide a comfortable and
+                        efficient experience with cutting-edge technology and a focus on clear communication. Our team of
+                        expert radiologists and caring technologists is dedicated to both your well-being and providing an
+                        exceptional patient experience.
+                    </p>
+                </div>
+            </div>
+            {% endif %}
+        </header>
+        <div class="flash-container">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div style="position: center">
+                {% for category, message in messages %}
+                    <div class=" flash-{{ category }}" >{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+        </div>
+
+
         {% block content %}
 
           {% endblock %}
@@ -30,16 +109,16 @@
                         best possible outcomes for you and your loved ones.
                     </p>
                 </div>
-                <div class="footer__col">
+                <!--<div class="footer__col">
                     <h4>About Us</h4>
                     <p><a href="#">Our Blog</a></p>
                     <p><a href="#">Terms & Conditions</a></p>
-                </div>
-                <div class="footer__col">
+                </div>-->
+                <!-- <div class="footer__col">
                     <h4>Services</h4>
                     <p><a href="#">Search Terms</a></p>
                     <p><a href="#">Privacy Policy</a></p>
-                </div>
+                </div> -->
                 <div class="footer__col">
                     <h4>Contact Us</h4>
                     <p class="Link">
@@ -49,17 +128,6 @@
                     </p>
                     <p><a href="mailto:support@care.com"><i class="ri-mail-fill"></i>support@care.com</a></p>
                     <p><a href="tel:+20102-453-9970"><i class="ri-phone-fill"></i>(+20) 1024539970</a></p>
-                </div>
-            </div>
-            <div class="footer__bar">
-                <div class="footer__bar__content">
-                    <p>Copyright © 2023 Web Design Mastery. All rights reserved.</p>
-                    <div class="footer__socials">
-                        <span><i class="ri-instagram-line"></i></span>
-                        <span><i class="ri-facebook-fill"></i></span>
-                        <span><i class="ri-heart-fill"></i></span>
-                        <span><i class="ri-twitter-fill"></i></span>
-                    </div>
                 </div>
             </div>
         </footer>

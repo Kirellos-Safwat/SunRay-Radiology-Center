@@ -1,55 +1,49 @@
 {% extends 'base.html' %}
 {% block title %}
-    Profile Page
+   Radiologist Profile Page
 {% endblock %}
 {% block content %}
 
 <body>
-    <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/profile.css') }}">
-<div class="container emp-profile">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/rad-profile.css') }}">
+<div class="container-profile">
             <form method="post">
-                <div class="row">
-                    <div class="col-md-4">
-                        <div class="profile-img">
+                </br>
+                <div class="content">
+                    </br> </br>
+                <div class="left-side">
+                    <div class="profile">
+
                             
                             
-                        {% if data.profile_picture is none %}
-                            <img src="{{ url_for('static', filename='images/image.png') }}" class="image" height="200"/>
+                        {% if data.d_profile_picture is none %}
+                            <div class="circular-frame">
+                            <img src="{{ url_for('static', filename='images/image.png') }}" class="image"/>
+                            </div>
                         {% else %}
-                            <img src="{{ url_for('static', filename=data.profile_picture) }}" class="image" height="200"/>
+                            <div class="circular-frame">
+                            <img src="{{ url_for('static', filename=data.d_profile_picture) }}" class="image"/>
+                            </div>
                         {% endif %}
-                        <!-- <div class="file btn btn-lg btn-primary">
-                            Change Photo
-                            <input type="file" name="file"/>
-                        </div> -->
+
                         <div class="profile-work">
-                            <!-- <p id="p1">Social</p>
-                            <a href={{data.facebook}}><i class="fab fa-facebook"></i> Facebook</a><br/>
-                            <a href={{data.linkedin}} target="_blank"><i class="fab fa-linkedin"></i> LinkedIn</a><br/>
-                            <a href={{data.instagram}} target="_blank"> <i class="fab fa-instagram"></i> Instagram</a><br/>
-                            <a href={{data.twitter}} target="_blank"><i class="fab fa-twitter"></i> Twitter</a> -->
                             <p> </p>
-                            <a class="edit_profile_btn" href="/radiologist-edit_profile">Edit Profile</a>
+                            </br>
+                            <a class="edit-profile-btn" href="/radiologist_edit_profile">Edit Profile</a>
                         </div>
-                    </div>
                 </div>
-                <div class="col-md-6">
-                    <div class="profile-head">
-                        <div class="profile-head-content">
+                    </br> </br>
+                    <div class="user-data">
+                            <div class="user-data-content">
                             <h5>
                                 {{ data.d_name }}
                             </h5>
                             <h6>
-                                {% if data.is_admin == true %}
-                                    admin
-                                {% else %}
-                                    user
-                                {% endif %}
+                                Radiologist
                             </h6>
-                            
+
                         </div>
-                        <div class="col-md-8">
+                        <div class="Info">
                             <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
                                 <div class="row">
                                     <div class="col-md-6">
@@ -67,14 +61,7 @@
                                         <p>{{ data.d_name }}</p>
                                     </div>
                                 </div>
-<!--                                <div class="row">-->
-<!--                                    <div class="col-md-6">-->
-<!--                                        <label>Last Name :</label>-->
-<!--                                    </div>-->
-<!--                                    <div class="col-md-6">-->
-<!--                                        <p>{{ data.lname }}</p>-->
-<!--                                    </div>-->
-<!--                                </div>-->
+
                                 <div class="row">
                                     <div class="col-md-6">
                                         <label>Email :</label>
@@ -116,55 +103,120 @@
                                     </div>
                                 </div>
                             </div>
+                            </br>
                         </div>
                     </div>
-                </div>
-            </div>
-
-            <div class="activity-section">
-                <div class="radiologist">
-<!--                    <h3>Your scans</h3>-->
-<!--                    <div class="scrollable">-->
-<!--                        <div class="scrollable-content">-->
-<!--                            {% if data.scans %}-->
-<!--                                {% for image in scan_Files %}-->
-<!--                                    <img src="{{ url_for('static', filename=data.scans+ '/' + image) }}" class="image" height="200"/>-->
-<!--                                {% endfor %}-->
-<!--                            {% else %}-->
-<!--                                <p>No scans available</p>-->
-<!--                            {% endif %}-->
-<!--                        </div>-->
-<!--                    </div>-->
-                    
-                </div>
-<!--                <a class="btn btn-primary" href="/upload_scan">upload_scans</a>-->
-                
-                    {% if appointments %}
+                    </br>
+                    </div>
+                    </br> </br>
+                <div class="right-side">
+                    <div class="tabs">
+                        <input type="radio" id="tab-appointment" name="mytabs" checked="checked">
+                        <label  class="appointment" for="tab-appointment">Appointments</label>
+                    <div class="tab" role="tabpanel" aria-labelledby="appointments-tab">
+                        <div class="scrollable">
+                            <div class="scrollable-content">
+                        {% if appointments %}
                         <ul>
-                            <h3>Your appointments</h3>
                             {% for appointment in appointments %}
-                            <div class ="row">
+                            <div class ="row" id="{{ appointment.state }}">
                                 <li>
 
-                                    <p>Appointment ID: {{ appointment.a_id }}</p>
-                                    <p>Date: {{ appointment.date }}</p>
-                                    <p>Dr: {{ appointment.p_name }}</p>
+                                    <p style="margin-left: 10px;"><strong>Appointment ID:</strong> {{ appointment.a_id }}</p>
+                                    <p style="margin-left: 10px;"><strong>Date:</strong> {{ appointment.date }}</p>
+                                    <p style="margin-left: 10px;"><strong>Patient:</strong> {{ appointment.fname +" "+ appointment.lname }}</p>
+                                    <p style="margin-left: 10px;"><strong>State:</strong> {{ appointment.state }}</p>
                                     <!-- Add more fields as needed -->
                                 </li>
                             </div>
                             {% endfor %}
                         </ul>
                     {% else %}
-                        <p>No appointments found.</p>
+                        <p>No Appointments Found.</p>
                     {% endif %}
+                            </div>
+
+                        </div>
                     <!-- change the route to add btn functionality -->
 <!--                    <a class="btn btn-primary" href="/book-appointement">book an appointment</a>-->
-                
-            </div>
-            
+                    </div>
+                        <input type="radio" id="tab-reports" name="mytabs">
+                        <label class="reports" for="tab-reports">Reports</label>
+                        <div class="tab" role="tabpanel" aria-labelledby="reports-tab">
+                            <div class="scrollable">
+                            <div class="scrollable-content">
+                    {% if reports %}
+                    <ul>
+                        {% for report in reports %}
+                        <style>
+                            .row .hidden-item {
+                                display: none;
+                            }
 
-            
-        </form>
+                            .row:hover .hidden-item {
+                                display: block;
+                            }
+                        </style>
+                        <div class ="row">
+                            <li>
+
+
+                                <p><strong>Report ID:</strong> {{ report.r_id }}</p>
+                                <p><strong>Patient Name:</strong> {{report.fname +" "+ report.lname}}</p>
+                                <p><strong>Study Area:</strong> {{ report.r_study_area}}</p>
+                                <p><strong>Prescripted Dose:</strong> {{ report.radiation_dose}}</p>
+                                <p class="hidden-item"><strong>Observation:</strong> {{ report.r_findings}}</p>
+                                <p class="hidden-item"><strong>Date:</strong> {{ report.r_time}}</p>
+                                <p class="hidden-item"><strong>Result:</strong> {{ report.r_result}}</p>
+                                <p class="hidden-item"><strong>Billing:</strong> {{ report.billing}}</p>
+                                <!-- <style>
+                                    .flex-container {
+                                        display: flex;
+
+                                    }
+                                </style> -->
+                                {% if report.r_scan %}
+                                    <div class="flex-container">
+                                        <p class="hidden-item"><strong>Scan:</strong> </p>
+                                        <img src="{{ url_for('static', filename=report.r_scan) }}" class="hidden-item" height="300"/>
+                                    </div>
+                                {% endif %}
+
+                            </li>
+                        </div>
+                        {% endfor %}
+                    </ul>
+                    {% else %}
+                        </br>
+                    <p>No Reports Found.</p>
+                        </br>
+                    {% endif %}
+
+
+
+                            </div>
+                                </br>
+                                <a class="create-report-btn" href="/SubmitReport">Create A Report</a>
+                            </div>
+            </div>
+
+                    </div>
+  <div class="scans">
+                        </br>
+
+<h2 style="text-align: center">AI Assistance For</h2>
+                            <a class="icon-button" href="/braintumourpredict"><img class="logo" src="static/photos/brain.png"></a>
+
+                            <a class="icon-button2" href="/pneumoniaPredict"><img class="logo" src="static/photos/lungs.png"></a>
+      <div class="brain">Brain Tumor</div>
+      <div class="lung">Pneumonia</div>
+                    </div>
+                </div>
+                    </br> </br>
+                    </br> </br>
+                </div>
+<!--                <a href='/predict' class="button">brain tumor prediction</a>-->
+                </form>
     </div>
 </body>
 {% endblock %}

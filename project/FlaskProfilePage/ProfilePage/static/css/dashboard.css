@@ -1,0 +1,87 @@
+.tab {
+    display: none;
+}
+.tab.active {
+    display: block;
+}
+.tabs-container {
+    width: 75%;
+    margin: auto;
+}
+.tabs-menu {
+    display: flex;
+    justify-content: space-around;
+    list-style-type: none;
+    padding: 0;
+    margin: 20px 0;
+    cursor: pointer;
+}
+.tabs-menu-item {
+    padding: 10px 20px;
+    background-color: #f0f0f0;
+    border-radius: 5px 5px 0 0;
+    margin: 10px;
+    text-align: center;
+    font-size: 0.8em;
+}
+.tabs-menu-item.active {
+    background-color: orange;
+}
+.tab-content {
+    margin-top: 20px;
+}
+.card-container
+{
+    position: center;
+top: 50px;
+padding: 10px;
+}
+
+.card {
+    background: linear-gradient(to right, rgba(18, 172, 142, 0.9), rgba(18, 172, 142, 0.7));
+    color: white;
+    padding: 20px;
+    border-radius: 10px;
+    margin-right: 20px;
+    margin-left: 27px;
+    margin-bottom: 20px;
+    display: inline-block;
+    width: 45%; /* Adjust width for 2x2 grid */
+    height: 300px;
+    box-sizing: border-box;
+    position: relative; /* Positioning for image overlay */
+    text-align: center;
+}
+.card img {
+            position: absolute;
+            top: 68%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            max-width: 100%;
+            max-height: 100%;
+            z-index: 1;
+}
+
+
+.custom-table{
+    width: 100%;
+
+}
+.custom-table td
+{
+    /* border: 1px solid white; */ /* Orange border */
+    background: linear-gradient(to right, rgba(18, 172, 142, 0.9), rgba(18, 172, 142, 0.7)); /* Darker green gradient */
+    color: black; /* Orange text color */
+    font-size: 1.2rem;
+    text-align: center;
+    height: 56px;
+}
+.custom-table th {
+    /* border: 1px solid white; */ /* Orange border */
+    background: rgba(245, 123, 24, 0.9);
+    color: black; /* Orange text color */
+    font-size: 1rem;
+    text-align: center;
+    height: 52px;
+}
+#revenuePieChart {position: relative!important;width: 520px!important;height: auto!important;margin: auto!important;left: 257px;top: 125px!important;transform: translate(-50%, -50%)!important;}
