@@ -753,14 +753,14 @@ def reset_token(token):
     return render_template("ResetPassword.html", form=form, data=None)
 
 
-def login_is_required(function):
-    def wrapper(*args, **kwargs):
-        if "google_id" not in session:
-            return os.abort(401)  # Authorization required
-        else:
-            return function()
+# def login_is_required(function):
+#     def wrapper(*args, **kwargs):
+#         if "google_id" not in session:
+#             return os.abort(401)  # Authorization required
+#         else:
+#             return function()
 
-    return wrapper
+#     return wrapper
 
 
 @app.route("/googleLogin")
