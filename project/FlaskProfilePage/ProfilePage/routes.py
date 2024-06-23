@@ -562,6 +562,10 @@ def patient_profile_page():
                    FROM report Join radiologist ON report.d_id = radiologist.d_id
                    WHERE p_id = %s """, (g.data['id'],))
     reports = cursor.fetchall()
+    if os.name == 'nt':
+        for report in reports:
+            if report['r_scan'] is not None:
+                report['r_scan'] = report['r_scan'].replace("\\", "/")
     cursor.close()
     g.connection.close()
     return render_template('patient-profile.html', data=g.data, scan_Files=scan_Files, appointments=appointments, reports=reports, template='patient_profile')

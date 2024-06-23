@@ -10,6 +10,7 @@
     box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
     margin: auto;
     margin-top: 7%;
+    margin-bottom: 7%;
     height: 879px;
     width: 967px;
     background: var(--primary-color);

@@ -218,7 +218,6 @@ header {
     text-align: center;
     border-radius: 10px;
     box-shadow: 5px 5px 20px rgba(0, 0, 0, 0.1);
-    cursor: pointer;
 }
 
 .service__card span {
@@ -359,7 +358,6 @@ header {
     text-align: center;
     box-shadow: 5px 5px 20px rgba(0, 0, 0, 0.1);
     border-radius: 10px;
-    cursor: pointer;
     overflow: hidden;
 }
 
