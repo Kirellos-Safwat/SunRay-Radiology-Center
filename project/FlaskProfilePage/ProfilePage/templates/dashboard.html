@@ -267,7 +267,7 @@ function scrollonclick(h) {
 
                     if (current < target) {
                         counter.innerText = Math.ceil(current + increment);
-                        setTimeout(updateCounter, 15); // Adjust the delay to control speed
+                        setTimeout(updateCounter, 10); // Adjust the delay to control speed
                     } else {
                         if (counter.classList.contains('dollar-sign')) {
                             counter.innerText = target + ' $';
