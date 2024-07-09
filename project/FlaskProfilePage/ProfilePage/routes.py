@@ -1,4 +1,3 @@
-from datetime import datetime
 from ProfilePage import app, db, connection_string, mail, flow, GOOGLE_CLIENT_ID
 from flask_login import current_user
 from flask_mail import Message
@@ -18,15 +17,15 @@ import tensorflow as tf
 from keras.src.optimizers import Adamax
 from tensorflow.keras.preprocessing import image
 
-model = tf.keras.models.load_model(
-    r"C:\Users\Anas Mohamed\Desktop\DB_project\his-finalproject-database_sbe_spring24_team6\project\FlaskProfilePage\ProfilePage\brain_tumor_v2.h5",
-    compile=False)
-model.compile(Adamax(learning_rate=0.001), loss='categorical_crossentropy', metrics=['accuracy'])
+# model = tf.keras.models.load_model(
+#     r"C:\Users\Anas Mohamed\Desktop\DB_project\his-finalproject-database_sbe_spring24_team6\project\FlaskProfilePage\ProfilePage\brain_tumor_v2.h5",
+#     compile=False)
+# model.compile(Adamax(learning_rate=0.001), loss='categorical_crossentropy', metrics=['accuracy'])
 
-pneumonia_model = tf.keras.models.load_model(
-    r'C:\Users\Anas Mohamed\Desktop\DB_project\his-finalproject-database_sbe_spring24_team6\project\FlaskProfilePage\ProfilePage\pneumonia_detection_v2.h5',
-    compile=False)
-pneumonia_model.compile(Adamax(learning_rate = 0.0001) , loss = 'categorical_crossentropy', metrics = ['accuracy'])
+# pneumonia_model = tf.keras.models.load_model(
+#     r'C:\Users\Anas Mohamed\Desktop\DB_project\his-finalproject-database_sbe_spring24_team6\project\FlaskProfilePage\ProfilePage\pneumonia_detection_v2.h5',
+#     compile=False)
+# pneumonia_model.compile(Adamax(learning_rate = 0.0001) , loss = 'categorical_crossentropy', metrics = ['accuracy'])
 
 
 @app.before_request
@@ -382,19 +381,18 @@ def radiologist_profile_page():
         return redirect('/radiologist-login')
     cursor = g.connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
     # Fetch appointments for the current user's ID
-    today = str(datetime.today().strftime('%Y-%m-%d'))
     cursor.execute("""
             SELECT 
             CASE
-            WHEN appointments.date < %(today)s THEN 'missed'
-            WHEN appointments.date = %(today)s THEN 'today'
+            WHEN appointments.date < NOW() :: DATE THEN 'missed'
+            WHEN appointments.date = NOW() :: DATE THEN 'today'
             ELSE 'upcoming' END AS state
             , appointments.*, patient.fname, patient.lname
             FROM appointments
             JOIN patient ON appointments.p_id = Patient.id
             WHERE appointments.d_id = %(d_id)s
             ORDER BY state, appointments.date
-        """, {'d_id':g.data['d_id'], 'today': today})
+        """, {'d_id':g.data['d_id']})
     appointments = cursor.fetchall()
     cursor.close()
 
@@ -530,19 +528,18 @@ def patient_profile_page():
         return redirect('/patient-login_page')
     cursor = g.connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
     # Fetch appointments for the current user's ID
-    today = str(datetime.today().strftime('%Y-%m-%d'))
     cursor.execute("""
         SELECT 
         CASE
-        WHEN appointments.date < %(today)s THEN 'missed'
-        WHEN appointments.date = %(today)s THEN 'today'
+        WHEN appointments.date < NOW() :: DATE THEN 'missed'
+        WHEN appointments.date = NOW() :: DATE THEN 'today'
         ELSE 'upcoming' END AS state
         , appointments.*, radiologist.d_name
         FROM appointments
         JOIN radiologist ON appointments.D_ID = radiologist.d_id
         WHERE P_ID = %(id)s
         ORDER BY state, appointments.date
-    """, {'id':g.data['id'], 'today': today})
+    """, {'id':g.data['id']})
     appointments = cursor.fetchall()
     cursor.close()
 
@@ -892,18 +889,26 @@ def dashboard():
 
     def appointments_per_day():
         cursor = g.connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
-        cursor.execute("SELECT date FROM appointments")
+        cursor.execute('''
+        WITH dates AS (
+            SELECT EXTRACT(dow FROM CAST(date as DATE)) :: INTEGER AS day, COUNT(*) AS appointments
+            FROM appointments
+            GROUP BY 1
+            ORDER BY day ASC)
+        SELECT * FROM dates
+        UNION ALL
+        SELECT day, appointments
+        FROM dates
+        WHERE appointments = (SELECT MAX(appointments) FROM dates)
+        ''')
         dates = cursor.fetchall()
         cursor.close()
-        days = []
-        for date in dates:
-            days.append(datetime.strptime(date[0], "%Y-%m-%d").strftime("%A"))
+        week_days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
         appointments_per_day = {
-            'days': ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
-            'appointments': [days.count('Monday'), days.count('Tuesday'), days.count('Wednesday'),
-            days.count('Thursday'), days.count('Friday'), days.count('Saturday'), days.count('Sunday')]
+            'days': [week_days[date[0]] for date in dates[:7]],
+            'appointments': [date[1] for date in dates[:7]]
         }
-        return appointments_per_day
+        return (appointments_per_day, week_days[dates[-1][0]])
 
     # age/gender demographics
     def demographics():
@@ -997,37 +1002,33 @@ def dashboard():
     # total revenues last month and last year
     def total_revenues_last_month_last_year():
         cursor = g.connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
-        current_month = datetime.today().month
-        year = datetime.today().year
-        last_month = current_month - 1 if current_month > 1 else 12
-        last_month = str('0'+str(last_month)) if last_month < 10 else str(last_month)
-        last_month_year = str(year) if current_month > 1 else str(year - 1)
         cursor.execute(f'''
         SELECT SUM(billing) 
         FROM report
-        WHERE r_time LIKE '{last_month_year}-{last_month}-%'
+        WHERE r_time >= DATE_TRUNC('month', NOW() - INTERVAL '1' month) AND r_time < DATE_TRUNC('month', NOW())
         ''')
         last_month = cursor.fetchone()
-        cursor.execute(f'''
-        SELECT SUM(billing) 
-        FROM report
-        WHERE r_time LIKE '{year - 1}%'
-        ''')
-        last_year = cursor.fetchone()
+        # cursor.execute(f'''
+        # SELECT SUM(billing) 
+        # FROM report
+        # WHERE r_time >= DATE_TRUNC('year', NOW() - INTERVAL '1' year)
+        # ''')
+        # last_year = cursor.fetchone()
         cursor.close()
-        return (last_month, last_year)
+        return (last_month, )
 
     # upcoming maintenances
     def upcoming_maintenances():
         cursor = g.connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
         cursor.execute(f'''
-        SELECT device_id, device_name, maintenance_date
+        SELECT device_id, device_name, maintenance_date :: DATE
         FROM radiology_equipment
-        WHERE maintenance_date > '{datetime.today().strftime('%Y-%m-%d')}'
+        WHERE maintenance_date > NOW()
         ORDER BY maintenance_date ASC;
         ''')
         upcoming_maintenances = cursor.fetchall()
         return upcoming_maintenances
+        
     def out_of_service():
         cursor = g.connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
         cursor.execute(f'''
@@ -1040,54 +1041,26 @@ def dashboard():
 
     def revenue_data():
         cursor = g.connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
-        year = datetime.today().year
-        cursor.execute(f'''
-        SELECT CASE 
-        WHEN r_time LIKE  '{str(year)}-01%' THEN 1
-        WHEN r_time LIKE  '{str(year)}-02%' THEN 2
-        WHEN r_time LIKE  '{str(year)}-03%' THEN 3
-        WHEN r_time LIKE  '{str(year)}-04%' THEN 4
-        WHEN r_time LIKE  '{str(year)}-05%' THEN 5
-        WHEN r_time LIKE  '{str(year)}-06%' THEN 6
-        WHEN r_time LIKE  '{str(year)}-07%' THEN 7
-        WHEN r_time LIKE  '{str(year)}-08%' THEN 8
-        WHEN r_time LIKE  '{str(year)}-09%' THEN 9
-        WHEN r_time LIKE  '{str(year)}-10%' THEN 10
-        WHEN r_time LIKE  '{str(year)}-11%' THEN 11
-        ELSE 12 END AS month, SUM(billing) AS revenues
+        cursor.execute('SELECT EXTRACT(year FROM NOW())')
+        year = cursor.fetchone()
+        cursor.execute('''
+        SELECT EXTRACT(month FROM r_time) :: INTEGER AS month, SUM(billing) AS revenues
         FROM report
-        GROUP BY month
+        WHERE EXTRACT(year FROM r_time) = EXTRACT(year FROM NOW())
+        GROUP BY 1
         ORDER BY month;
         ''')
         revenues = cursor.fetchall()
         cursor.close()
         months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
-        revenues_per_month = dict()
-        for i in revenues:
-            revenues_per_month[months[i[0]-1]] = i[1]
-        total_year_revenues = sum(revenues_per_month.values())
-        revenue = [revenues_per_month['January'] if 'January' in revenues_per_month else 0,
-        revenues_per_month['February'] if 'February' in revenues_per_month else 0,
-        revenues_per_month['March'] if 'March' in revenues_per_month else 0,
-        revenues_per_month['April'] if 'April' in revenues_per_month else 0,
-        revenues_per_month['May'] if 'May' in revenues_per_month else 0,
-        revenues_per_month['June'] if 'June' in revenues_per_month else 0,
-        revenues_per_month['July'] if 'July' in revenues_per_month else 0,
-        revenues_per_month['August'] if 'August' in revenues_per_month else 0,
-        revenues_per_month['September'] if 'September' in revenues_per_month else 0,
-        revenues_per_month['October'] if 'October' in revenues_per_month else 0,
-        revenues_per_month['November'] if 'November' in revenues_per_month else 0,
-        revenues_per_month['December'] if 'December' in revenues_per_month else 0]
-        print(revenue)
         revenues_per_month = {
-            'months': months,
-            'revenue': revenue
+            'months': [months[date[0] - 1] for date in revenues],
+            'revenue': [date[1] for date in revenues]
         }
-        return (revenues_per_month, year, total_year_revenues)
+        return (revenues_per_month, year[0], sum(revenues_per_month['revenue']))
 
     a_p_d = appointments_per_day()
-    return render_template('dashboard.html', days=a_p_d, data= g.data,
-        most_crowded_day=a_p_d['days'][a_p_d['appointments'].index(max(a_p_d['appointments']))], demographics=demographics(),
-        most_served_age_group=most_served_age_group(), doctors_data=doctors_data(),
+    return render_template('dashboard.html', days=a_p_d[0], most_crowded_day=a_p_d[1], demographics=demographics(), 
+        data= g.data, most_served_age_group=most_served_age_group(), doctors_data=doctors_data(),
         total_patients_docotrs_equipments=total_patients_docotrs_equipments(), total_revenues_last_month_last_year=total_revenues_last_month_last_year(),
         upcoming_maintenances=upcoming_maintenances(), out_of_service=out_of_service(), revenue_data=revenue_data(), template='dashboard')
