@@ -67,6 +67,3 @@ Welcome to SunRay Radiology Center, a web application designed to streamline int
 - **Backend:** Flask
 - **Database:** PostgreSQL
 <!-- - **Additional Tools:** BootStrap -->
-
-
-Feel free to modify and expand this template based on your specific project details and requirements. Happy documenting!
